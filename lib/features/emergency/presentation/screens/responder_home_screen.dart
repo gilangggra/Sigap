@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -12,14 +11,14 @@ import '../../../../shared/components/accessible_button.dart';
 /// Halaman Beranda Relawan Warga (Community Responder Dashboard)
 /// Menampilkan radar darurat terdekat, tombol klaim insiden ("Saya Meluncur"),
 /// dan papan tugas bantuan mikro tetangga.
-class ResponderHomeScreen extends ConsumerStatefulWidget {
+class ResponderHomeScreen extends StatefulWidget {
   const ResponderHomeScreen({super.key});
 
   @override
-  ConsumerState<ResponderHomeScreen> createState() => _ResponderHomeScreenState();
+  State<ResponderHomeScreen> createState() => _ResponderHomeScreenState();
 }
 
-class _ResponderHomeScreenState extends ConsumerState<ResponderHomeScreen> {
+class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
   bool _isOnline = true;
   bool _isClaiming = false;
   String? _lockedIncidentId;
@@ -92,6 +91,11 @@ class _ResponderHomeScreenState extends ConsumerState<ResponderHomeScreen> {
                 ),
               ],
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            tooltip: 'Profil Saya',
+            onPressed: () => context.push('/profile'),
           ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
@@ -173,13 +177,7 @@ class _ResponderHomeScreenState extends ConsumerState<ResponderHomeScreen> {
                       const SizedBox(height: AppDimensions.spaceSM),
                       AccessibleButton(
                         label: 'Lihat Data Medis (ICE Card 2 Jam)',
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Akses Data Medis Terverifikasi via Token Darurat'),
-                            ),
-                          );
-                        },
+                        onPressed: () => context.push('/emergency/ice-card-view'),
                         backgroundColor: AppColors.infoBlue,
                         icon: Icons.medical_services_outlined,
                       ),
@@ -283,4 +281,3 @@ class _TaskItemCard extends StatelessWidget {
     );
   }
 }
-

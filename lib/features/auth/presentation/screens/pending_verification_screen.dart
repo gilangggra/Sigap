@@ -1,44 +1,46 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
+import '../../data/repositories/auth_repository.dart';
 
 /// Halaman tunggu verifikasi warga oleh Pengurus RT/RW setempat.
-class PendingVerificationScreen extends ConsumerStatefulWidget {
+class PendingVerificationScreen extends StatefulWidget {
   const PendingVerificationScreen({super.key});
 
   @override
-  ConsumerState<PendingVerificationScreen> createState() => _PendingVerificationScreenState();
+  State<PendingVerificationScreen> createState() => _PendingVerificationScreenState();
 }
 
-class _PendingVerificationScreenState extends ConsumerState<PendingVerificationScreen> {
+class _PendingVerificationScreenState extends State<PendingVerificationScreen> {
+  final AuthRepository _authRepository = AuthRepository();
   bool _isChecking = false;
 
   Future<void> _checkVerificationStatus() async {
     setState(() => _isChecking = true);
+    final authProvider = context.read<AuthProvider>();
     await FeedbackService.instance.triggerSuccessFeedback();
 
-    final authState = ref.read(authStateProvider);
+    if (!mounted) return;
 
-    if (authState.userId != null) {
-      final repository = ref.read(authRepositoryProvider);
-      final profile = await repository.getUserProfile(authState.userId!);
+    if (authProvider.userId != null) {
+      final profile = await _authRepository.getUserProfile(authProvider.userId!);
       if (profile != null && profile.isVerified) {
-        ref.read(authStateProvider.notifier).setAuthenticated(
-              userId: profile.id,
-              phoneNumber: profile.phoneNumber,
-              role: profile.role,
-              isVerified: true,
-              fullName: profile.fullName,
-              rtAreaId: profile.rtAreaId,
-            );
+        authProvider.setAuthenticated(
+          userId: profile.id,
+          phone: profile.phoneNumber,
+          userRole: profile.role,
+          isVerifiedStatus: true,
+          name: profile.fullName,
+          areaId: profile.rtAreaId,
+        );
 
         if (!mounted) return;
         _navigateToRoleHome(profile.role);
@@ -58,18 +60,18 @@ class _PendingVerificationScreenState extends ConsumerState<PendingVerificationS
 
   void _simulateImmediateApproval() {
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
-    final authState = ref.read(authStateProvider);
+    final authProvider = context.read<AuthProvider>();
 
-    ref.read(authStateProvider.notifier).setAuthenticated(
-          userId: authState.userId ?? 'demo-user-id',
-          phoneNumber: authState.phoneNumber ?? '+628123456789',
-          role: authState.role,
-          isVerified: true,
-          fullName: authState.fullName ?? 'Warga SIGAP',
-          rtAreaId: authState.rtAreaId ?? '00000000-0000-0000-0000-000000000001',
-        );
+    authProvider.setAuthenticated(
+      userId: authProvider.userId ?? 'demo-user-id',
+      phone: authProvider.phoneNumber ?? '+628123456789',
+      userRole: authProvider.role,
+      isVerifiedStatus: true,
+      name: authProvider.fullName ?? 'Warga SIGAP',
+      areaId: authProvider.rtAreaId ?? '00000000-0000-0000-0000-000000000001',
+    );
 
-    _navigateToRoleHome(authState.role);
+    _navigateToRoleHome(authProvider.role);
   }
 
   void _navigateToRoleHome(UserRole role) {
@@ -91,8 +93,8 @@ class _PendingVerificationScreenState extends ConsumerState<PendingVerificationS
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authStateProvider);
-    final String areaName = authState.rtArea?.formattedAreaName ?? 'RT 03 / RW 05, Menteng';
+    final authProvider = context.watch<AuthProvider>();
+    final String areaName = authProvider.rtArea?.formattedAreaName ?? 'RT 03 / RW 05, Menteng';
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,

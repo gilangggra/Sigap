@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
 /// Halaman input nomor telepon untuk proses verifikasi OTP
-class PhoneInputScreen extends ConsumerStatefulWidget {
+class PhoneInputScreen extends StatefulWidget {
   const PhoneInputScreen({super.key});
 
   @override
-  ConsumerState<PhoneInputScreen> createState() => _PhoneInputScreenState();
+  State<PhoneInputScreen> createState() => _PhoneInputScreenState();
 }
 
-class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
+class _PhoneInputScreenState extends State<PhoneInputScreen> {
   final TextEditingController _phoneController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
@@ -45,7 +45,8 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
         ? '+62${rawPhone.substring(1)}'
         : (rawPhone.startsWith('+62') ? rawPhone : '+62$rawPhone');
 
-    final success = await ref.read(authStateProvider.notifier).sendOtp(formattedPhone);
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.sendOtp(formattedPhone);
 
     if (!mounted) return;
 
@@ -58,7 +59,7 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
       unawaited(context.push('/auth/otp', extra: formattedPhone));
     } else {
       setState(() {
-        _errorMessage = ref.read(authStateProvider).errorMessage ?? 'Gagal mengirim OTP.';
+        _errorMessage = authProvider.errorMessage ?? 'Gagal mengirim OTP.';
       });
     }
   }
@@ -163,4 +164,3 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
     );
   }
 }
-

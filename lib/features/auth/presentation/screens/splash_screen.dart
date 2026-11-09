@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/supabase_service.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Halaman pembuka untuk inisialisasi lingkungan dan pemeriksaan sesi login
-class SplashScreen extends ConsumerStatefulWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  ConsumerState<SplashScreen> createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends ConsumerState<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
@@ -32,8 +32,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     final session = SupabaseService.instance.currentSession;
     if (session != null) {
       // User telah memiliki session aktif
-      final authState = ref.read(authStateProvider);
-      _navigateBasedOnRole(authState.role);
+      final auth = context.read<AuthProvider>();
+      _navigateBasedOnRole(auth.role);
     } else {
       // Belum login, arahkan ke alur registrasi/login
       context.go('/auth/phone');
@@ -114,4 +114,3 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     );
   }
 }
-

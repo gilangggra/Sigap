@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Halaman pemilihan peran (Role-Based Onboarding)
-class RoleSelectionScreen extends ConsumerWidget {
+class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
-  void _selectRole(BuildContext context, WidgetRef ref, UserRole role) {
-    ref.read(authStateProvider.notifier).selectRole(role);
+  void _selectRole(BuildContext context, UserRole role) {
+    context.read<AuthProvider>().selectRole(role);
 
     if (role == UserRole.civicAdmin) {
       context.go('/admin');
@@ -23,7 +23,7 @@ class RoleSelectionScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
@@ -52,7 +52,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                 description: 'Antarmuka tombol besar, SOS satu ketukan, dan pengingat kondisi harian.',
                 icon: Icons.elderly_rounded,
                 accentColor: AppColors.roleCareReceiver,
-                onTap: () => _selectRole(context, ref, UserRole.careReceiver),
+                onTap: () => _selectRole(context, UserRole.careReceiver),
               ),
               const SizedBox(height: AppDimensions.spaceMD),
 
@@ -62,7 +62,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                 description: 'Klaim insiden darurat terdekat, navigasi cepat ke lokasi, dan bantu tugas tetangga.',
                 icon: Icons.volunteer_activism_rounded,
                 accentColor: AppColors.roleResponder,
-                onTap: () => _selectRole(context, ref, UserRole.responder),
+                onTap: () => _selectRole(context, UserRole.responder),
               ),
               const SizedBox(height: AppDimensions.spaceMD),
 
@@ -72,7 +72,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                 description: 'Pantau check-in kesehatan harian lansia, jadwal obat, dan terima notifikasi darurat.',
                 icon: Icons.family_restroom_rounded,
                 accentColor: AppColors.roleGuardian,
-                onTap: () => _selectRole(context, ref, UserRole.guardian),
+                onTap: () => _selectRole(context, UserRole.guardian),
               ),
               const SizedBox(height: AppDimensions.spaceMD),
 
@@ -82,7 +82,7 @@ class RoleSelectionScreen extends ConsumerWidget {
                 description: 'Validasi identitas warga, kelola kode undangan lingkungan, dan rekap laporan.',
                 icon: Icons.admin_panel_settings_rounded,
                 accentColor: AppColors.roleAdmin,
-                onTap: () => _selectRole(context, ref, UserRole.civicAdmin),
+                onTap: () => _selectRole(context, UserRole.civicAdmin),
               ),
             ],
           ),
@@ -166,4 +166,3 @@ class _RoleCard extends StatelessWidget {
     );
   }
 }
-

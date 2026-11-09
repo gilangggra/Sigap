@@ -1,23 +1,23 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
 /// Halaman input kode RT/RW unik untuk verifikasi domisili warga di lingkungan terkait.
-class RtCodeInputScreen extends ConsumerStatefulWidget {
+class RtCodeInputScreen extends StatefulWidget {
   const RtCodeInputScreen({super.key});
 
   @override
-  ConsumerState<RtCodeInputScreen> createState() => _RtCodeInputScreenState();
+  State<RtCodeInputScreen> createState() => _RtCodeInputScreenState();
 }
 
-class _RtCodeInputScreenState extends ConsumerState<RtCodeInputScreen> {
+class _RtCodeInputScreenState extends State<RtCodeInputScreen> {
   final TextEditingController _codeController = TextEditingController(text: 'SIGAP-RT03-26');
   bool _isLoading = false;
   String? _errorMessage;
@@ -42,7 +42,8 @@ class _RtCodeInputScreenState extends ConsumerState<RtCodeInputScreen> {
       _errorMessage = null;
     });
 
-    final success = await ref.read(authStateProvider.notifier).joinWithInviteCode(code);
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.joinWithInviteCode(code);
 
     if (!mounted) return;
 
@@ -59,7 +60,7 @@ class _RtCodeInputScreenState extends ConsumerState<RtCodeInputScreen> {
       unawaited(FeedbackService.instance.triggerWarningFeedback());
       if (mounted) {
         setState(() {
-          _errorMessage = ref.read(authStateProvider).errorMessage ??
+          _errorMessage = authProvider.errorMessage ??
               'Kode RT tidak ditemukan atau sudah kedaluwarsa.';
         });
       }
