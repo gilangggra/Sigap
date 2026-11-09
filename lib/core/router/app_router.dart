@@ -9,6 +9,9 @@ import '../../features/auth/presentation/screens/rt_code_input_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/emergency/presentation/screens/care_receiver_home_screen.dart';
 import '../../features/emergency/presentation/screens/responder_home_screen.dart';
+import '../../features/profile/presentation/screens/ice_card_form_screen.dart';
+import '../../features/profile/presentation/screens/ice_card_view_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/wellness/presentation/screens/guardian_home_screen.dart';
 
 /// Konfigurasi routing deklaratif modular aplikasi SIGAP menggunakan GoRouter
@@ -94,6 +97,31 @@ final GoRouter appRouter = GoRouter(
       path: '/admin',
       builder: (BuildContext context, GoRouterState state) {
         return const AdminHomeScreen();
+      },
+    ),
+
+    // Rute Profil & Pengaturan Aksesibilitas
+    GoRoute(
+      path: '/profile',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ProfileScreen();
+      },
+    ),
+
+    // Rute Edit Kartu Medis Darurat (ICE Card)
+    GoRoute(
+      path: '/profile/ice-card',
+      builder: (BuildContext context, GoRouterState state) {
+        return const IceCardFormScreen();
+      },
+    ),
+
+    // Rute Lihat Kartu Medis Darurat Korban (Responder via Token)
+    GoRoute(
+      path: '/emergency/ice-card-view',
+      builder: (BuildContext context, GoRouterState state) {
+        final token = state.extra as String? ?? 'DEMO-EMERGENCY-TOKEN';
+        return IceCardViewScreen(emergencyToken: token);
       },
     ),
   ],

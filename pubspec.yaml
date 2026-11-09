@@ -15,7 +15,7 @@ dependencies:
   supabase_flutter: ^2.8.0
 
   # State Management
-  flutter_riverpod: ^2.6.1
+  provider: ^6.1.2
 
   # Routing & Navigation
   go_router: ^14.6.2

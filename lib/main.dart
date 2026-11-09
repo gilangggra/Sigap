@@ -1,13 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'core/constants/app_constants.dart';
 import 'core/router/app_router.dart';
 import 'core/services/location_service.dart';
 import 'core/services/supabase_service.dart';
-import 'core/state/auth_state.dart';
+import 'core/state/auth_provider.dart';
 import 'core/theme/app_theme.dart';
+import 'features/profile/presentation/state/profile_provider.dart';
 
 /// Titik masuk utama aplikasi SIGAP (Civic Mutual-Aid & Caregiver Network)
 Future<void> main() async {
@@ -44,26 +45,30 @@ Future<void> main() async {
     }
   }
 
-  // 4. Jalankan aplikasi dibungkus Riverpod ProviderScope
+  // 4. Jalankan aplikasi dibungkus MultiProvider
   runApp(
-    const ProviderScope(
-      child: SigapApp(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
+        ChangeNotifierProvider<ProfileProvider>(create: (_) => ProfileProvider()),
+      ],
+      child: const SigapApp(),
     ),
   );
 }
 
 /// Widget root aplikasi SIGAP
-class SigapApp extends ConsumerWidget {
+class SigapApp extends StatelessWidget {
   const SigapApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authStateProvider);
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
 
     // Otomatis memilih tema:
     // Jika peran adalah Care-Receiver (Lansia) atau simplifiedMode aktif,
     // gunakan [AppTheme.seniorTheme] dengan rasio kontras maksimal dan tombol besar.
-    final ThemeData activeTheme = (authState.simplifiedMode || authState.role == UserRole.careReceiver)
+    final ThemeData activeTheme = (authProvider.simplifiedMode || authProvider.role == UserRole.careReceiver)
         ? AppTheme.seniorTheme
         : AppTheme.darkTheme;
 
@@ -77,4 +82,3 @@ class SigapApp extends ConsumerWidget {
     );
   }
 }
-

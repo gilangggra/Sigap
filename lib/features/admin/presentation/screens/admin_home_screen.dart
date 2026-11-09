@@ -1,24 +1,26 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../auth/data/repositories/auth_repository.dart';
 
 /// Halaman Dasbor Pengurus RT/RW (Civic Admin Dashboard)
 /// Menampilkan manajemen kode undangan RT 30 hari, validasi identitas warga baru,
 /// dan rekap status kesiapsiagaan lingkungan.
-class AdminHomeScreen extends ConsumerStatefulWidget {
+class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
 
   @override
-  ConsumerState<AdminHomeScreen> createState() => _AdminHomeScreenState();
+  State<AdminHomeScreen> createState() => _AdminHomeScreenState();
 }
 
-class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
+class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  final AuthRepository _authRepository = AuthRepository();
   String _rtInviteCode = 'SIGAP-RT03-26';
 
   final List<Map<String, String>> _pendingResidents = [
@@ -44,11 +46,10 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
     final String residentId = item['id']!;
     final String name = item['name']!;
 
-    final repository = ref.read(authRepositoryProvider);
-    final authState = ref.read(authStateProvider);
-    final String adminId = authState.userId ?? 'demo-admin-id';
+    final authProvider = context.read<AuthProvider>();
+    final String adminId = authProvider.userId ?? 'demo-admin-id';
 
-    unawaited(repository.verifyResident(
+    unawaited(_authRepository.verifyResident(
       residentId: residentId,
       adminId: adminId,
       isApproved: isApproved,
@@ -73,11 +74,10 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
   void _refreshInviteCode() {
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
     final String newCode = 'SIGAP-RT03-${DateTime.now().minute}${DateTime.now().second}';
-    final repository = ref.read(authRepositoryProvider);
-    final authState = ref.read(authStateProvider);
-    final String rtAreaId = authState.rtAreaId ?? '00000000-0000-0000-0000-000000000001';
+    final authProvider = context.read<AuthProvider>();
+    final String rtAreaId = authProvider.rtAreaId ?? '00000000-0000-0000-0000-000000000001';
 
-    unawaited(repository.refreshRtInviteCode(
+    unawaited(_authRepository.refreshRtInviteCode(
       rtAreaId: rtAreaId,
       newInviteCode: newCode,
     ));
@@ -101,6 +101,11 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
       appBar: AppBar(
         title: const Text('SIGAP — Pengurus RT 03'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            tooltip: 'Profil Saya',
+            onPressed: () => context.push('/profile'),
+          ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Ganti Peran',
@@ -266,4 +271,3 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
     );
   }
 }
-

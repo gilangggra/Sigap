@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/state/auth_state.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
 /// Halaman verifikasi kode OTP 6-digit
-class OtpVerificationScreen extends ConsumerStatefulWidget {
+class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
 
   const OtpVerificationScreen({
@@ -17,10 +17,10 @@ class OtpVerificationScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
+  State<OtpVerificationScreen> createState() => _OtpVerificationScreenState();
 }
 
-class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
+class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   bool _isLoading = false;
   String? _errorMessage;
@@ -45,10 +45,11 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       _errorMessage = null;
     });
 
-    final success = await ref.read(authStateProvider.notifier).verifyOtp(
-          phoneNumber: widget.phoneNumber,
-          token: otp,
-        );
+    final authProvider = context.read<AuthProvider>();
+    final success = await authProvider.verifyOtp(
+      phone: widget.phoneNumber,
+      token: otp,
+    );
 
     if (!mounted) return;
 
@@ -60,7 +61,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       context.go('/auth/role');
     } else {
       setState(() {
-        _errorMessage = ref.read(authStateProvider).errorMessage ??
+        _errorMessage = authProvider.errorMessage ??
             'Kode OTP salah atau telah kedaluwarsa.';
       });
     }
@@ -161,4 +162,3 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     );
   }
 }
-

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -15,14 +14,14 @@ import '../../../../shared/components/accessible_button.dart';
 /// Halaman Beranda Care-Receiver (Antarmuka Khusus Lansia / Simplified Mode)
 /// Mengimplementasikan Tombol SOS ukuran min 120x120dp, Card Check-in Besar,
 /// dan Countdown Pembatalan 8 detik dengan feedback haptic/audio.
-class CareReceiverHomeScreen extends ConsumerStatefulWidget {
+class CareReceiverHomeScreen extends StatefulWidget {
   const CareReceiverHomeScreen({super.key});
 
   @override
-  ConsumerState<CareReceiverHomeScreen> createState() => _CareReceiverHomeScreenState();
+  State<CareReceiverHomeScreen> createState() => _CareReceiverHomeScreenState();
 }
 
-class _CareReceiverHomeScreenState extends ConsumerState<CareReceiverHomeScreen> {
+class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   bool _isCountdownActive = false;
   int _countdownRemaining = AppConstants.sosCountdownSeconds;
   Timer? _countdownTimer;
@@ -148,6 +147,11 @@ class _CareReceiverHomeScreenState extends ConsumerState<CareReceiverHomeScreen>
       appBar: AppBar(
         title: const Text('SIGAP — Beranda'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded, size: 30.0),
+            tooltip: 'Profil & ICE Card',
+            onPressed: () => context.push('/profile'),
+          ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded, size: 30.0),
             tooltip: 'Ganti Peran',
@@ -434,4 +438,3 @@ class _CountdownOverlay extends StatelessWidget {
     );
   }
 }
-

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -9,16 +8,21 @@ import '../../../../shared/components/accessible_button.dart';
 /// Halaman Dasbor Keluarga / Wali (Primary Guardian Dashboard)
 /// Menampilkan ringkasan kondisi lansia yang dipantau, riwayat check-in harian,
 /// dan jadwal kepatuhan konsumsi obat harian.
-class GuardianHomeScreen extends ConsumerWidget {
+class GuardianHomeScreen extends StatelessWidget {
   const GuardianHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
         title: const Text('SIGAP — Dasbor Wali'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            tooltip: 'Profil Saya',
+            onPressed: () => context.push('/profile'),
+          ),
           IconButton(
             icon: const Icon(Icons.swap_horiz_rounded),
             tooltip: 'Ganti Peran',
@@ -132,14 +136,10 @@ class GuardianHomeScreen extends ConsumerWidget {
               const SizedBox(height: AppDimensions.spaceXL),
 
               AccessibleButton(
-                label: 'Buat Tiket Bantuan Mikro untuk Lansia',
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Form pembuatan bantuan mikro siap dibuka')),
-                  );
-                },
+                label: 'Lihat / Edit Data Medis Lansia (ICE Card)',
+                onPressed: () => context.push('/profile/ice-card'),
                 backgroundColor: AppColors.roleGuardian,
-                icon: Icons.add_task_rounded,
+                icon: Icons.medical_information_rounded,
               ),
             ],
           ),
@@ -211,4 +211,3 @@ class _MedicationItemCard extends StatelessWidget {
     );
   }
 }
-
