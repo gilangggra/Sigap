@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/admin/presentation/screens/admin_home_screen.dart';
 import '../../features/auth/presentation/screens/otp_verification_screen.dart';
+import '../../features/auth/presentation/screens/pending_verification_screen.dart';
 import '../../features/auth/presentation/screens/phone_input_screen.dart';
 import '../../features/auth/presentation/screens/role_selection_screen.dart';
+import '../../features/auth/presentation/screens/rt_code_input_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/emergency/presentation/screens/care_receiver_home_screen.dart';
 import '../../features/emergency/presentation/screens/responder_home_screen.dart';
@@ -44,6 +46,22 @@ final GoRouter appRouter = GoRouter(
       path: '/auth/role',
       builder: (BuildContext context, GoRouterState state) {
         return const RoleSelectionScreen();
+      },
+    ),
+
+    // Rute Onboarding: Input Kode RT/RW (Verifikasi Domisili Warga)
+    GoRoute(
+      path: '/auth/rt-code',
+      builder: (BuildContext context, GoRouterState state) {
+        return const RtCodeInputScreen();
+      },
+    ),
+
+    // Rute Onboarding: Menunggu Persetujuan Admin RT
+    GoRoute(
+      path: '/auth/pending-verification',
+      builder: (BuildContext context, GoRouterState state) {
+        return const PendingVerificationScreen();
       },
     ),
 
