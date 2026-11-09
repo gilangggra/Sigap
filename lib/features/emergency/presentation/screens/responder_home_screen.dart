@@ -147,15 +147,23 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                     ),
                     const SizedBox(height: AppDimensions.spaceLG),
 
-                    if (_lockedIncidentId == null)
+                    if (_lockedIncidentId == null) ...[
                       AccessibleButton(
                         label: _isClaiming ? 'Mengunci Insiden...' : 'SAYA MELUNCUR (RESPON)',
                         onPressed: _isOnline && !_isClaiming ? _claimIncident : null,
                         backgroundColor: Colors.white,
                         textColor: AppColors.emergencyRedDark,
                         icon: Icons.navigation_rounded,
-                      )
-                    else ...[
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+                      AccessibleButton(
+                        label: 'Lihat Detail & Navigasi Peta',
+                        onPressed: () => context.push('/emergency/incident-detail'),
+                        backgroundColor: AppColors.darkSurfaceElevated,
+                        textColor: Colors.white,
+                        icon: Icons.map_rounded,
+                      ),
+                    ] else ...[
                       Container(
                         padding: const EdgeInsets.all(AppDimensions.spaceSM),
                         decoration: BoxDecoration(
@@ -176,9 +184,16 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                       ),
                       const SizedBox(height: AppDimensions.spaceSM),
                       AccessibleButton(
+                        label: 'Detail Rute Navigasi & Selesaikan',
+                        onPressed: () => context.push('/emergency/incident-detail'),
+                        backgroundColor: AppColors.infoBlue,
+                        icon: Icons.navigation_rounded,
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+                      AccessibleButton(
                         label: 'Lihat Data Medis (ICE Card 2 Jam)',
                         onPressed: () => context.push('/emergency/ice-card-view'),
-                        backgroundColor: AppColors.infoBlue,
+                        backgroundColor: AppColors.darkSurfaceElevated,
                         icon: Icons.medical_services_outlined,
                       ),
                     ],

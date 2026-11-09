@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
-import '../../../../core/services/location_service.dart';
-import '../../../../core/services/sms_service.dart';
-import '../../../../core/services/supabase_service.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
+import '../state/emergency_provider.dart';
 
 /// Halaman Beranda Care-Receiver (Antarmuka Khusus Lansia / Simplified Mode)
 /// Mengimplementasikan Tombol SOS ukuran min 120x120dp, Card Check-in Besar,
@@ -22,50 +22,20 @@ class CareReceiverHomeScreen extends StatefulWidget {
 }
 
 class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
-  bool _isCountdownActive = false;
-  int _countdownRemaining = AppConstants.sosCountdownSeconds;
-  Timer? _countdownTimer;
   CheckinStatus? _selectedCheckinStatus;
-  bool _sosDispatched = false;
-
-  @override
-  void dispose() {
-    _countdownTimer?.cancel();
-    super.dispose();
-  }
 
   void _triggerSosCountdown() {
-    setState(() {
-      _isCountdownActive = true;
-      _countdownRemaining = AppConstants.sosCountdownSeconds;
-      _sosDispatched = false;
-    });
+    final authProvider = context.read<AuthProvider>();
+    final emergencyProvider = context.read<EmergencyProvider>();
 
-    unawaited(FeedbackService.instance.triggerEmergencyVibration());
-    unawaited(FeedbackService.instance.playAlertSound());
-
-    _countdownTimer?.cancel();
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdownRemaining > 1) {
-        setState(() {
-          _countdownRemaining--;
-        });
-        unawaited(FeedbackService.instance.triggerEmergencyVibration());
-      } else {
-        _countdownTimer?.cancel();
-        unawaited(_dispatchEmergencySignal());
-      }
-    });
+    emergencyProvider.startSosCountdown(
+      careReceiverId: authProvider.userId ?? 'care-receiver-001',
+      senderName: authProvider.fullName ?? 'Lansia SIGAP',
+    );
   }
 
   void _cancelSosCountdown() {
-    _countdownTimer?.cancel();
-    unawaited(FeedbackService.instance.cancelVibration());
-    setState(() {
-      _isCountdownActive = false;
-      _countdownRemaining = AppConstants.sosCountdownSeconds;
-    });
-
+    context.read<EmergencyProvider>().cancelSosCountdown();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.darkSurfaceElevated,
@@ -75,51 +45,6 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _dispatchEmergencySignal() async {
-    await FeedbackService.instance.cancelVibration();
-
-    setState(() {
-      _isCountdownActive = false;
-      _sosDispatched = true;
-    });
-
-    // Ambil koordinat GPS perangkat
-    final position = await LocationService.instance.getCurrentPosition();
-    final double lat = position?.latitude ?? -6.2088;
-    final double lng = position?.longitude ?? 106.8456;
-
-    try {
-      if (SupabaseService.instance.isInitialized) {
-        await SupabaseService.instance.dispatchEmergency(
-          careReceiverId: SupabaseService.instance.currentUser?.id ?? '00000000-0000-0000-0000-000000000000',
-          latitude: lat,
-          longitude: lng,
-          gpsApproximate: position == null,
-        );
-      } else {
-        // Fallback SMS jika offline
-        await SmsService.instance.sendEmergencySms(
-          recipientPhoneNumber: '+62811000000',
-          message: SmsService.instance.buildEmergencyMessage(
-            senderName: 'Lansia SIGAP',
-            latitude: lat,
-            longitude: lng,
-          ),
-        );
-      }
-    } catch (_) {
-      // Fallback SMS jika terjadi kegagalan jaringan
-      await SmsService.instance.sendEmergencySms(
-        recipientPhoneNumber: '+62811000000',
-        message: SmsService.instance.buildEmergencyMessage(
-          senderName: 'Lansia SIGAP',
-          latitude: lat,
-          longitude: lng,
-        ),
-      );
-    }
   }
 
   void _submitCheckin(CheckinStatus status) {
@@ -142,6 +67,8 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final emergencyProvider = context.watch<EmergencyProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
@@ -168,7 +95,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Banner Status Darurat Terkirim
-                  if (_sosDispatched) ...[
+                  if (emergencyProvider.isDispatched) ...[
                     Container(
                       padding: const EdgeInsets.all(AppDimensions.spaceMD),
                       decoration: BoxDecoration(
@@ -299,9 +226,9 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
           ),
 
           // Overlay Countdown Pembatalan 8 Detik
-          if (_isCountdownActive)
+          if (emergencyProvider.isCountingDown)
             _CountdownOverlay(
-              secondsRemaining: _countdownRemaining,
+              secondsRemaining: emergencyProvider.countdownRemaining,
               onCancel: _cancelSosCountdown,
             ),
         ],
