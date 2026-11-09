@@ -7,7 +7,9 @@ import '../../features/auth/presentation/screens/phone_input_screen.dart';
 import '../../features/auth/presentation/screens/role_selection_screen.dart';
 import '../../features/auth/presentation/screens/rt_code_input_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/emergency/domain/models/incident.dart';
 import '../../features/emergency/presentation/screens/care_receiver_home_screen.dart';
+import '../../features/emergency/presentation/screens/incident_detail_screen.dart';
 import '../../features/emergency/presentation/screens/responder_home_screen.dart';
 import '../../features/profile/presentation/screens/ice_card_form_screen.dart';
 import '../../features/profile/presentation/screens/ice_card_view_screen.dart';
@@ -122,6 +124,26 @@ final GoRouter appRouter = GoRouter(
       builder: (BuildContext context, GoRouterState state) {
         final token = state.extra as String? ?? 'DEMO-EMERGENCY-TOKEN';
         return IceCardViewScreen(emergencyToken: token);
+      },
+    ),
+
+    // Rute Detail Penanganan Insiden Darurat
+    GoRoute(
+      path: '/emergency/incident-detail',
+      builder: (BuildContext context, GoRouterState state) {
+        final incident = state.extra as Incident? ??
+            Incident(
+              id: 'inc-001',
+              careReceiverId: 'victim-001',
+              careReceiverName: 'Ibu Aminah (71 thn)',
+              careReceiverPhone: '+628123456789',
+              latitude: -6.2088,
+              longitude: 106.8456,
+              address: 'Jl. Kenanga No. 14, RT 03 / RW 05',
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            );
+        return IncidentDetailScreen(incident: incident);
       },
     ),
   ],

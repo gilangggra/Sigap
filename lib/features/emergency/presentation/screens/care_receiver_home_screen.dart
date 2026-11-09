@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
-import '../../../../core/services/location_service.dart';
-import '../../../../core/services/sms_service.dart';
-import '../../../../core/services/supabase_service.dart';
+import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
+import '../../../wellness/presentation/state/wellness_provider.dart';
+import '../state/emergency_provider.dart';
 
 /// Halaman Beranda Care-Receiver (Antarmuka Khusus Lansia / Simplified Mode)
 /// Mengimplementasikan Tombol SOS ukuran min 120x120dp, Card Check-in Besar,
@@ -22,50 +23,29 @@ class CareReceiverHomeScreen extends StatefulWidget {
 }
 
 class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
-  bool _isCountdownActive = false;
-  int _countdownRemaining = AppConstants.sosCountdownSeconds;
-  Timer? _countdownTimer;
   CheckinStatus? _selectedCheckinStatus;
-  bool _sosDispatched = false;
 
   @override
-  void dispose() {
-    _countdownTimer?.cancel();
-    super.dispose();
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
+      context.read<WellnessProvider>().loadTodayWellness(auth.userId ?? 'care-receiver-001');
+    });
   }
 
   void _triggerSosCountdown() {
-    setState(() {
-      _isCountdownActive = true;
-      _countdownRemaining = AppConstants.sosCountdownSeconds;
-      _sosDispatched = false;
-    });
+    final authProvider = context.read<AuthProvider>();
+    final emergencyProvider = context.read<EmergencyProvider>();
 
-    unawaited(FeedbackService.instance.triggerEmergencyVibration());
-    unawaited(FeedbackService.instance.playAlertSound());
-
-    _countdownTimer?.cancel();
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_countdownRemaining > 1) {
-        setState(() {
-          _countdownRemaining--;
-        });
-        unawaited(FeedbackService.instance.triggerEmergencyVibration());
-      } else {
-        _countdownTimer?.cancel();
-        unawaited(_dispatchEmergencySignal());
-      }
-    });
+    emergencyProvider.startSosCountdown(
+      careReceiverId: authProvider.userId ?? 'care-receiver-001',
+      senderName: authProvider.fullName ?? 'Lansia SIGAP',
+    );
   }
 
   void _cancelSosCountdown() {
-    _countdownTimer?.cancel();
-    unawaited(FeedbackService.instance.cancelVibration());
-    setState(() {
-      _isCountdownActive = false;
-      _countdownRemaining = AppConstants.sosCountdownSeconds;
-    });
-
+    context.read<EmergencyProvider>().cancelSosCountdown();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.darkSurfaceElevated,
@@ -77,57 +57,18 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
     );
   }
 
-  Future<void> _dispatchEmergencySignal() async {
-    await FeedbackService.instance.cancelVibration();
-
-    setState(() {
-      _isCountdownActive = false;
-      _sosDispatched = true;
-    });
-
-    // Ambil koordinat GPS perangkat
-    final position = await LocationService.instance.getCurrentPosition();
-    final double lat = position?.latitude ?? -6.2088;
-    final double lng = position?.longitude ?? 106.8456;
-
-    try {
-      if (SupabaseService.instance.isInitialized) {
-        await SupabaseService.instance.dispatchEmergency(
-          careReceiverId: SupabaseService.instance.currentUser?.id ?? '00000000-0000-0000-0000-000000000000',
-          latitude: lat,
-          longitude: lng,
-          gpsApproximate: position == null,
-        );
-      } else {
-        // Fallback SMS jika offline
-        await SmsService.instance.sendEmergencySms(
-          recipientPhoneNumber: '+62811000000',
-          message: SmsService.instance.buildEmergencyMessage(
-            senderName: 'Lansia SIGAP',
-            latitude: lat,
-            longitude: lng,
-          ),
-        );
-      }
-    } catch (_) {
-      // Fallback SMS jika terjadi kegagalan jaringan
-      await SmsService.instance.sendEmergencySms(
-        recipientPhoneNumber: '+62811000000',
-        message: SmsService.instance.buildEmergencyMessage(
-          senderName: 'Lansia SIGAP',
-          latitude: lat,
-          longitude: lng,
-        ),
-      );
-    }
-  }
-
   void _submitCheckin(CheckinStatus status) {
     setState(() {
       _selectedCheckinStatus = status;
     });
 
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
+
+    final auth = context.read<AuthProvider>();
+    context.read<WellnessProvider>().submitCheckin(
+      careReceiverId: auth.userId ?? 'care-receiver-001',
+      status: status,
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -142,6 +83,8 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final emergencyProvider = context.watch<EmergencyProvider>();
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
@@ -168,7 +111,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Banner Status Darurat Terkirim
-                  if (_sosDispatched) ...[
+                  if (emergencyProvider.isDispatched) ...[
                     Container(
                       padding: const EdgeInsets.all(AppDimensions.spaceMD),
                       decoration: BoxDecoration(
@@ -293,15 +236,60 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                     isSelected: _selectedCheckinStatus == CheckinStatus.butuhBantuan,
                     onTap: () => _submitCheckin(CheckinStatus.butuhBantuan),
                   ),
+
+                  const SizedBox(height: AppDimensions.space2XL),
+                  const Divider(color: AppColors.darkBorderHighContrast, thickness: 2.0),
+                  const SizedBox(height: AppDimensions.spaceLG),
+
+                  // Bagian Pengingat Obat Lansia (PRD F2.3)
+                  Text(
+                    'Jadwal Minum Obat',
+                    style: AppTypography.seniorHeadingMedium(color: Colors.white),
+                  ),
+                  const SizedBox(height: AppDimensions.spaceSM),
+                  Text(
+                    'Tekan tombol hijau setelah Anda meminum obat:',
+                    style: AppTypography.seniorBodyPrimary(color: AppColors.textDarkSecondary),
+                  ),
+                  const SizedBox(height: AppDimensions.spaceMD),
+
+                  ...context.watch<WellnessProvider>().medicationSchedules.map((med) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
+                      child: _SeniorMedicationCard(
+                        scheduleName: med.medicationName,
+                        dosage: med.dosage,
+                        reminderTime: med.reminderTimes.isNotEmpty ? med.reminderTimes.first : '08:00',
+                        isTaken: med.isTakenToday,
+                        onTake: () {
+                          final auth = context.read<AuthProvider>();
+                          context.read<WellnessProvider>().markMedicationTaken(
+                            scheduleId: med.id,
+                            careReceiverId: auth.userId ?? 'care-receiver-001',
+                          );
+                          unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: AppColors.safeGreenDark,
+                              content: Text(
+                                'Konfirmasi: ${med.medicationName} sudah diminum.',
+                                style: AppTypography.seniorBodyPrimary(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
           ),
 
           // Overlay Countdown Pembatalan 8 Detik
-          if (_isCountdownActive)
+          if (emergencyProvider.isCountingDown)
             _CountdownOverlay(
-              secondsRemaining: _countdownRemaining,
+              secondsRemaining: emergencyProvider.countdownRemaining,
               onCancel: _cancelSosCountdown,
             ),
         ],
@@ -438,3 +426,74 @@ class _CountdownOverlay extends StatelessWidget {
     );
   }
 }
+
+class _SeniorMedicationCard extends StatelessWidget {
+  final String scheduleName;
+  final String dosage;
+  final String reminderTime;
+  final bool isTaken;
+  final VoidCallback onTake;
+
+  const _SeniorMedicationCard({
+    required this.scheduleName,
+    required this.dosage,
+    required this.reminderTime,
+    required this.isTaken,
+    required this.onTake,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spaceLG),
+      decoration: BoxDecoration(
+        color: isTaken ? AppColors.darkSurfaceElevated : AppColors.darkCard,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+        border: Border.all(
+          color: isTaken ? AppColors.safeGreenDark : AppColors.darkBorderHighContrast,
+          width: AppDimensions.highContrastBorderWidth,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isTaken ? Icons.check_circle_rounded : Icons.medication_rounded,
+                color: isTaken ? AppColors.safeGreenLight : AppColors.warningAmberLight,
+                size: 36.0,
+              ),
+              const SizedBox(width: AppDimensions.spaceMD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      scheduleName,
+                      style: AppTypography.seniorTitle(color: Colors.white),
+                    ),
+                    Text(
+                      '$dosage • Jam $reminderTime WIB',
+                      style: AppTypography.seniorBodySecondary(color: AppColors.textDarkSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spaceMD),
+          AccessibleButton(
+            label: isTaken ? 'Sudah Diminum ✓' : 'Saya Sudah Minum Obat Ini',
+            onPressed: isTaken ? null : onTake,
+            isSimplified: true,
+            backgroundColor: isTaken ? AppColors.darkSurface : AppColors.safeGreen,
+            textColor: Colors.white,
+            icon: isTaken ? Icons.done_all_rounded : Icons.check_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
