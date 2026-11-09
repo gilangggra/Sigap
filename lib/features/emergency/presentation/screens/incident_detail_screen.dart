@@ -309,3 +309,4 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     );
   }
 }
+

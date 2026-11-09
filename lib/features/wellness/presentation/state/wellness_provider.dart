@@ -96,3 +96,4 @@ class WellnessProvider extends ChangeNotifier {
     }
   }
 }
+
