@@ -9,6 +9,7 @@ import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
+import '../../../wellness/presentation/state/wellness_provider.dart';
 import '../state/emergency_provider.dart';
 
 /// Halaman Beranda Care-Receiver (Antarmuka Khusus Lansia / Simplified Mode)
@@ -23,6 +24,15 @@ class CareReceiverHomeScreen extends StatefulWidget {
 
 class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   CheckinStatus? _selectedCheckinStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final auth = context.read<AuthProvider>();
+      context.read<WellnessProvider>().loadTodayWellness(auth.userId ?? 'care-receiver-001');
+    });
+  }
 
   void _triggerSosCountdown() {
     final authProvider = context.read<AuthProvider>();
@@ -53,6 +63,12 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
     });
 
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
+
+    final auth = context.read<AuthProvider>();
+    context.read<WellnessProvider>().submitCheckin(
+      careReceiverId: auth.userId ?? 'care-receiver-001',
+      status: status,
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -220,6 +236,51 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                     isSelected: _selectedCheckinStatus == CheckinStatus.butuhBantuan,
                     onTap: () => _submitCheckin(CheckinStatus.butuhBantuan),
                   ),
+
+                  const SizedBox(height: AppDimensions.space2XL),
+                  const Divider(color: AppColors.darkBorderHighContrast, thickness: 2.0),
+                  const SizedBox(height: AppDimensions.spaceLG),
+
+                  // Bagian Pengingat Obat Lansia (PRD F2.3)
+                  Text(
+                    'Jadwal Minum Obat',
+                    style: AppTypography.seniorHeadingMedium(color: Colors.white),
+                  ),
+                  const SizedBox(height: AppDimensions.spaceSM),
+                  Text(
+                    'Tekan tombol hijau setelah Anda meminum obat:',
+                    style: AppTypography.seniorBodyPrimary(color: AppColors.textDarkSecondary),
+                  ),
+                  const SizedBox(height: AppDimensions.spaceMD),
+
+                  ...context.watch<WellnessProvider>().medicationSchedules.map((med) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
+                      child: _SeniorMedicationCard(
+                        scheduleName: med.medicationName,
+                        dosage: med.dosage,
+                        reminderTime: med.reminderTimes.isNotEmpty ? med.reminderTimes.first : '08:00',
+                        isTaken: med.isTakenToday,
+                        onTake: () {
+                          final auth = context.read<AuthProvider>();
+                          context.read<WellnessProvider>().markMedicationTaken(
+                            scheduleId: med.id,
+                            careReceiverId: auth.userId ?? 'care-receiver-001',
+                          );
+                          unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: AppColors.safeGreenDark,
+                              content: Text(
+                                'Konfirmasi: ${med.medicationName} sudah diminum.',
+                                style: AppTypography.seniorBodyPrimary(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
@@ -365,3 +426,74 @@ class _CountdownOverlay extends StatelessWidget {
     );
   }
 }
+
+class _SeniorMedicationCard extends StatelessWidget {
+  final String scheduleName;
+  final String dosage;
+  final String reminderTime;
+  final bool isTaken;
+  final VoidCallback onTake;
+
+  const _SeniorMedicationCard({
+    required this.scheduleName,
+    required this.dosage,
+    required this.reminderTime,
+    required this.isTaken,
+    required this.onTake,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimensions.spaceLG),
+      decoration: BoxDecoration(
+        color: isTaken ? AppColors.darkSurfaceElevated : AppColors.darkCard,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+        border: Border.all(
+          color: isTaken ? AppColors.safeGreenDark : AppColors.darkBorderHighContrast,
+          width: AppDimensions.highContrastBorderWidth,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isTaken ? Icons.check_circle_rounded : Icons.medication_rounded,
+                color: isTaken ? AppColors.safeGreenLight : AppColors.warningAmberLight,
+                size: 36.0,
+              ),
+              const SizedBox(width: AppDimensions.spaceMD),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      scheduleName,
+                      style: AppTypography.seniorTitle(color: Colors.white),
+                    ),
+                    Text(
+                      '$dosage • Jam $reminderTime WIB',
+                      style: AppTypography.seniorBodySecondary(color: AppColors.textDarkSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppDimensions.spaceMD),
+          AccessibleButton(
+            label: isTaken ? 'Sudah Diminum ✓' : 'Saya Sudah Minum Obat Ini',
+            onPressed: isTaken ? null : onTake,
+            isSimplified: true,
+            backgroundColor: isTaken ? AppColors.darkSurface : AppColors.safeGreen,
+            textColor: Colors.white,
+            icon: isTaken ? Icons.done_all_rounded : Icons.check_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+}
+

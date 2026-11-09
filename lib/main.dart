@@ -10,6 +10,7 @@ import 'core/state/auth_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/emergency/presentation/state/emergency_provider.dart';
 import 'features/profile/presentation/state/profile_provider.dart';
+import 'features/wellness/presentation/state/wellness_provider.dart';
 
 /// Titik masuk utama aplikasi SIGAP (Civic Mutual-Aid & Caregiver Network)
 Future<void> main() async {
@@ -53,6 +54,7 @@ Future<void> main() async {
         ChangeNotifierProvider<AuthProvider>(create: (_) => AuthProvider()),
         ChangeNotifierProvider<ProfileProvider>(create: (_) => ProfileProvider()),
         ChangeNotifierProvider<EmergencyProvider>(create: (_) => EmergencyProvider()),
+        ChangeNotifierProvider<WellnessProvider>(create: (_) => WellnessProvider()),
       ],
       child: const SigapApp(),
     ),
