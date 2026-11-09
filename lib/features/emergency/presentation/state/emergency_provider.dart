@@ -217,3 +217,4 @@ class EmergencyProvider extends ChangeNotifier {
     super.dispose();
   }
 }
+
