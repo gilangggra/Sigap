@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
+import '../../../../core/state/auth_state.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Halaman Dasbor Pengurus RT/RW (Civic Admin Dashboard)
@@ -39,7 +40,19 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
 
   void _verifyResident(int index, bool isApproved) {
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
-    final name = _pendingResidents[index]['name'];
+    final item = _pendingResidents[index];
+    final String residentId = item['id']!;
+    final String name = item['name']!;
+
+    final repository = ref.read(authRepositoryProvider);
+    final authState = ref.read(authStateProvider);
+    final String adminId = authState.userId ?? 'demo-admin-id';
+
+    unawaited(repository.verifyResident(
+      residentId: residentId,
+      adminId: adminId,
+      isApproved: isApproved,
+    ));
 
     setState(() {
       _pendingResidents.removeAt(index);
@@ -59,8 +72,18 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
 
   void _refreshInviteCode() {
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
+    final String newCode = 'SIGAP-RT03-${DateTime.now().minute}${DateTime.now().second}';
+    final repository = ref.read(authRepositoryProvider);
+    final authState = ref.read(authStateProvider);
+    final String rtAreaId = authState.rtAreaId ?? '00000000-0000-0000-0000-000000000001';
+
+    unawaited(repository.refreshRtInviteCode(
+      rtAreaId: rtAreaId,
+      newInviteCode: newCode,
+    ));
+
     setState(() {
-      _rtInviteCode = 'SIGAP-RT03-${DateTime.now().minute}${DateTime.now().second}';
+      _rtInviteCode = newCode;
     });
 
     ScaffoldMessenger.of(context).showSnackBar(

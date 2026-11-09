@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/state/auth_state.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
@@ -30,7 +31,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     super.dispose();
   }
 
-  void _verifyOtp() {
+  Future<void> _verifyOtp() async {
     final String otp = _otpController.text.trim();
     if (otp.length != 6) {
       setState(() {
@@ -44,8 +45,25 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
       _errorMessage = null;
     });
 
-    // Simulasi verifikasi OTP sukses -> arahkan ke pemilihan peran
-    context.go('/auth/role');
+    final success = await ref.read(authStateProvider.notifier).verifyOtp(
+          phoneNumber: widget.phoneNumber,
+          token: otp,
+        );
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (success) {
+      context.go('/auth/role');
+    } else {
+      setState(() {
+        _errorMessage = ref.read(authStateProvider).errorMessage ??
+            'Kode OTP salah atau telah kedaluwarsa.';
+      });
+    }
   }
 
   @override

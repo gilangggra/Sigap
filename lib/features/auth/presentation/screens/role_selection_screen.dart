@@ -12,21 +12,13 @@ class RoleSelectionScreen extends ConsumerWidget {
   const RoleSelectionScreen({super.key});
 
   void _selectRole(BuildContext context, WidgetRef ref, UserRole role) {
-    ref.read(authStateProvider.notifier).setRole(role);
+    ref.read(authStateProvider.notifier).selectRole(role);
 
-    switch (role) {
-      case UserRole.careReceiver:
-        context.go('/care-receiver');
-        break;
-      case UserRole.responder:
-        context.go('/responder');
-        break;
-      case UserRole.guardian:
-        context.go('/guardian');
-        break;
-      case UserRole.civicAdmin:
-        context.go('/admin');
-        break;
+    if (role == UserRole.civicAdmin) {
+      context.go('/admin');
+    } else {
+      // Warga wajib memasukkan kode unik RT/RW untuk verifikasi domisili (PRD F4.1)
+      context.go('/auth/rt-code');
     }
   }
 

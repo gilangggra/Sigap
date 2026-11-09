@@ -69,3 +69,7 @@ captures/
 .env
 !.env.example
 
+# Documentation (Internal specs)
+docs/
+
+

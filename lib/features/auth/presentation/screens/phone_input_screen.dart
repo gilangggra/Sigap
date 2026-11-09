@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/state/auth_state.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
@@ -25,7 +27,7 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
     super.dispose();
   }
 
-  void _handleSendOtp() {
+  Future<void> _handleSendOtp() async {
     final String rawPhone = _phoneController.text.trim();
     if (rawPhone.isEmpty || rawPhone.length < 8) {
       setState(() {
@@ -43,12 +45,22 @@ class _PhoneInputScreenState extends ConsumerState<PhoneInputScreen> {
         ? '+62${rawPhone.substring(1)}'
         : (rawPhone.startsWith('+62') ? rawPhone : '+62$rawPhone');
 
-    // Arahkan ke layar verifikasi OTP
-    context.push('/auth/otp', extra: formattedPhone);
+    final success = await ref.read(authStateProvider.notifier).sendOtp(formattedPhone);
+
+    if (!mounted) return;
 
     setState(() {
       _isLoading = false;
     });
+
+    if (success) {
+      // Arahkan ke layar verifikasi OTP
+      unawaited(context.push('/auth/otp', extra: formattedPhone));
+    } else {
+      setState(() {
+        _errorMessage = ref.read(authStateProvider).errorMessage ?? 'Gagal mengirim OTP.';
+      });
+    }
   }
 
   @override
