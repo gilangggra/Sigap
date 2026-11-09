@@ -204,11 +204,21 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
               const SizedBox(height: AppDimensions.spaceXL),
 
               // Papan Tugas Bantuan Mikro Sekitar
-              Text(
-                'Tugas Bantuan Mikro Tetangga (Radius 800m)',
-                style: AppTypography.standardTitle(color: Colors.white),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Tugas Bantuan Mikro (Radius 800m)',
+                    style: AppTypography.standardTitle(color: Colors.white),
+                  ),
+                  TextButton.icon(
+                    onPressed: () => context.push('/tasks'),
+                    icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.infoBlueLight),
+                    label: const Text('Lihat Semua', style: TextStyle(color: AppColors.infoBlueLight)),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               const _TaskItemCard(
                 category: 'Ambil Resep Obat',
@@ -224,6 +234,34 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                 address: 'Jl. Dahlia RT 01 / RW 05 (600m)',
                 points: '+10 Poin',
                 icon: Icons.shopping_basket_rounded,
+              ),
+
+              const SizedBox(height: AppDimensions.spaceLG),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: AccessibleButton(
+                      label: 'Radar Tugas Lengkap',
+                      onPressed: () => context.push('/tasks'),
+                      backgroundColor: AppColors.darkCard,
+                      textColor: Colors.white,
+                      borderColor: AppColors.darkBorderHighContrast,
+                      icon: Icons.radar_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: AppDimensions.spaceMD),
+                  Expanded(
+                    child: AccessibleButton(
+                      label: 'Peringkat Relawan RT',
+                      onPressed: () => context.push('/tasks/leaderboard'),
+                      backgroundColor: AppColors.darkCard,
+                      textColor: AppColors.warningAmberLight,
+                      borderColor: AppColors.warningAmber,
+                      icon: Icons.leaderboard_rounded,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
