@@ -1,0 +1,54 @@
+name: sigap
+description: "SIGAP - Civic Mutual-Aid & Caregiver Network"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Backend & Database
+  supabase_flutter: ^2.8.0
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+
+  # Routing & Navigation
+  go_router: ^14.6.2
+
+  # Geospatial & Hardware Sensors
+  geolocator: ^13.0.2
+
+  # Audio Feedback & Haptics
+  audioplayers: ^6.1.0
+  vibration: ^2.0.1
+
+  # Connectivity & External Utilities
+  connectivity_plus: ^6.1.0
+  url_launcher: ^6.3.1
+
+  # Secure Local Storage & Preferences
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.3
+
+  # Environment Variable Management
+  flutter_dotenv: ^5.2.1
+
+  # Design & Fonts
+  google_fonts: ^6.2.1
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env.example
+
