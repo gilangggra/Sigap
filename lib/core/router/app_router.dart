@@ -11,6 +11,9 @@ import '../../features/emergency/domain/models/incident.dart';
 import '../../features/emergency/presentation/screens/care_receiver_home_screen.dart';
 import '../../features/emergency/presentation/screens/incident_detail_screen.dart';
 import '../../features/emergency/presentation/screens/responder_home_screen.dart';
+import '../../features/microtask/presentation/screens/create_task_screen.dart';
+import '../../features/microtask/presentation/screens/leaderboard_screen.dart';
+import '../../features/microtask/presentation/screens/task_board_screen.dart';
 import '../../features/profile/presentation/screens/ice_card_form_screen.dart';
 import '../../features/profile/presentation/screens/ice_card_view_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
@@ -144,6 +147,30 @@ final GoRouter appRouter = GoRouter(
               updatedAt: DateTime.now(),
             );
         return IncidentDetailScreen(incident: incident);
+      },
+    ),
+
+    // Rute Papan Tugas Bantuan Mikro Warga (Mutual-Aid Board)
+    GoRoute(
+      path: '/tasks',
+      builder: (BuildContext context, GoRouterState state) {
+        return const TaskBoardScreen();
+      },
+    ),
+
+    // Rute Buat Permohonan Tugas Bantuan Mikro
+    GoRoute(
+      path: '/tasks/create',
+      builder: (BuildContext context, GoRouterState state) {
+        return const CreateTaskScreen();
+      },
+    ),
+
+    // Rute Papan Peringkat Relawan RT & Poin Sosial
+    GoRoute(
+      path: '/tasks/leaderboard',
+      builder: (BuildContext context, GoRouterState state) {
+        return const LeaderboardScreen();
       },
     ),
   ],

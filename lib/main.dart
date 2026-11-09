@@ -9,6 +9,7 @@ import 'core/services/supabase_service.dart';
 import 'core/state/auth_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/emergency/presentation/state/emergency_provider.dart';
+import 'features/microtask/presentation/state/task_provider.dart';
 import 'features/profile/presentation/state/profile_provider.dart';
 import 'features/wellness/presentation/state/wellness_provider.dart';
 
@@ -55,6 +56,7 @@ Future<void> main() async {
         ChangeNotifierProvider<ProfileProvider>(create: (_) => ProfileProvider()),
         ChangeNotifierProvider<EmergencyProvider>(create: (_) => EmergencyProvider()),
         ChangeNotifierProvider<WellnessProvider>(create: (_) => WellnessProvider()),
+        ChangeNotifierProvider<TaskProvider>(create: (_) => TaskProvider()),
       ],
       child: const SigapApp(),
     ),
