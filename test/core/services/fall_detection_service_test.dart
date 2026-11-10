@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:sensors_plus_platform_interface/sensors_plus_platform_interface.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:sigap/core/services/fall_detection_service.dart';
 
 class FakeSensorsPlatform extends SensorsPlatform {
