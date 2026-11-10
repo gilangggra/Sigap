@@ -18,6 +18,13 @@ abstract final class AppColors {
   static const Color mintSurfaceHighlight = Color(0xFFE6FFFA);
   static const Color mintBorder = Color(0xFFE2E8F0);
 
+  /// Warna wash / pastel lembut untuk badge, pill, dan ikon kontainer
+  static const Color primaryTealWash = Color(0xFFF0FDFA);
+  static const Color emergencyRedWash = Color(0xFFFEF2F2);
+  static const Color warningAmberWash = Color(0xFFFFFBEB);
+  static const Color safeGreenWash = Color(0xFFECFDF5);
+  static const Color neutralWash = Color(0xFFF1F5F9);
+
   /// Permukaan kartu putih standar mobile
   static const Color cardWhite = Color(0xFFFFFFFF);
   static const Color lightSurface = Color(0xFFFFFFFF);

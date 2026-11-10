@@ -6,10 +6,10 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
+import '../../../../core/theme/app_decorations.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/components/accessible_button.dart';
+import '../../../../shared/components/components.dart';
 import '../state/profile_provider.dart';
 
 /// Halaman Tampilan Data Medis Darurat (Digital ICE Card & Medical ID Pass).
@@ -162,26 +162,14 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         // Kartu Profil Pasien Standar Mobile
-                        Container(
+                        AppCard(
                           padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                          decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                            border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: AppColors.cardShadow,
-                                blurRadius: 8.0,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
-                          ),
                           child: Row(
                             children: [
-                              const CircleAvatar(
-                                radius: 28.0,
-                                backgroundColor: AppColors.primaryTealLight,
-                                child: Icon(Icons.elderly_rounded, color: AppColors.primaryTealDark, size: 32.0),
+                              AppAvatar(
+                                name: patientName,
+                                radius: 26.0,
+                                borderColor: AppColors.primaryTealLight,
                               ),
                               const SizedBox(width: AppDimensions.spaceMD),
                               Expanded(
@@ -193,9 +181,12 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                       style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
                                     ),
                                     const SizedBox(height: 2.0),
-                                    Text(
-                                      'Lansia Terdaftar • RT 04 / RW 02',
-                                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                                    Row(
+                                      children: [
+                                        AppBadge.brand('Lansia Terdaftar', isSmall: true),
+                                        const SizedBox(width: 6.0),
+                                        AppBadge.neutral('RT 04 / RW 02', isSmall: true),
+                                      ],
                                     ),
                                   ],
                                 ),
@@ -207,65 +198,21 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                         const SizedBox(height: AppDimensions.spaceMD),
 
                         // Segmented Control Tabs (Informasi Medis vs QR Code ICE)
-                        Container(
-                          padding: const EdgeInsets.all(3.0),
-                          decoration: BoxDecoration(
-                            color: AppColors.mintSurface,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                            border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    FeedbackService.instance.triggerSuccessFeedback();
-                                    setState(() => _selectedTabIndex = 0);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: _selectedTabIndex == 0 ? AppColors.primaryTeal : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Informasi Medis',
-                                      style: TextStyle(
-                                        color: _selectedTabIndex == 0 ? Colors.white : AppColors.textDarkSecondary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    FeedbackService.instance.triggerSuccessFeedback();
-                                    setState(() => _selectedTabIndex = 1);
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                                    decoration: BoxDecoration(
-                                      color: _selectedTabIndex == 1 ? AppColors.primaryTeal : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'QR Code ICE',
-                                      style: TextStyle(
-                                        color: _selectedTabIndex == 1 ? Colors.white : AppColors.textDarkSecondary,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13.0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                        AppSegmentedPill<int>(
+                          items: const [
+                            SegmentItem(
+                              value: 0,
+                              label: 'Informasi Medis',
+                              icon: Icons.medical_information_rounded,
+                            ),
+                            SegmentItem(
+                              value: 1,
+                              label: 'QR Code ICE',
+                              icon: Icons.qr_code_2_rounded,
+                            ),
+                          ],
+                          selectedValue: _selectedTabIndex,
+                          onValueChanged: (idx) => setState(() => _selectedTabIndex = idx),
                         ),
 
                         const SizedBox(height: AppDimensions.spaceMD),
@@ -273,35 +220,24 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                         // Tab 0: Informasi Medis Lengkap
                         if (_selectedTabIndex == 0) ...[
                           // Kartu Golongan Darah
-                          Container(
+                          AppCard(
                             padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                            decoration: BoxDecoration(
-                              color: AppColors.cardWhite,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                              border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: AppColors.cardShadow,
-                                  blurRadius: 8.0,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
                             child: Row(
                               children: [
                                 Container(
-                                  width: 54.0,
-                                  height: 54.0,
+                                  width: 52.0,
+                                  height: 52.0,
                                   decoration: const BoxDecoration(
                                     color: AppColors.emergencyRed,
                                     shape: BoxShape.circle,
+                                    boxShadow: AppShadows.emergencyGlow,
                                   ),
                                   alignment: Alignment.center,
                                   child: Text(
                                     card.bloodType,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 22.0,
+                                      fontSize: 20.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -322,6 +258,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                     ],
                                   ),
                                 ),
+                                AppBadge.danger('Resus Darah', isSmall: true),
                               ],
                             ),
                           ),
@@ -352,20 +289,8 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
 
                           // Kontak Dokter & Catatan Khusus
                           if (card.doctorName != null || card.doctorPhone != null || card.doctorNotes != null) ...[
-                            Container(
+                            AppCard(
                               padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                              decoration: BoxDecoration(
-                                color: AppColors.cardWhite,
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                                border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: AppColors.cardShadow,
-                                    blurRadius: 8.0,
-                                    offset: Offset(0, 2),
-                                  ),
-                                ],
-                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -417,20 +342,8 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                           ],
                         ] else ...[
                           // Tab 1: QR Code Medis
-                          Container(
+                          AppCard(
                             padding: const EdgeInsets.all(AppDimensions.spaceXL),
-                            decoration: BoxDecoration(
-                              color: AppColors.cardWhite,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                              border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: AppColors.cardShadow,
-                                  blurRadius: 10.0,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
-                            ),
                             child: Column(
                               children: [
                                 QrImageView(
@@ -496,20 +409,8 @@ class _MedicalSectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       padding: const EdgeInsets.all(AppDimensions.spaceMD),
-      decoration: BoxDecoration(
-        color: AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        border: Border.all(color: AppColors.lightBorder, width: 1.0),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 8.0,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

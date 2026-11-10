@@ -9,8 +9,9 @@ import '../../../../core/services/feedback_service.dart';
 import '../../../../core/services/fall_detection_service.dart';
 import '../../../../core/services/safety_check_service.dart';
 import '../../../../core/state/auth_provider.dart';
+import '../../../../core/theme/app_decorations.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/components/accessible_button.dart';
+import '../../../../shared/components/components.dart';
 import '../../../wellness/presentation/state/wellness_provider.dart';
 import '../state/emergency_provider.dart';
 import '../widgets/fall_alert_dialog.dart';
@@ -161,466 +162,395 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6.0),
-              decoration: const BoxDecoration(
-                color: AppColors.primaryTealLight,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.shield_rounded, color: AppColors.primaryTeal, size: 22.0),
-            ),
-            const SizedBox(width: AppDimensions.spaceSM),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'SIGAP',
-                  style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
-                ),
-                Text(
-                  'Mode Bantuan Lansia',
-                  style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.qr_code_2_rounded, size: 26.0),
-            tooltip: 'Kartu Medis ICE',
-            onPressed: () => context.push('/profile/ice-card-view'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded, size: 26.0),
-            tooltip: 'Profil Saya',
-            onPressed: () => context.push('/profile'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded, size: 26.0),
-            tooltip: 'Ganti Peran',
-            onPressed: () => context.go('/auth/role'),
-          ),
-        ],
-      ),
       body: Stack(
         children: [
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppDimensions.spaceMD,
-                vertical: AppDimensions.spaceSM,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // =============================================================
-                  // 1. Kartu Profil & Wilayah RT (Standar Mobile Card)
-                  // =============================================================
-                  Container(
-                    padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                      border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.cardShadow,
-                          blurRadius: 8.0,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+          Column(
+            children: [
+              // =============================================================
+              // Top Hero Header Banner Khas Mobile Modern
+              // =============================================================
+              AppHeaderBanner(
+                title: 'Halo, $userName',
+                subtitle: 'Sistem Siaga RT 04 / RW 02 Aktif',
+                leading: AppAvatar(
+                  name: userName,
+                  radius: 22.0,
+                  isOnline: true,
+                  showBadge: true,
+                  borderColor: Colors.white,
+                ),
+                actions: [
+                  _HeaderIconButton(
+                    icon: Icons.qr_code_2_rounded,
+                    tooltip: 'Kartu Medis ICE',
+                    onTap: () => context.push('/profile/ice-card-view'),
+                  ),
+                  const SizedBox(width: 6.0),
+                  _HeaderIconButton(
+                    icon: Icons.person_outline_rounded,
+                    tooltip: 'Profil Saya',
+                    onTap: () => context.push('/profile'),
+                  ),
+                  const SizedBox(width: 6.0),
+                  _HeaderIconButton(
+                    icon: Icons.swap_horiz_rounded,
+                    tooltip: 'Ganti Peran',
+                    onTap: () => context.go('/auth/role'),
+                  ),
+                ],
+                bottomSlot: Row(
+                  children: [
+                    AppBadge.success('Siaga Aktif', icon: Icons.check_circle_rounded),
+                    const SizedBox(width: 8.0),
+                    AppBadge.neutral('RT 04 / RW 02'),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.battery_charging_full_rounded, size: 14.0, color: Colors.white),
+                          SizedBox(width: 4.0),
+                          Text(
+                            '95% • GPS OK',
+                            style: TextStyle(fontSize: 11.0, color: Colors.white, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Row(
-                      children: [
-                        const CircleAvatar(
-                          radius: 26.0,
-                          backgroundColor: AppColors.primaryTealLight,
-                          child: Icon(Icons.person_rounded, color: AppColors.primaryTeal, size: 30.0),
-                        ),
-                        const SizedBox(width: AppDimensions.spaceMD),
-                        Expanded(
+                  ],
+                ),
+              ),
+
+              // =============================================================
+              // Konten Scrollable
+              // =============================================================
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spaceMD,
+                    vertical: AppDimensions.spaceMD,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Banner Status Darurat Terkirim
+                      if (emergencyProvider.isDispatched) ...[
+                        AppCard.emergency(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Text(
-                                'Halo, $userName',
-                                style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
-                              ),
-                              const SizedBox(height: 2.0),
                               Row(
                                 children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.mintSurface,
-                                      borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
+                                  const Icon(Icons.warning_amber_rounded, color: AppColors.emergencyRed, size: 32.0),
+                                  const SizedBox(width: AppDimensions.spaceMD),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Sinyal Darurat Aktif!',
+                                          style: AppTypography.seniorTitle(color: AppColors.emergencyRed),
+                                        ),
+                                        Text(
+                                          'Relawan tetangga dan keluarga sedang meluncur.',
+                                          style: AppTypography.seniorBodySecondary(color: AppColors.emergencyRedDark),
+                                        ),
+                                      ],
                                     ),
-                                    child: Text(
-                                      'RT 04 / RW 02',
-                                      style: AppTypography.standardCaption(color: AppColors.primaryTealDark),
-                                    ),
-                                  ),
-                                  const SizedBox(width: AppDimensions.spaceSM),
-                                  const Icon(Icons.check_circle_rounded, color: AppColors.safeGreen, size: 14.0),
-                                  const SizedBox(width: 4.0),
-                                  Text(
-                                    'Siaga Aktif',
-                                    style: AppTypography.standardCaption(color: AppColors.safeGreen),
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: AppDimensions.spaceMD),
-
-                  // Banner Status Darurat Terkirim
-                  if (emergencyProvider.isDispatched) ...[
-                    Container(
-                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                      decoration: BoxDecoration(
-                        color: AppColors.emergencyRed,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.emergencyRedGlow,
-                            blurRadius: 12.0,
-                            offset: Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 32.0),
-                              const SizedBox(width: AppDimensions.spaceMD),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Sinyal Darurat Aktif!',
-                                      style: AppTypography.seniorTitle(color: Colors.white),
-                                    ),
-                                    Text(
-                                      'Relawan tetangga dan keluarga sedang meluncur.',
-                                      style: AppTypography.seniorBodySecondary(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
+                              const SizedBox(height: AppDimensions.spaceMD),
+                              AccessibleButton(
+                                label: 'BATALKAN DARURAT (SAYA AMAN)',
+                                onPressed: _cancelSosCountdown,
+                                backgroundColor: AppColors.emergencyRed,
+                                textColor: Colors.white,
+                                customHeight: 64.0,
+                                icon: Icons.check_circle_rounded,
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppDimensions.spaceMD),
-                          AccessibleButton(
-                            label: 'BATALKAN DARURAT (SAYA AMAN)',
-                            onPressed: _cancelSosCountdown,
-                            backgroundColor: Colors.white,
-                            textColor: AppColors.emergencyRed,
-                            customHeight: 64.0,
-                            icon: Icons.check_circle_rounded,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppDimensions.spaceMD),
-                  ],
-
-                  // =============================================================
-                  // 2. Kartu Tombol SOS Darurat Utama
-                  // =============================================================
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppDimensions.spaceLG,
-                      horizontal: AppDimensions.spaceMD,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                      border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.cardShadow,
-                          blurRadius: 10.0,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'PANGGILAN BANTUAN DARURAT',
-                          style: AppTypography.seniorTitle(color: AppColors.emergencyRed),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: AppDimensions.spaceXS),
-                        Text(
-                          'Tekan tombol satu kali jika butuh pertolongan cepat',
-                          style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                          textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: AppDimensions.spaceMD),
-                        Semantics(
-                          button: true,
-                          label: 'Tombol Darurat SOS, tekan untuk memanggil bantuan',
-                          child: GestureDetector(
-                            onTap: emergencyProvider.isDispatched
-                                ? () {
-                                    FeedbackService.instance.triggerWarningFeedback();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        backgroundColor: AppColors.emergencyRedDark,
-                                        behavior: SnackBarBehavior.floating,
-                                        content: Text(
-                                          'Panggilan darurat sedang aktif. Tekan tombol batalkan jika sudah aman.',
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                : _triggerSosCountdown,
-                            child: Container(
-                              width: 140.0,
-                              height: 140.0,
-                              decoration: BoxDecoration(
-                                color: AppColors.emergencyRed,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 4.0),
-                                boxShadow: const [
-                                  BoxShadow(
-                                    color: AppColors.emergencyRedGlow,
-                                    blurRadius: 24.0,
-                                    spreadRadius: 4.0,
-                                  ),
-                                ],
-                              ),
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.sos_rounded,
-                                    color: Colors.white,
-                                    size: 52.0,
-                                  ),
-                                  Text(
-                                    'SOS',
-                                    style: AppTypography.seniorSosLabel(),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
-                    ),
-                  ),
 
-                  const SizedBox(height: AppDimensions.spaceMD),
-
-                  // =============================================================
-                  // 3. Kartu Cek Perjalanan Aman (Safety Check / Walk-Safe Timer)
-                  // =============================================================
-                  SafetyCheckCard(
-                    onEmergencyTriggered: _handleSafetyCheckEmergency,
-                  ),
-
-                  const SizedBox(height: AppDimensions.spaceMD),
-
-                  // =============================================================
-                  // 4. Kartu AI Fall Guard (Deteksi Jatuh Otomatis)
-                  // =============================================================
-                  Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                      border: Border.all(
-                        color: _isFallGuardActive ? AppColors.primaryTeal : AppColors.lightBorder,
-                        width: 1.0,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.cardShadow,
-                          blurRadius: 8.0,
-                          offset: Offset(0, 2),
+                      // =============================================================
+                      // 1. Kartu Tombol SOS Darurat Utama (Concentric Pulse Rings)
+                      // =============================================================
+                      AppCard(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppDimensions.spaceXL,
+                          horizontal: AppDimensions.spaceMD,
                         ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
+                        child: Column(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.all(10.0),
-                              decoration: BoxDecoration(
-                                color: _isFallGuardActive
-                                    ? AppColors.primaryTealLight
-                                    : AppColors.mintSurface,
-                                shape: BoxShape.circle,
-                              ),
-                              child: Icon(
-                                Icons.personal_injury_rounded,
-                                color: _isFallGuardActive ? AppColors.primaryTealDark : AppColors.textDarkTertiary,
-                                size: 24.0,
-                              ),
+                            Text(
+                              'PANGGILAN BANTUAN DARURAT',
+                              style: AppTypography.seniorTitle(color: AppColors.emergencyRed),
+                              textAlign: TextAlign.center,
                             ),
-                            const SizedBox(width: AppDimensions.spaceMD),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'AI Fall Guard',
-                                    style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                            const SizedBox(height: AppDimensions.spaceXS),
+                            Text(
+                              'Tekan tombol satu kali jika butuh pertolongan cepat',
+                              style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppDimensions.spaceLG),
+                            Semantics(
+                              button: true,
+                              label: 'Tombol Darurat SOS, tekan untuk memanggil bantuan',
+                              child: GestureDetector(
+                                onTap: emergencyProvider.isDispatched
+                                    ? () {
+                                        FeedbackService.instance.triggerWarningFeedback();
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            backgroundColor: AppColors.emergencyRedDark,
+                                            behavior: SnackBarBehavior.floating,
+                                            content: Text(
+                                              'Panggilan darurat sedang aktif. Tekan tombol batalkan jika sudah aman.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    : _triggerSosCountdown,
+                                child: Container(
+                                  width: 172.0,
+                                  height: 172.0,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColors.emergencyRedWash,
                                   ),
-                                  Text(
-                                    _isFallGuardActive
-                                        ? 'Sensor memantau benturan & imobilitas otomatis.'
-                                        : 'Fitur deteksi jatuh dinonaktifkan.',
-                                    style: AppTypography.standardCaption(
-                                      color: _isFallGuardActive
-                                          ? AppColors.primaryTealDark
-                                          : AppColors.textDarkSecondary,
+                                  alignment: Alignment.center,
+                                  child: Container(
+                                    width: 144.0,
+                                    height: 144.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.emergencyRed.withValues(alpha: 0.12),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      width: 118.0,
+                                      height: 118.0,
+                                      decoration: const BoxDecoration(
+                                        gradient: AppGradients.emergency,
+                                        shape: BoxShape.circle,
+                                        boxShadow: AppShadows.emergencyGlow,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.sos_rounded,
+                                            color: Colors.white,
+                                            size: 46.0,
+                                          ),
+                                          Text(
+                                            'SOS',
+                                            style: AppTypography.seniorSosLabel(),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                            Switch(
-                              value: _isFallGuardActive,
-                              activeColor: AppColors.primaryTeal,
-                              onChanged: (val) {
-                                setState(() => _isFallGuardActive = val);
-                                unawaited(FeedbackService.instance.triggerSuccessFeedback());
-                                if (val) {
-                                  _initFallDetection();
-                                } else {
-                                  FallDetectionService.instance.stopMonitoring();
-                                }
-                              },
                             ),
                           ],
                         ),
-                        if (_isFallGuardActive) ...[
-                          const SizedBox(height: AppDimensions.spaceSM),
-                          OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.warningAmberDark,
-                              side: const BorderSide(color: AppColors.warningAmber),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            ),
-                            onPressed: () {
-                              unawaited(FeedbackService.instance.triggerSuccessFeedback());
-                              FallDetectionService.instance.simulateFallEvent();
-                            },
-                            icon: const Icon(Icons.play_circle_outline_rounded, color: AppColors.warningAmber, size: 20),
-                            label: Text(
-                              'Uji Simulasi Deteksi Jatuh (10s Pre-Alarm)',
-                              style: AppTypography.standardCaption(color: AppColors.warningAmberDark),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: AppDimensions.spaceLG),
-
-                  // =============================================================
-                  // 5. Bagian Check-in Kondisi Harian
-                  // =============================================================
-                  Text(
-                    'Kondisi Anda Hari Ini?',
-                    style: AppTypography.categoryHeadline(),
-                  ),
-                  const SizedBox(height: AppDimensions.spaceXS),
-                  Text(
-                    'Pilih salah satu agar keluarga dan RT mengetahui kabar Anda:',
-                    style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                  ),
-                  const SizedBox(height: AppDimensions.spaceSM),
-
-                  _CheckinOptionCard(
-                    status: CheckinStatus.baik,
-                    isSelected: _selectedCheckinStatus == CheckinStatus.baik,
-                    onTap: () => _submitCheckin(CheckinStatus.baik),
-                  ),
-                  const SizedBox(height: AppDimensions.spaceSM),
-                  _CheckinOptionCard(
-                    status: CheckinStatus.kurangEnak,
-                    isSelected: _selectedCheckinStatus == CheckinStatus.kurangEnak,
-                    onTap: () => _submitCheckin(CheckinStatus.kurangEnak),
-                  ),
-                  const SizedBox(height: AppDimensions.spaceSM),
-                  _CheckinOptionCard(
-                    status: CheckinStatus.butuhBantuan,
-                    isSelected: _selectedCheckinStatus == CheckinStatus.butuhBantuan,
-                    onTap: () => _submitCheckin(CheckinStatus.butuhBantuan),
-                  ),
-
-                  const SizedBox(height: AppDimensions.spaceLG),
-
-                  // =============================================================
-                  // 6. Bagian Pengingat Obat Lansia
-                  // =============================================================
-                  Text(
-                    'Jadwal Minum Obat',
-                    style: AppTypography.categoryHeadline(),
-                  ),
-                  const SizedBox(height: AppDimensions.spaceXS),
-                  Text(
-                    'Tekan tombol setelah Anda meminum obat:',
-                    style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                  ),
-                  const SizedBox(height: AppDimensions.spaceSM),
-
-                  ...context.watch<WellnessProvider>().medicationSchedules.map((med) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppDimensions.spaceSM),
-                      child: _SeniorMedicationCard(
-                        scheduleName: med.medicationName,
-                        dosage: med.dosage,
-                        reminderTime: med.reminderTimes.isNotEmpty ? med.reminderTimes.first : '08:00',
-                        isTaken: med.isTakenToday,
-                        onTake: () {
-                          final authUser = context.read<AuthProvider>();
-                          context.read<WellnessProvider>().markMedicationTaken(
-                            scheduleId: med.id,
-                            careReceiverId: authUser.userId ?? 'care-receiver-001',
-                          );
-                          unawaited(FeedbackService.instance.triggerSuccessFeedback());
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: AppColors.safeGreenDark,
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(
-                                'Konfirmasi: ${med.medicationName} sudah diminum.',
-                                style: AppTypography.seniorBodyPrimary(color: Colors.white),
-                              ),
-                            ),
-                          );
-                        },
                       ),
-                    );
-                  }),
-                  const SizedBox(height: AppDimensions.spaceXL),
-                ],
+
+                      const SizedBox(height: AppDimensions.spaceMD),
+
+                      // =============================================================
+                      // 2. Kartu Cek Perjalanan Aman (Safety Check / Walk-Safe Timer)
+                      // =============================================================
+                      SafetyCheckCard(
+                        onEmergencyTriggered: _handleSafetyCheckEmergency,
+                      ),
+
+                      const SizedBox(height: AppDimensions.spaceMD),
+
+                      // =============================================================
+                      // 3. Kartu AI Fall Guard (Deteksi Jatuh Otomatis)
+                      // =============================================================
+                      AppCard(
+                        border: _isFallGuardActive ? AppBorders.tealActive : AppBorders.standard,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10.0),
+                                  decoration: BoxDecoration(
+                                    color: _isFallGuardActive
+                                        ? AppColors.primaryTealLight
+                                        : AppColors.mintSurface,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.personal_injury_rounded,
+                                    color: _isFallGuardActive ? AppColors.primaryTealDark : AppColors.textDarkTertiary,
+                                    size: 24.0,
+                                  ),
+                                ),
+                                const SizedBox(width: AppDimensions.spaceMD),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'AI Fall Guard',
+                                            style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                                          ),
+                                          const SizedBox(width: 8.0),
+                                          if (_isFallGuardActive)
+                                            AppBadge.brand('Aktif', isSmall: true)
+                                          else
+                                            AppBadge.neutral('Mati', isSmall: true),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2.0),
+                                      Text(
+                                        _isFallGuardActive
+                                            ? 'Sensor memantau benturan & imobilitas otomatis.'
+                                            : 'Fitur deteksi jatuh dinonaktifkan.',
+                                        style: AppTypography.standardCaption(
+                                          color: _isFallGuardActive
+                                              ? AppColors.primaryTealDark
+                                              : AppColors.textDarkSecondary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Switch(
+                                  value: _isFallGuardActive,
+                                  activeColor: AppColors.primaryTeal,
+                                  onChanged: (val) {
+                                    setState(() => _isFallGuardActive = val);
+                                    unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                                    if (val) {
+                                      _initFallDetection();
+                                    } else {
+                                      FallDetectionService.instance.stopMonitoring();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                            if (_isFallGuardActive) ...[
+                              const SizedBox(height: AppDimensions.spaceMD),
+                              OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: AppColors.warningAmberDark,
+                                  side: const BorderSide(color: AppColors.warningAmber),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                ),
+                                onPressed: () {
+                                  unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                                  FallDetectionService.instance.simulateFallEvent();
+                                },
+                                icon: const Icon(Icons.play_circle_outline_rounded, color: AppColors.warningAmber, size: 20),
+                                label: Text(
+                                  'Uji Simulasi Deteksi Jatuh (10s Pre-Alarm)',
+                                  style: AppTypography.standardCaption(color: AppColors.warningAmberDark),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: AppDimensions.spaceLG),
+
+                      // =============================================================
+                      // 4. Bagian Check-in Kondisi Harian
+                      // =============================================================
+                      const AppSectionHeader(
+                        title: 'Kondisi Anda Hari Ini?',
+                        subtitle: 'Pilih salah satu agar keluarga dan RT mengetahui kabar Anda',
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+
+                      _CheckinOptionCard(
+                        status: CheckinStatus.baik,
+                        isSelected: _selectedCheckinStatus == CheckinStatus.baik,
+                        onTap: () => _submitCheckin(CheckinStatus.baik),
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+                      _CheckinOptionCard(
+                        status: CheckinStatus.kurangEnak,
+                        isSelected: _selectedCheckinStatus == CheckinStatus.kurangEnak,
+                        onTap: () => _submitCheckin(CheckinStatus.kurangEnak),
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+                      _CheckinOptionCard(
+                        status: CheckinStatus.butuhBantuan,
+                        isSelected: _selectedCheckinStatus == CheckinStatus.butuhBantuan,
+                        onTap: () => _submitCheckin(CheckinStatus.butuhBantuan),
+                      ),
+
+                      const SizedBox(height: AppDimensions.spaceLG),
+
+                      // =============================================================
+                      // 5. Bagian Pengingat Obat Lansia
+                      // =============================================================
+                      const AppSectionHeader(
+                        title: 'Jadwal Minum Obat',
+                        subtitle: 'Tekan tombol setelah Anda meminum obat',
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+
+                      ...context.watch<WellnessProvider>().medicationSchedules.map((med) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: AppDimensions.spaceSM),
+                          child: _SeniorMedicationCard(
+                            scheduleName: med.medicationName,
+                            dosage: med.dosage,
+                            reminderTime: med.reminderTimes.isNotEmpty ? med.reminderTimes.first : '08:00',
+                            isTaken: med.isTakenToday,
+                            onTake: () {
+                              final authUser = context.read<AuthProvider>();
+                              context.read<WellnessProvider>().markMedicationTaken(
+                                scheduleId: med.id,
+                                careReceiverId: authUser.userId ?? 'care-receiver-001',
+                              );
+                              unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: AppColors.safeGreenDark,
+                                  behavior: SnackBarBehavior.floating,
+                                  content: Text(
+                                    'Konfirmasi: ${med.medicationName} sudah diminum.',
+                                    style: AppTypography.seniorBodyPrimary(color: Colors.white),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: AppDimensions.spaceXL),
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
 
           // Overlay Countdown Pembatalan 8 Detik
@@ -630,6 +560,37 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
               onCancel: _cancelSosCountdown,
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _HeaderIconButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  const _HeaderIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.2),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(icon, color: Colors.white, size: 20.0),
+          ),
+        ),
       ),
     );
   }
@@ -648,47 +609,40 @@ class _CheckinOptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: isSelected ? AppColors.primaryTealLight : AppColors.cardWhite,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        side: BorderSide(
-          color: isSelected ? AppColors.primaryTeal : AppColors.lightBorder,
-          width: isSelected ? 1.5 : 1.0,
-        ),
+    return AppCard.interactive(
+      isSelected: isSelected,
+      onTap: onTap,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppDimensions.spaceMD,
+        vertical: AppDimensions.spaceMD,
       ),
-      elevation: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        child: Container(
-          constraints: const BoxConstraints(
-            minHeight: AppDimensions.seniorRecommendedTouchTarget, // 72dp
+      child: Row(
+        children: [
+          Container(
+            width: 44.0,
+            height: 44.0,
+            decoration: BoxDecoration(
+              color: isSelected ? AppColors.primaryTealLight : AppColors.mintSurface,
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              status.emoji,
+              style: const TextStyle(fontSize: 24.0),
+            ),
           ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.spaceMD,
-            vertical: AppDimensions.spaceSM,
-          ),
-          child: Row(
-            children: [
-              Text(
-                status.emoji,
-                style: const TextStyle(fontSize: 30.0),
+          const SizedBox(width: AppDimensions.spaceMD),
+          Expanded(
+            child: Text(
+              status.label,
+              style: AppTypography.seniorTitle(
+                color: isSelected ? AppColors.primaryTealDeep : AppColors.textDarkPrimary,
               ),
-              const SizedBox(width: AppDimensions.spaceMD),
-              Expanded(
-                child: Text(
-                  status.label,
-                  style: AppTypography.seniorTitle(
-                    color: isSelected ? AppColors.primaryTealDeep : AppColors.textDarkPrimary,
-                  ),
-                ),
-              ),
-              if (isSelected)
-                const Icon(Icons.check_circle_rounded, color: AppColors.primaryTeal, size: 24.0),
-            ],
+            ),
           ),
-        ),
+          if (isSelected)
+            const Icon(Icons.check_circle_rounded, color: AppColors.primaryTeal, size: 24.0),
+        ],
       ),
     );
   }
@@ -777,37 +731,25 @@ class _SeniorMedicationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppDimensions.spaceMD),
-      decoration: BoxDecoration(
-        color: isTaken ? AppColors.mintSurface : AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        border: Border.all(
-          color: isTaken ? AppColors.safeGreen : AppColors.lightBorder,
-          width: 1.0,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 8.0,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
+    return AppCard(
+      border: isTaken
+          ? Border.all(color: AppColors.safeGreen, width: 1.0)
+          : AppBorders.standard,
+      backgroundColor: isTaken ? AppColors.safeGreenWash : AppColors.cardWhite,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
-                  color: isTaken ? AppColors.safeGreen.withValues(alpha: 0.15) : AppColors.primaryTealLight,
+                  color: isTaken ? AppColors.safeGreenWash : AppColors.primaryTealLight,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isTaken ? Icons.check_circle_rounded : Icons.medication_rounded,
-                  color: isTaken ? AppColors.safeGreen : AppColors.primaryTealDark,
+                  color: isTaken ? AppColors.safeGreenDark : AppColors.primaryTealDark,
                   size: 24.0,
                 ),
               ),
@@ -827,6 +769,8 @@ class _SeniorMedicationCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (isTaken)
+                AppBadge.success('Sudah', isSmall: true),
             ],
           ),
           const SizedBox(height: AppDimensions.spaceMD),

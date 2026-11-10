@@ -10,8 +10,9 @@ import '../../../../core/services/location_service.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../core/state/auth_provider.dart';
+import '../../../../core/theme/app_decorations.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/components/accessible_button.dart';
+import '../../../../shared/components/components.dart';
 import '../../domain/models/incident.dart';
 import '../state/emergency_provider.dart';
 
@@ -100,431 +101,414 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
-      appBar: AppBar(
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6.0),
-              decoration: const BoxDecoration(
-                color: AppColors.primaryTealLight,
-                shape: BoxShape.circle,
+      body: Column(
+        children: [
+          // =============================================================
+          // Top Hero Header Banner Khas Mobile Modern
+          // =============================================================
+          AppHeaderBanner(
+            title: 'Halo, $responderName',
+            subtitle: 'Pusat Koordinasi Relawan Lingkungan RT',
+            leading: AppAvatar(
+              name: responderName,
+              radius: 22.0,
+              isOnline: _isOnline,
+              showBadge: true,
+              borderColor: Colors.white,
+            ),
+            actions: [
+              _HeaderIconButton(
+                icon: Icons.person_outline_rounded,
+                tooltip: 'Profil Saya',
+                onTap: () => context.push('/profile'),
               ),
-              child: const Icon(Icons.volunteer_activism_rounded, color: AppColors.primaryTeal, size: 22.0),
-            ),
-            const SizedBox(width: AppDimensions.spaceSM),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'SIGAP Relawan',
-                  style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
-                ),
-                Text(
-                  responderName,
-                  style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                ),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          // Toggle Siaga Pill Button
-          Container(
-            margin: const EdgeInsets.symmetric(vertical: 10.0),
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            decoration: BoxDecoration(
-              color: _isOnline ? AppColors.primaryTealLight : AppColors.mintSurface,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
-              border: Border.all(
-                color: _isOnline ? AppColors.primaryTeal : AppColors.lightBorder,
+              const SizedBox(width: 6.0),
+              _HeaderIconButton(
+                icon: Icons.swap_horiz_rounded,
+                tooltip: 'Ganti Peran',
+                onTap: () => context.go('/auth/role'),
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+            ],
+            bottomSlot: Row(
               children: [
-                Text(
-                  _isOnline ? 'Siaga' : 'Istirahat',
-                  style: TextStyle(
-                    fontSize: 12.0,
-                    fontWeight: FontWeight.bold,
-                    color: _isOnline ? AppColors.primaryTealDark : AppColors.textDarkTertiary,
+                // Toggle Siaga Pill
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 2.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                    boxShadow: AppShadows.subtle,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 8.0,
+                        height: 8.0,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _isOnline ? AppColors.safeGreen : AppColors.textDarkTertiary,
+                        ),
+                      ),
+                      const SizedBox(width: 6.0),
+                      Text(
+                        _isOnline ? 'Siaga Aktif' : 'Mode Istirahat',
+                        style: TextStyle(
+                          fontSize: 12.0,
+                          fontWeight: FontWeight.w700,
+                          color: _isOnline ? AppColors.primaryTealDark : AppColors.textDarkSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: 4.0),
+                      Transform.scale(
+                        scale: 0.75,
+                        child: Switch(
+                          value: _isOnline,
+                          activeColor: AppColors.primaryTeal,
+                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          onChanged: (val) {
+                            setState(() => _isOnline = val);
+                            unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                            final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+                            if (val) {
+                              unawaited(LocationService.instance.startStandbyTracking(responderId: responderId));
+                            } else {
+                              unawaited(LocationService.instance.stopStandbyTracking(responderId: responderId));
+                            }
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 2.0),
-                Switch(
-                  value: _isOnline,
-                  activeColor: AppColors.primaryTeal,
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  onChanged: (val) {
-                    setState(() => _isOnline = val);
-                    unawaited(FeedbackService.instance.triggerSuccessFeedback());
-                    final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
-                    if (val) {
-                      unawaited(LocationService.instance.startStandbyTracking(responderId: responderId));
-                    } else {
-                      unawaited(LocationService.instance.stopStandbyTracking(responderId: responderId));
-                    }
-                  },
-                ),
+                const Spacer(),
+                AppBadge.brand('+120 Poin Sosial', icon: Icons.stars_rounded),
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded, size: 24.0),
-            tooltip: 'Profil Saya',
-            onPressed: () => context.push('/profile'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded, size: 24.0),
-            tooltip: 'Ganti Peran',
-            onPressed: () => context.go('/auth/role'),
+
+          // =============================================================
+          // Konten Scrollable
+          // =============================================================
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimensions.spaceMD,
+                vertical: AppDimensions.spaceMD,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // =============================================================
+                  // 1. Kartu Status Radar & GPS Siaga Relawan
+                  // =============================================================
+                  ValueListenableBuilder<Position?>(
+                    valueListenable: LocationService.instance.standbyPositionNotifier,
+                    builder: (context, position, _) {
+                      return AppCard(
+                        padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                color: _isOnline ? AppColors.primaryTealLight : AppColors.mintSurface,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _isOnline ? Icons.radar_rounded : Icons.location_off_rounded,
+                                color: _isOnline ? AppColors.primaryTealDark : AppColors.textDarkTertiary,
+                                size: 20.0,
+                              ),
+                            ),
+                            const SizedBox(width: AppDimensions.spaceMD),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _isOnline ? 'Radar Hyperlocal Aktif' : 'GPS Dinonaktifkan',
+                                    style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
+                                  ),
+                                  Text(
+                                    _isOnline
+                                        ? position != null
+                                            ? 'Koordinat: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)} (Radius 500m)'
+                                            : 'Menghubungkan satelit GPS...'
+                                        : 'Mode Istirahat • Lokasi tidak dibagikan (Privasi terjaga)',
+                                    style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (_isOnline)
+                              const Icon(Icons.check_circle_rounded, color: AppColors.safeGreen, size: 18.0),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: AppDimensions.spaceMD),
+
+                  // =============================================================
+                  // 2. Banner Insiden Darurat Aktif
+                  // =============================================================
+                  if (activeIncidents.isEmpty) ...[
+                    AppCard(
+                      padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(14.0),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primaryTealLight,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.shield_outlined, color: AppColors.primaryTealDark, size: 36.0),
+                          ),
+                          const SizedBox(height: AppDimensions.spaceMD),
+                          Text(
+                            'STATUS SIAGA: LINGKUNGAN AMAN',
+                            style: AppTypography.standardHeadline(color: AppColors.primaryTealDeep),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppDimensions.spaceXS),
+                          Text(
+                            'Tidak ada panggilan darurat aktif dalam radius 500m. Radar tetap memantau sinyal darurat warga sekitar secara real-time.',
+                            style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else ...[
+                    ...activeIncidents.map((inc) {
+                      final double distMeters = LocationService.instance.calculateDistanceMeters(
+                        startLatitude: currentLat,
+                        startLongitude: currentLng,
+                        endLatitude: inc.latitude,
+                        endLongitude: inc.longitude,
+                      );
+                      final String distStr = LocationService.instance.formatDistance(distMeters);
+                      final bool isLockedByMe = emergencyProvider.lockedIncidentId == inc.id;
+
+                      return AppCard.emergency(
+                        margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                AppBadge.danger('DARURAT AKTIF', icon: Icons.emergency_rounded),
+                                const SizedBox(width: AppDimensions.spaceSM),
+                                AppBadge.warning(distStr, icon: Icons.near_me_rounded),
+                                const Spacer(),
+                                AppBadge.neutral(inc.status.label, isSmall: true),
+                              ],
+                            ),
+                            const SizedBox(height: AppDimensions.spaceMD),
+                            Text(
+                              inc.careReceiverName ?? 'Lansia SIGAP',
+                              style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                            ),
+                            const SizedBox(height: 2.0),
+                            Text(
+                              'Lokasi: ${inc.address ?? "Koordinat (${inc.latitude.toStringAsFixed(4)}, ${inc.longitude.toStringAsFixed(4)})"}',
+                              style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
+                            ),
+                            const SizedBox(height: AppDimensions.spaceMD),
+
+                            if (!isLockedByMe) ...[
+                              AccessibleButton(
+                                label: _isClaiming ? 'Mengunci Insiden...' : 'SAYA MELUNCUR (RESPON)',
+                                onPressed: _isOnline && !_isClaiming ? () => _claimIncident(inc) : null,
+                                backgroundColor: AppColors.emergencyRed,
+                                textColor: Colors.white,
+                                icon: Icons.navigation_rounded,
+                              ),
+                              const SizedBox(height: AppDimensions.spaceSM),
+                              AccessibleButton(
+                                label: 'Lihat Detail & Navigasi Peta',
+                                onPressed: () => context.push('/emergency/incident-detail', extra: inc),
+                                backgroundColor: AppColors.mintSurface,
+                                borderColor: AppColors.lightBorder,
+                                textColor: AppColors.textDarkPrimary,
+                                icon: Icons.map_rounded,
+                              ),
+                            ] else ...[
+                              Container(
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: AppColors.safeGreenDark,
+                                  borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                                    SizedBox(width: AppDimensions.spaceSM),
+                                    Text(
+                                      'Insiden Sedang Anda Tangani',
+                                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: AppDimensions.spaceSM),
+                              AccessibleButton(
+                                label: 'Detail Rute Navigasi & Selesaikan',
+                                onPressed: () => context.push('/emergency/incident-detail', extra: inc),
+                                backgroundColor: AppColors.primaryTeal,
+                                icon: Icons.navigation_rounded,
+                              ),
+                              const SizedBox(height: AppDimensions.spaceSM),
+                              AccessibleButton(
+                                label: 'Lihat Data Medis (ICE Card 2 Jam)',
+                                onPressed: () => context.push(
+                                  '/profile/ice-card-view',
+                                  extra: 'EMERGENCY-TOKEN-${inc.id}',
+                                ),
+                                backgroundColor: AppColors.mintSurface,
+                                borderColor: AppColors.lightBorder,
+                                textColor: AppColors.primaryTealDark,
+                                icon: Icons.medical_services_outlined,
+                              ),
+                            ],
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+
+                  const SizedBox(height: AppDimensions.spaceLG),
+
+                  // =============================================================
+                  // 3. Papan Tugas Bantuan Mikro Sekitar
+                  // =============================================================
+                  AppSectionHeader(
+                    title: 'Tugas Bantuan Mikro',
+                    subtitle: 'Bantu tetangga dan kumpulkan poin kebaikan',
+                    actionLabel: 'Lihat Semua',
+                    onActionTap: () => context.push('/tasks'),
+                  ),
+                  const SizedBox(height: AppDimensions.spaceSM),
+
+                  const _TaskItemCard(
+                    category: 'Ambil Resep Obat',
+                    targetPerson: 'Bapak Hartono (68 thn)',
+                    address: 'Jl. Melati RT 02 / RW 05 (450m)',
+                    points: '+10 Poin',
+                    icon: Icons.medication_liquid_rounded,
+                  ),
+                  const SizedBox(height: AppDimensions.spaceSM),
+                  const _TaskItemCard(
+                    category: 'Belanja Kebutuhan Pokok',
+                    targetPerson: 'Ibu Sutrisno (74 thn)',
+                    address: 'Jl. Dahlia RT 01 / RW 05 (600m)',
+                    points: '+10 Poin',
+                    icon: Icons.shopping_basket_rounded,
+                  ),
+
+                  const SizedBox(height: AppDimensions.spaceMD),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AccessibleButton(
+                          label: 'Radar Tugas',
+                          onPressed: () => context.push('/tasks'),
+                          backgroundColor: AppColors.cardWhite,
+                          textColor: AppColors.primaryTealDark,
+                          borderColor: AppColors.lightBorder,
+                          icon: Icons.radar_rounded,
+                        ),
+                      ),
+                      const SizedBox(width: AppDimensions.spaceMD),
+                      Expanded(
+                        child: AccessibleButton(
+                          label: 'Peringkat',
+                          onPressed: () => context.push('/tasks/leaderboard'),
+                          backgroundColor: AppColors.cardWhite,
+                          textColor: AppColors.warningAmberDark,
+                          borderColor: AppColors.lightBorder,
+                          icon: Icons.leaderboard_rounded,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: AppDimensions.spaceMD),
+
+                  // Tombol Uji Notifikasi Alarm SOS
+                  AccessibleButton(
+                    label: 'Uji Alarm Notifikasi Darurat (Heads-Up SOS)',
+                    onPressed: () {
+                      unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                      final testIncidentId = activeIncidents.isNotEmpty ? activeIncidents.first.id : 'inc-demo-test';
+                      final testVictimName = activeIncidents.isNotEmpty
+                          ? (activeIncidents.first.careReceiverName ?? 'Warga SIGAP')
+                          : 'Ibu Aminah (Uji Notifikasi)';
+                      final testAddress = activeIncidents.isNotEmpty
+                          ? (activeIncidents.first.address ?? 'RT 03 / RW 05')
+                          : 'Jl. Kenanga No. 14, RT 03';
+
+                      unawaited(
+                        NotificationService.instance.showEmergencyAlert(
+                          incidentId: testIncidentId,
+                          victimName: testVictimName,
+                          address: testAddress,
+                          distanceMeters: 320,
+                        ),
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          backgroundColor: AppColors.emergencyRedDark,
+                          behavior: SnackBarBehavior.floating,
+                          content: Text('Notifikasi darurat SOS terkirim ke panel notifikasi HP Anda.'),
+                        ),
+                      );
+                    },
+                    backgroundColor: AppColors.mintSurface,
+                    textColor: AppColors.emergencyRed,
+                    borderColor: AppColors.emergencyRedLight,
+                    icon: Icons.notifications_active_rounded,
+                  ),
+                  const SizedBox(height: AppDimensions.spaceXL),
+                ],
+              ),
+            ),
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.spaceMD,
-            vertical: AppDimensions.spaceSM,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // =============================================================
-              // 1. Kartu Status Radar & GPS Siaga Relawan
-              // =============================================================
-              ValueListenableBuilder<Position?>(
-                valueListenable: LocationService.instance.standbyPositionNotifier,
-                builder: (context, position, _) {
-                  return Container(
-                    padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                      border: Border.all(
-                        color: _isOnline ? AppColors.primaryTeal.withValues(alpha: 0.5) : AppColors.lightBorder,
-                        width: 1.0,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.cardShadow,
-                          blurRadius: 8.0,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(
-                          _isOnline ? Icons.radar_rounded : Icons.location_off_rounded,
-                          color: _isOnline ? AppColors.primaryTeal : AppColors.textDarkTertiary,
-                          size: 22.0,
-                        ),
-                        const SizedBox(width: AppDimensions.spaceSM),
-                        Expanded(
-                          child: Text(
-                            _isOnline
-                                ? position != null
-                                    ? 'Radar Siaga Aktif • GPS: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}'
-                                    : 'Radar Siaga Aktif • Menghubungkan satelit GPS...'
-                                : 'Mode Istirahat • Lokasi tidak dibagikan (Privasi Terjaga)',
-                            style: AppTypography.standardCaption(
-                              color: _isOnline ? AppColors.textDarkPrimary : AppColors.textDarkSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+    );
+  }
+}
 
-              const SizedBox(height: AppDimensions.spaceMD),
+class _HeaderIconButton extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
 
-              // =============================================================
-              // 2. Banner Insiden Darurat Aktif
-              // =============================================================
-              if (activeIncidents.isEmpty) ...[
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.spaceXL),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardWhite,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                    border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: AppColors.cardShadow,
-                        blurRadius: 8.0,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(14.0),
-                        decoration: const BoxDecoration(
-                          color: AppColors.primaryTealLight,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.shield_outlined, color: AppColors.primaryTealDark, size: 40.0),
-                      ),
-                      const SizedBox(height: AppDimensions.spaceMD),
-                      Text(
-                        'STATUS SIAGA: LINGKUNGAN AMAN',
-                        style: AppTypography.standardHeadline(color: AppColors.primaryTealDeep),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppDimensions.spaceXS),
-                      Text(
-                        'Tidak ada panggilan darurat aktif dalam radius 500m. Mode Siaga tetap memantau sinyal darurat warga sekitar secara real-time.',
-                        style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ] else ...[
-                ...activeIncidents.map((inc) {
-                  final double distMeters = LocationService.instance.calculateDistanceMeters(
-                    startLatitude: currentLat,
-                    startLongitude: currentLng,
-                    endLatitude: inc.latitude,
-                    endLongitude: inc.longitude,
-                  );
-                  final String distStr = LocationService.instance.formatDistance(distMeters);
-                  final bool isLockedByMe = emergencyProvider.lockedIncidentId == inc.id;
+  const _HeaderIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onTap,
+  });
 
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                      border: Border.all(color: AppColors.emergencyRed, width: 2.0),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: AppColors.emergencyRedGlow,
-                          blurRadius: 16.0,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(6.0),
-                              decoration: const BoxDecoration(
-                                color: AppColors.emergencyRed,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.emergency_rounded, color: Colors.white, size: 20.0),
-                            ),
-                            const SizedBox(width: AppDimensions.spaceSM),
-                            const Expanded(
-                              child: Text(
-                                'PANGGILAN DARURAT (500M)',
-                                style: TextStyle(
-                                  color: AppColors.emergencyRed,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14.0,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppDimensions.spaceSM),
-                        Text(
-                          inc.careReceiverName ?? 'Lansia SIGAP',
-                          style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
-                        ),
-                        const SizedBox(height: 2.0),
-                        Text(
-                          'Lokasi: ${inc.address ?? "Koordinat (${inc.latitude.toStringAsFixed(4)}, ${inc.longitude.toStringAsFixed(4)})"}',
-                          style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
-                        ),
-                        Text(
-                          'Jarak: $distStr • Status: ${inc.status.label}',
-                          style: const TextStyle(
-                            color: AppColors.warningAmberDark,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13.0,
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.spaceMD),
-
-                        if (!isLockedByMe) ...[
-                          AccessibleButton(
-                            label: _isClaiming ? 'Mengunci Insiden...' : 'SAYA MELUNCUR (RESPON)',
-                            onPressed: _isOnline && !_isClaiming ? () => _claimIncident(inc) : null,
-                            backgroundColor: AppColors.emergencyRed,
-                            textColor: Colors.white,
-                            icon: Icons.navigation_rounded,
-                          ),
-                          const SizedBox(height: AppDimensions.spaceSM),
-                          AccessibleButton(
-                            label: 'Lihat Detail & Navigasi Peta',
-                            onPressed: () => context.push('/emergency/incident-detail', extra: inc),
-                            backgroundColor: AppColors.mintSurface,
-                            borderColor: AppColors.lightBorder,
-                            textColor: AppColors.textDarkPrimary,
-                            icon: Icons.map_rounded,
-                          ),
-                        ] else ...[
-                          Container(
-                            padding: const EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: AppColors.safeGreenDark,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
-                                SizedBox(width: AppDimensions.spaceSM),
-                                Text(
-                                  'Insiden Sedang Anda Tangani',
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: AppDimensions.spaceSM),
-                          AccessibleButton(
-                            label: 'Detail Rute Navigasi & Selesaikan',
-                            onPressed: () => context.push('/emergency/incident-detail', extra: inc),
-                            backgroundColor: AppColors.primaryTeal,
-                            icon: Icons.navigation_rounded,
-                          ),
-                          const SizedBox(height: AppDimensions.spaceSM),
-                          AccessibleButton(
-                            label: 'Lihat Data Medis (ICE Card 2 Jam)',
-                            onPressed: () => context.push(
-                              '/profile/ice-card-view',
-                              extra: 'EMERGENCY-TOKEN-${inc.id}',
-                            ),
-                            backgroundColor: AppColors.mintSurface,
-                            borderColor: AppColors.lightBorder,
-                            textColor: AppColors.primaryTealDark,
-                            icon: Icons.medical_services_outlined,
-                          ),
-                        ],
-                      ],
-                    ),
-                  );
-                }),
-              ],
-
-              const SizedBox(height: AppDimensions.spaceLG),
-
-              // =============================================================
-              // 3. Papan Tugas Bantuan Mikro Sekitar
-              // =============================================================
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Tugas Bantuan Mikro',
-                    style: AppTypography.categoryHeadline(),
-                  ),
-                  TextButton.icon(
-                    onPressed: () => context.push('/tasks'),
-                    icon: const Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primaryTealDark),
-                    label: const Text(
-                      'Lihat Semua',
-                      style: TextStyle(color: AppColors.primaryTealDark, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppDimensions.spaceSM),
-
-              const _TaskItemCard(
-                category: 'Ambil Resep Obat',
-                targetPerson: 'Bapak Hartono (68 thn)',
-                address: 'Jl. Melati RT 02 / RW 05 (450m)',
-                points: '+10 Poin',
-                icon: Icons.medication_liquid_rounded,
-              ),
-              const SizedBox(height: AppDimensions.spaceSM),
-              const _TaskItemCard(
-                category: 'Belanja Kebutuhan Pokok',
-                targetPerson: 'Ibu Sutrisno (74 thn)',
-                address: 'Jl. Dahlia RT 01 / RW 05 (600m)',
-                points: '+10 Poin',
-                icon: Icons.shopping_basket_rounded,
-              ),
-
-              const SizedBox(height: AppDimensions.spaceMD),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: AccessibleButton(
-                      label: 'Radar Tugas',
-                      onPressed: () => context.push('/tasks'),
-                      backgroundColor: AppColors.cardWhite,
-                      textColor: AppColors.primaryTealDark,
-                      borderColor: AppColors.lightBorder,
-                      icon: Icons.radar_rounded,
-                    ),
-                  ),
-                  const SizedBox(width: AppDimensions.spaceMD),
-                  Expanded(
-                    child: AccessibleButton(
-                      label: 'Peringkat Relawan',
-                      onPressed: () => context.push('/tasks/leaderboard'),
-                      backgroundColor: AppColors.cardWhite,
-                      textColor: AppColors.warningAmberDark,
-                      borderColor: AppColors.lightBorder,
-                      icon: Icons.leaderboard_rounded,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: AppDimensions.spaceMD),
-
-              // Tombol Uji Notifikasi Alarm SOS
-              AccessibleButton(
-                label: 'Uji Alarm Notifikasi Darurat (Heads-Up SOS)',
-                onPressed: () {
-                  unawaited(FeedbackService.instance.triggerSuccessFeedback());
-                  final testIncidentId = activeIncidents.isNotEmpty ? activeIncidents.first.id : 'inc-demo-test';
-                  final testVictimName = activeIncidents.isNotEmpty
-                      ? (activeIncidents.first.careReceiverName ?? 'Warga SIGAP')
-                      : 'Ibu Aminah (Uji Notifikasi)';
-                  final testAddress = activeIncidents.isNotEmpty
-                      ? (activeIncidents.first.address ?? 'RT 03 / RW 05')
-                      : 'Jl. Kenanga No. 14, RT 03';
-
-                  unawaited(
-                    NotificationService.instance.showEmergencyAlert(
-                      incidentId: testIncidentId,
-                      victimName: testVictimName,
-                      address: testAddress,
-                      distanceMeters: 320,
-                    ),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      backgroundColor: AppColors.emergencyRedDark,
-                      behavior: SnackBarBehavior.floating,
-                      content: Text('Notifikasi darurat SOS terkirim ke panel notifikasi HP Anda.'),
-                    ),
-                  );
-                },
-                backgroundColor: AppColors.mintSurface,
-                textColor: AppColors.emergencyRed,
-                borderColor: AppColors.emergencyRedLight,
-                icon: Icons.notifications_active_rounded,
-              ),
-              const SizedBox(height: AppDimensions.spaceXL),
-            ],
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.white.withValues(alpha: 0.2),
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(icon, color: Colors.white, size: 20.0),
           ),
         ),
       ),
@@ -549,42 +533,43 @@ class _TaskItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        border: Border.all(color: AppColors.lightBorder, width: 1.0),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.cardShadow,
-            blurRadius: 6.0,
-            offset: Offset(0, 1),
-          ),
-        ],
-      ),
+    return AppCard(
       padding: const EdgeInsets.all(AppDimensions.spaceMD),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(10.0),
             decoration: const BoxDecoration(
               color: AppColors.primaryTealLight,
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: AppColors.primaryTealDark, size: 24.0),
+            child: Icon(icon, color: AppColors.primaryTealDark, size: 22.0),
           ),
           const SizedBox(width: AppDimensions.spaceMD),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(category, style: AppTypography.standardTitle(color: AppColors.textDarkPrimary)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        category,
+                        style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    AppBadge.brand(points, isSmall: true),
+                  ],
+                ),
                 const SizedBox(height: 2),
                 Text(targetPerson, style: AppTypography.standardBody(color: AppColors.textDarkSecondary)),
                 Text(address, style: AppTypography.standardCaption(color: AppColors.textDarkTertiary)),
               ],
             ),
           ),
+          const SizedBox(width: AppDimensions.spaceSM),
           ElevatedButton(
             onPressed: () {
               unawaited(FeedbackService.instance.triggerSuccessFeedback());
@@ -598,9 +583,10 @@ class _TaskItemCard extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primaryTeal,
               foregroundColor: Colors.white,
-              minimumSize: const Size(72, 38),
+              minimumSize: const Size(64, 36),
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
               ),
             ),
             child: const Text('Bantu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),

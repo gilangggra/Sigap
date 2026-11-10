@@ -6,7 +6,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/components/accessible_button.dart';
+import '../../../../shared/components/components.dart';
 
 /// Halaman Profil Pengguna & Pengaturan Mode Aksesibilitas Lansia
 /// Menggunakan tata letak standar mobile yang bersih, rapi, dan konsisten dengan font Poppins.
@@ -38,26 +38,16 @@ class ProfileScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Kartu Header Profil
-              Container(
+              AppCard(
                 padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                  border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: AppColors.cardShadow,
-                      blurRadius: 8.0,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 32.0,
-                      backgroundColor: AppColors.primaryTealLight,
-                      child: Icon(Icons.person, color: AppColors.primaryTealDark, size: 38.0),
+                    AppAvatar(
+                      name: user?.fullName ?? authProvider.fullName ?? 'Warga SIGAP',
+                      radius: 30.0,
+                      isOnline: authProvider.isVerified,
+                      showBadge: true,
+                      borderColor: AppColors.primaryTealLight,
                     ),
                     const SizedBox(width: AppDimensions.spaceMD),
                     Expanded(
@@ -66,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           Text(
                             user?.fullName ?? authProvider.fullName ?? 'Warga SIGAP',
-                            style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                            style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
                           ),
                           const SizedBox(height: 2.0),
                           Text(
@@ -76,38 +66,12 @@ class ProfileScreen extends StatelessWidget {
                           const SizedBox(height: 6.0),
                           Row(
                             children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryTealLight,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                  border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
-                                ),
-                                child: Text(
-                                  authProvider.role.label,
-                                  style: const TextStyle(
-                                    color: AppColors.primaryTealDark,
-                                    fontSize: 11.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                              AppBadge.brand(authProvider.role.label, isSmall: true),
                               const SizedBox(width: 6.0),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
-                                decoration: BoxDecoration(
-                                  color: authProvider.isVerified ? AppColors.mintSurface : const Color(0xFFFEF3C7),
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                ),
-                                child: Text(
-                                  authProvider.isVerified ? 'Terverifikasi' : 'Menunggu RT',
-                                  style: TextStyle(
-                                    color: authProvider.isVerified ? AppColors.safeGreenDark : AppColors.warningAmberDark,
-                                    fontSize: 11.0,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
+                              if (authProvider.isVerified)
+                                AppBadge.success('Terverifikasi', isSmall: true)
+                              else
+                                AppBadge.warning('Menunggu RT', isSmall: true),
                             ],
                           ),
                         ],
@@ -120,24 +84,12 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: AppDimensions.spaceMD),
 
               // Wilayah Domisili RT/RW
-              Container(
+              AppCard(
                 padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                  border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: AppColors.cardShadow,
-                      blurRadius: 8.0,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(10.0),
                       decoration: const BoxDecoration(
                         color: AppColors.primaryTealLight,
                         shape: BoxShape.circle,
@@ -150,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text('Lingkungan Domisili', style: AppTypography.standardCaption(color: AppColors.textDarkTertiary)),
-                          Text(areaName, style: AppTypography.standardBody(color: AppColors.textDarkPrimary)),
+                          Text(areaName, style: AppTypography.standardTitle(color: AppColors.textDarkPrimary)),
                         ],
                       ),
                     ),
@@ -161,29 +113,17 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: AppDimensions.spaceMD),
 
               // Toggle Mode Lansia (Simplified Mode)
-              Container(
+              AppCard(
                 padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                decoration: BoxDecoration(
-                  color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                  border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: AppColors.cardShadow,
-                      blurRadius: 8.0,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.safeGreen.withValues(alpha: 0.12),
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: const BoxDecoration(
+                        color: AppColors.safeGreenWash,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.accessibility_new_rounded, color: AppColors.safeGreenDark, size: 24.0),
+                      child: const Icon(Icons.accessibility_new_rounded, color: AppColors.safeGreenDark, size: 22.0),
                     ),
                     const SizedBox(width: AppDimensions.spaceMD),
                     Expanded(
@@ -215,6 +155,9 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: AppDimensions.spaceLG),
 
+              const AppSectionHeader(title: 'Data Medis Darurat'),
+              const SizedBox(height: AppDimensions.spaceSM),
+
               // Tombol Lihat Kartu Medis Digital & QR Code
               AccessibleButton(
                 label: 'Lihat Kartu Medis Digital & QR (ICE)',
@@ -237,6 +180,9 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.medical_services_rounded,
               ),
 
+              const SizedBox(height: AppDimensions.spaceLG),
+
+              const AppSectionHeader(title: 'Pengaturan Akun'),
               const SizedBox(height: AppDimensions.spaceSM),
 
               // Tombol Ganti Peran

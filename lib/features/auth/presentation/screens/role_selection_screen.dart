@@ -7,6 +7,7 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../shared/components/components.dart';
 
 /// Halaman pemilihan peran (Role-Based Onboarding)
 /// Mengimplementasikan tata letak standar mobile yang rapi dan konsisten dengan font Poppins.
@@ -116,60 +117,46 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.cardWhite,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        side: const BorderSide(
-          color: AppColors.lightBorder,
-          width: 1.0,
-        ),
-      ),
-      elevation: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        child: Container(
-          constraints: const BoxConstraints(
-            minHeight: AppDimensions.seniorMinTouchTarget,
+    return AppCard(
+      onTap: onTap,
+      padding: const EdgeInsets.all(AppDimensions.spaceMD),
+      child: Row(
+        children: [
+          Container(
+            width: 50.0,
+            height: 50.0,
+            decoration: BoxDecoration(
+              color: accentColor.withValues(alpha: 0.12),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: accentColor, size: 26.0),
           ),
-          padding: const EdgeInsets.all(AppDimensions.spaceMD),
-          child: Row(
-            children: [
-              Container(
-                width: 48.0,
-                height: 48.0,
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
+          const SizedBox(width: AppDimensions.spaceMD),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary).copyWith(
+                    fontSize: 16.0,
+                  ),
                 ),
-                child: Icon(icon, color: accentColor, size: 26.0),
-              ),
-              const SizedBox(width: AppDimensions.spaceMD),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
-                    ),
-                    const SizedBox(height: 2.0),
-                    Text(
-                      description,
-                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                    ),
-                  ],
+                const SizedBox(height: 2.0),
+                Text(
+                  description,
+                  style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                 ),
-              ),
-              const Icon(
-                Icons.arrow_forward_ios_rounded,
-                color: AppColors.textDarkTertiary,
-                size: 16.0,
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
+          const SizedBox(width: AppDimensions.spaceSM),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.textDarkTertiary,
+            size: 20.0,
+          ),
+        ],
       ),
     );
   }

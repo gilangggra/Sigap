@@ -6,8 +6,9 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
+import '../../../../core/theme/app_decorations.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/components/accessible_button.dart';
+import '../../../../shared/components/components.dart';
 import '../../domain/models/task_item.dart';
 import '../state/task_provider.dart';
 
@@ -126,16 +127,20 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Banner Informasi Radius Hyperlocal 800m
-                Container(
+                AppCard(
                   padding: const EdgeInsets.all(AppDimensions.spaceMD),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryTealLight,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                    border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
-                  ),
+                  backgroundColor: AppColors.primaryTealWash,
+                  border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
                   child: Row(
                     children: [
-                      const Icon(Icons.radar_rounded, color: AppColors.primaryTealDark, size: 26.0),
+                      Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.radar_rounded, color: AppColors.primaryTealDark, size: 22.0),
+                      ),
                       const SizedBox(width: AppDimensions.spaceMD),
                       Expanded(
                         child: Text(
@@ -145,6 +150,13 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                       ),
                     ],
                   ),
+                ),
+
+                const SizedBox(height: AppDimensions.spaceMD),
+
+                // Bilah Pencarian Cepat Khas Mobile
+                const AppSearchField(
+                  hintText: 'Cari tugas bantuan atau kebutuhan warga...',
                 ),
 
                 const SizedBox(height: AppDimensions.spaceMD),
@@ -208,31 +220,18 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
 
                 // Tugas Aktif yang Sedang Diambil Pengguna
                 if (myClaimedTasks.isNotEmpty) ...[
-                  Text(
-                    'Tugas yang Sedang Anda Kerjakan',
-                    style: AppTypography.categoryHeadline(color: AppColors.safeGreenDark),
+                  const AppSectionHeader(
+                    title: 'Tugas yang Sedang Anda Kerjakan',
+                    subtitle: 'Selesaikan dan konfirmasi untuk memperoleh poin sosial',
                   ),
                   const SizedBox(height: AppDimensions.spaceSM),
                   ...myClaimedTasks.map((task) {
                     final isDone = task.status == TaskStatus.completed;
-                    return Container(
+                    return AppCard(
                       margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                        border: Border.all(
-                          color: isDone ? AppColors.safeGreen : AppColors.primaryTeal,
-                          width: 1.5,
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.cardShadow,
-                            blurRadius: 8.0,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                      border: isDone
+                          ? Border.all(color: AppColors.safeGreen, width: 1.5)
+                          : AppBorders.tealActive,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -246,35 +245,25 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                                   style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: isDone ? AppColors.safeGreen.withValues(alpha: 0.15) : AppColors.primaryTealLight,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                ),
-                                child: Text(
-                                  task.status.label,
-                                  style: TextStyle(
-                                    color: isDone ? AppColors.safeGreenDark : AppColors.primaryTealDark,
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
+                              if (isDone)
+                                AppBadge.success(task.status.label, isSmall: true)
+                              else
+                                AppBadge.brand(task.status.label, isSmall: true),
                             ],
                           ),
                           const SizedBox(height: AppDimensions.spaceSM),
                           Text(task.description, style: AppTypography.standardBody(color: AppColors.textDarkPrimary)),
                           const SizedBox(height: 2.0),
                           Text('Tujuan: ${task.destinationAddress}', style: AppTypography.standardCaption(color: AppColors.textDarkSecondary)),
-                          const SizedBox(height: AppDimensions.spaceMD),
-                          if (!isDone)
+                          if (!isDone) ...[
+                            const SizedBox(height: AppDimensions.spaceMD),
                             AccessibleButton(
                               label: 'Tandai Selesai (+10 Poin)',
                               onPressed: () => _finishTask(task),
                               backgroundColor: AppColors.safeGreen,
                               icon: Icons.check_circle_rounded,
                             ),
+                          ],
                         ],
                       ),
                     );
@@ -283,68 +272,32 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                 ],
 
                 // Daftar Tugas Terbuka di Sekitar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Tugas Menunggu Relawan (${nearbyTasks.length})',
-                      style: AppTypography.categoryHeadline(),
-                    ),
-                    if (provider.isLoading)
-                      const SizedBox(
-                        width: 16.0,
-                        height: 16.0,
-                        child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.primaryTeal),
-                      ),
-                  ],
+                AppSectionHeader(
+                  title: 'Tugas Menunggu Relawan (${nearbyTasks.length})',
+                  subtitle: 'Pilih tugas terdekat yang bisa Anda bantu',
+                  trailing: provider.isLoading
+                      ? const SizedBox(
+                          width: 16.0,
+                          height: 16.0,
+                          child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.primaryTeal),
+                        )
+                      : null,
                 ),
                 const SizedBox(height: AppDimensions.spaceSM),
 
                 if (nearbyTasks.isEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.all(AppDimensions.spaceXL),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardWhite,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                      border: Border.all(color: AppColors.lightBorder),
-                    ),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          const Icon(Icons.check_circle_outline_rounded, color: AppColors.safeGreen, size: 44.0),
-                          const SizedBox(height: AppDimensions.spaceMD),
-                          Text(
-                            'Semua warga di sekitar aman!',
-                            style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
-                          ),
-                          const SizedBox(height: 2.0),
-                          Text(
-                            'Belum ada permohonan bantuan mikro baru dalam radius 800m.',
-                            style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
+                  AppEmptyState(
+                    icon: Icons.check_circle_outline_rounded,
+                    title: 'Semua Warga Sekitar Aman!',
+                    description: 'Belum ada permohonan bantuan mikro baru dalam radius 800m.',
+                    actionLabel: 'Buat Permohonan Baru',
+                    onActionPressed: () => context.push('/tasks/create'),
                   ),
                 ] else ...[
                   ...nearbyTasks.map((task) {
                     final dist = task.distanceMeters != null ? '${task.distanceMeters!.toInt()} m' : 'Dekat';
-                    return Container(
+                    return AppCard(
                       margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardWhite,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                        border: Border.all(color: AppColors.lightBorder, width: 1.0),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: AppColors.cardShadow,
-                            blurRadius: 6.0,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -364,17 +317,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                                   ],
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryTealLight,
-                                  borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                ),
-                                child: const Text(
-                                  '+10 Poin',
-                                  style: TextStyle(color: AppColors.primaryTealDark, fontSize: 11, fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                              AppBadge.brand('+10 Poin', isSmall: true),
                             ],
                           ),
                           const SizedBox(height: AppDimensions.spaceSM),
