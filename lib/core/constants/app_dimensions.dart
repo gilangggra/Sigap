@@ -1,5 +1,5 @@
 /// Konstanta ukuran, target sentuh (touch targets), dan jarak tata letak
-/// dengan fokus utama pada standar aksesibilitas lansia dan situasi darurat.
+/// dengan fokus utama pada standar aksesibilitas lansia dan sistem desain modern SIGAP.
 abstract final class AppDimensions {
   // --- Target Sentuh Aksesibilitas (Touch Targets) ---
   /// Target sentuh minimum mutlak untuk tombol lansia (sesuai spesifikasi min 64dp)
@@ -26,10 +26,13 @@ abstract final class AppDimensions {
   static const double space2XL = 40.0;
   static const double space3XL = 48.0;
 
-  // --- Border Radius ---
-  static const double radiusSM = 6.0;
-  static const double radiusMD = 12.0;
-  static const double radiusLG = 16.0;
+  // --- Border Radius Modern Healthcare ---
+  static const double radiusSM = 8.0;
+  static const double radiusMD = 14.0;
+  static const double radiusLG = 18.0;
+  static const double radiusCard = 24.0;
+  static const double radiusPill = 28.0;
+  static const double radiusHeader = 32.0;
   static const double radiusXL = 24.0;
   static const double radiusFull = 999.0;
 
@@ -38,8 +41,7 @@ abstract final class AppDimensions {
   static const double standardBorderWidth = 1.0;
 
   // --- Elevasi Bayangan ---
-  static const double elevationLow = 2.0;
-  static const double elevationMedium = 4.0;
-  static const double elevationHigh = 8.0;
+  static const double elevationLow = 1.0;
+  static const double elevationMedium = 3.0;
+  static const double elevationHigh = 6.0;
 }
-

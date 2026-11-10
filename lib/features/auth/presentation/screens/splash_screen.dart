@@ -9,6 +9,7 @@ import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Halaman pembuka untuk inisialisasi lingkungan dan pemeriksaan sesi login
+/// Didesain dengan estetika Medis & Healthcare Modern (Sesuai Referensi Gambar).
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -24,18 +25,15 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkInitialSession() async {
-    // Jeda sejenak untuk visual branding dan kesiapan service
     await Future<void>.delayed(const Duration(milliseconds: 1200));
 
     if (!mounted) return;
 
     final session = SupabaseService.instance.currentSession;
     if (session != null) {
-      // User telah memiliki session aktif
       final auth = context.read<AuthProvider>();
       _navigateBasedOnRole(auth.role);
     } else {
-      // Belum login, arahkan ke alur registrasi/login
       context.go('/auth/phone');
     }
   }
@@ -60,7 +58,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.mintBackground,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(AppDimensions.spaceXL),
@@ -71,10 +69,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: 110.0,
                 height: 110.0,
                 decoration: const BoxDecoration(
+                  color: AppColors.cardWhite,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.emergencyRedGlow,
+                      color: AppColors.primaryTealGlow,
                       blurRadius: 28.0,
                       spreadRadius: 4.0,
                     ),
@@ -85,10 +84,10 @@ class _SplashScreenState extends State<SplashScreen> {
                     'assets/branding/app_icon.png',
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: AppColors.emergencyRed,
+                      color: AppColors.primaryTealLight,
                       child: const Icon(
-                        Icons.shield_rounded,
-                        color: Colors.white,
+                        Icons.health_and_safety_rounded,
+                        color: AppColors.primaryTeal,
                         size: 56.0,
                       ),
                     ),
@@ -98,9 +97,9 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: AppDimensions.spaceLG),
               Text(
                 AppConstants.appName,
-                style: AppTypography.seniorHeadingLarge(color: Colors.white),
+                style: AppTypography.seniorHeadingLarge(color: AppColors.primaryTealDeep),
               ),
-              const SizedBox(height: AppDimensions.spaceSM),
+              const SizedBox(height: AppDimensions.spaceXS),
               Text(
                 AppConstants.appTagline,
                 textAlign: TextAlign.center,
@@ -112,7 +111,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 height: 32.0,
                 child: CircularProgressIndicator(
                   strokeWidth: 3.0,
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.emergencyRed),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryTeal),
                 ),
               ),
             ],

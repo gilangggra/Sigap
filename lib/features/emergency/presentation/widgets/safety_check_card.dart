@@ -9,7 +9,7 @@ import '../../../../shared/components/accessible_button.dart';
 import 'safety_check_dialog.dart';
 
 /// Kartu Antarmuka Fitur Cek Keselamatan Perjalanan (Walk-Safe Timer Card)
-/// Ditampilkan pada Beranda Lansia (CareReceiverHomeScreen)
+/// Ditampilkan pada Beranda Lansia dengan estetika modern Healthcare Pill & White Surface.
 class SafetyCheckCard extends StatelessWidget {
   final VoidCallback onEmergencyTriggered;
 
@@ -31,26 +31,33 @@ class SafetyCheckCard extends StatelessWidget {
           // Tampilan Mode Standby (Belum Berangkat)
           return Container(
             decoration: BoxDecoration(
-              color: AppColors.darkCard,
-              borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-              border: Border.all(color: AppColors.darkBorderHighContrast, width: 2.0),
+              color: AppColors.cardWhite,
+              borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+              border: Border.all(color: AppColors.mintBorder, width: 1.5),
+              boxShadow: const [
+                BoxShadow(
+                  color: AppColors.cardShadow,
+                  blurRadius: 16.0,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
-            padding: const EdgeInsets.all(AppDimensions.spaceMD),
+            padding: const EdgeInsets.all(AppDimensions.spaceLG),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(AppDimensions.spaceSM),
-                      decoration: BoxDecoration(
-                        color: AppColors.infoBlue.withValues(alpha: 0.2),
+                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primaryTealLight,
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.directions_walk_rounded,
-                        color: AppColors.infoBlueLight,
-                        size: 30.0,
+                        color: AppColors.primaryTealDark,
+                        size: 28.0,
                       ),
                     ),
                     const SizedBox(width: AppDimensions.spaceMD),
@@ -60,8 +67,9 @@ class SafetyCheckCard extends StatelessWidget {
                         children: [
                           Text(
                             'Cek Perjalanan Aman',
-                            style: AppTypography.seniorTitle(color: Colors.white),
+                            style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                           ),
+                          const SizedBox(height: 2),
                           Text(
                             'Atur pengatur waktu saat bepergian ke masjid atau jalan pagi.',
                             style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
@@ -71,7 +79,7 @@ class SafetyCheckCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceLG),
                 AccessibleButton(
                   label: 'MULAI PERJALANAN AMAN',
                   onPressed: () {
@@ -83,9 +91,9 @@ class SafetyCheckCard extends StatelessWidget {
                       ),
                     );
                   },
-                  backgroundColor: AppColors.darkSurfaceElevated,
-                  borderColor: AppColors.infoBlueLight,
-                  textColor: Colors.white,
+                  backgroundColor: AppColors.primaryTealLight,
+                  borderColor: AppColors.primaryTeal,
+                  textColor: AppColors.primaryTealDeep,
                   customHeight: 64.0,
                   icon: Icons.timer_outlined,
                 ),
@@ -97,14 +105,21 @@ class SafetyCheckCard extends StatelessWidget {
         // Tampilan Mode Pengawasan Aktif (Sedang Berjalan)
         return Container(
           decoration: BoxDecoration(
-            color: AppColors.darkSurfaceElevated,
-            borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+            color: AppColors.cardWhite,
+            borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
             border: Border.all(
               color: status == SafetyCheckStatus.preAlarmTriggered
-                  ? AppColors.emergencyRedLight
-                  : AppColors.infoBlueLight,
+                  ? AppColors.emergencyRed
+                  : AppColors.primaryTeal,
               width: 2.5,
             ),
+            boxShadow: const [
+              BoxShadow(
+                color: AppColors.cardShadow,
+                blurRadius: 20.0,
+                offset: Offset(0, 6),
+              ),
+            ],
           ),
           padding: const EdgeInsets.all(AppDimensions.spaceLG),
           child: Column(
@@ -118,7 +133,7 @@ class SafetyCheckCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: status == SafetyCheckStatus.preAlarmTriggered
                           ? AppColors.emergencyRed
-                          : AppColors.safeGreenLight,
+                          : AppColors.safeGreen,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -129,11 +144,11 @@ class SafetyCheckCard extends StatelessWidget {
                         : 'PERJALANAN SEDANG DIPANTAU',
                     style: TextStyle(
                       color: status == SafetyCheckStatus.preAlarmTriggered
-                          ? AppColors.emergencyRedLight
-                          : AppColors.safeGreenLight,
+                          ? AppColors.emergencyRed
+                          : AppColors.primaryTealDark,
                       fontWeight: FontWeight.bold,
                       fontSize: 14.0,
-                      letterSpacing: 1.0,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ],
@@ -154,8 +169,8 @@ class SafetyCheckCard extends StatelessWidget {
                             : SafetyCheckService.formatSecondsToMinutes(seconds),
                         style: TextStyle(
                           color: status == SafetyCheckStatus.preAlarmTriggered
-                              ? AppColors.emergencyRedLight
-                              : Colors.white,
+                              ? AppColors.emergencyRed
+                              : AppColors.textDarkPrimary,
                           fontSize: 44.0,
                           fontWeight: FontWeight.w900,
                           letterSpacing: 1.5,
@@ -201,8 +216,9 @@ class SafetyCheckCard extends StatelessWidget {
                     child: AccessibleButton(
                       label: '+15 Menit',
                       onPressed: () => safetyService.extendDuration(additionalMinutes: 15),
-                      backgroundColor: AppColors.darkCard,
-                      borderColor: AppColors.darkBorderHighContrast,
+                      backgroundColor: AppColors.mintSurface,
+                      borderColor: AppColors.mintBorder,
+                      textColor: AppColors.primaryTealDark,
                       customHeight: 56.0,
                       icon: Icons.more_time_rounded,
                     ),
@@ -212,8 +228,8 @@ class SafetyCheckCard extends StatelessWidget {
                     child: AccessibleButton(
                       label: 'Batalkan',
                       onPressed: () => safetyService.cancelSafetyCheck(),
-                      backgroundColor: AppColors.darkCard,
-                      borderColor: AppColors.darkBorderHighContrast,
+                      backgroundColor: AppColors.mintSurface,
+                      borderColor: AppColors.mintBorder,
                       textColor: AppColors.textDarkSecondary,
                       customHeight: 56.0,
                       icon: Icons.close_rounded,

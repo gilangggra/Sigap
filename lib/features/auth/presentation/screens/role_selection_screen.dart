@@ -4,20 +4,22 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Halaman pemilihan peran (Role-Based Onboarding)
+/// Mengimplementasikan sistem desain Healthcare Teal & Mint dengan kartu permukaan putih halus.
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
   void _selectRole(BuildContext context, UserRole role) {
+    FeedbackService.instance.triggerSuccessFeedback();
     context.read<AuthProvider>().selectRole(role);
 
     if (role == UserRole.civicAdmin) {
       context.go('/admin');
     } else {
-      // Warga wajib memasukkan kode unik RT/RW untuk verifikasi domisili (PRD F4.1)
       context.go('/auth/rt-code');
     }
   }
@@ -25,33 +27,34 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.mintBackground,
       appBar: AppBar(
         title: const Text('Pilih Peran Anda'),
+        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG, vertical: AppDimensions.spaceMD),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'Peran dalam Komunitas',
-                style: AppTypography.seniorHeadingMedium(color: Colors.white),
+                style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
               ),
-              const SizedBox(height: AppDimensions.spaceSM),
+              const SizedBox(height: AppDimensions.spaceXS),
               Text(
                 'Pilih peran Anda untuk menyesuaikan tata letak dan fitur yang paling relevan.',
-                style: AppTypography.seniorBodyPrimary(color: AppColors.textDarkSecondary),
+                style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
               ),
-              const SizedBox(height: AppDimensions.spaceXL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Kartu Peran 1: Care-Receiver
               _RoleCard(
                 title: 'Penerima Bantuan (Lansia)',
                 description: 'Antarmuka tombol besar, SOS satu ketukan, dan pengingat kondisi harian.',
                 icon: Icons.elderly_rounded,
-                accentColor: AppColors.roleCareReceiver,
+                accentColor: AppColors.primaryTeal,
                 onTap: () => _selectRole(context, UserRole.careReceiver),
               ),
               const SizedBox(height: AppDimensions.spaceMD),
@@ -110,54 +113,55 @@ class _RoleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.darkCard,
+      color: AppColors.cardWhite,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
         side: const BorderSide(
-          color: AppColors.darkBorderHighContrast,
-          width: AppDimensions.highContrastBorderWidth,
+          color: AppColors.mintBorder,
+          width: 1.5,
         ),
       ),
-      elevation: AppDimensions.elevationLow,
+      elevation: 0,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-        child: Padding(
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        child: Container(
+          constraints: const BoxConstraints(
+            minHeight: AppDimensions.seniorRecommendedTouchTarget,
+          ),
           padding: const EdgeInsets.all(AppDimensions.spaceLG),
           child: Row(
             children: [
               Container(
-                width: 56.0,
-                height: 56.0,
+                width: 60.0,
+                height: 60.0,
                 decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.18),
+                  color: accentColor.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: accentColor, width: 2.0),
                 ),
-                child: Icon(icon, color: accentColor, size: 30.0),
+                child: Icon(icon, color: accentColor, size: 32.0),
               ),
-              const SizedBox(width: AppDimensions.spaceMD),
+              const SizedBox(width: AppDimensions.spaceLG),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: AppTypography.seniorTitle(color: Colors.white),
+                      style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                     ),
                     const SizedBox(height: AppDimensions.spaceXS),
                     Text(
                       description,
-                      style: AppTypography.seniorBodySecondary(color: AppColors.textDarkSecondary),
+                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: AppDimensions.spaceSM),
               const Icon(
                 Icons.arrow_forward_ios_rounded,
-                color: Colors.white,
-                size: 22.0,
+                color: AppColors.textDarkTertiary,
+                size: 20.0,
               ),
             ],
           ),

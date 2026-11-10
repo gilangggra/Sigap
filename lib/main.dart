@@ -100,17 +100,18 @@ class SigapApp extends StatelessWidget {
 
     // Otomatis memilih tema:
     // Jika peran adalah Care-Receiver (Lansia) atau simplifiedMode aktif,
-    // gunakan [AppTheme.seniorTheme] dengan rasio kontras maksimal dan tombol besar.
+    // gunakan [AppTheme.seniorTheme] dengan rasio kontras tinggi dan tombol pill besar.
+    // Untuk peran lainnya, gunakan [AppTheme.lightTheme] (Healthcare Teal-Mint Design System).
     final ThemeData activeTheme = (authProvider.simplifiedMode || authProvider.role == UserRole.careReceiver)
         ? AppTheme.seniorTheme
-        : AppTheme.darkTheme;
+        : AppTheme.lightTheme;
 
     return MaterialApp.router(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: activeTheme,
-      darkTheme: AppTheme.seniorTheme,
-      themeMode: ThemeMode.dark, // Default gelap untuk aksesibilitas kontras tinggi
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light, // Default tema terang Healthcare Teal-Mint sesuai Design System
       routerConfig: appRouter,
     );
   }

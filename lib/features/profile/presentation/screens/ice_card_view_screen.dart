@@ -13,9 +13,7 @@ import '../../../../shared/components/accessible_button.dart';
 import '../state/profile_provider.dart';
 
 /// Halaman Tampilan Data Medis Darurat (Digital ICE Card & Medical ID Pass).
-/// Dapat diakses dalam 2 mode:
-/// 1. Self-View (Lansia/Keluarga): Menampilkan Medical Pass pribadi beserta QR Code offline untuk paramedis.
-/// 2. Responder-View: Menggunakan Emergency Token (berlaku 2 jam) saat menangani insiden korban.
+/// Didesain dengan Sistem Desain Medis & Healthcare Modern (Sesuai Referensi Gambar).
 class IceCardViewScreen extends StatefulWidget {
   final String? emergencyToken;
   final bool isSelfView;
@@ -31,7 +29,7 @@ class IceCardViewScreen extends StatefulWidget {
 }
 
 class _IceCardViewScreenState extends State<IceCardViewScreen> {
-  bool _showQrCode = false;
+  int _selectedTabIndex = 0; // 0: Data Medis, 1: QR Code Darurat
 
   @override
   void initState() {
@@ -88,18 +86,22 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
     final card = widget.isSelfView
         ? profileProvider.iceCard
         : profileProvider.emergencyIceCard;
+    final patientName = authProvider.fullName ?? 'Ibu Aminah';
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.mintBackground,
       appBar: AppBar(
-        title: Text(widget.isSelfView ? 'Kartu Medis Digital (Medical ID)' : 'Data Medis Darurat Korban'),
-        backgroundColor: widget.isSelfView ? AppColors.darkSurface : AppColors.emergencyRedDark,
+        title: Text(widget.isSelfView ? 'Kartu Medis Digital' : 'Data Medis Korban'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: SafeArea(
         child: profileProvider.isLoading
             ? const Center(
                 child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.emergencyRed),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryTeal),
                 ),
               )
             : card == null
@@ -109,30 +111,41 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.gpp_bad_rounded, color: AppColors.emergencyRedLight, size: 64.0),
+                          Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primaryTealLight,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.medical_information_outlined,
+                              color: AppColors.primaryTealDark,
+                              size: 56.0,
+                            ),
+                          ),
                           const SizedBox(height: AppDimensions.spaceMD),
                           Text(
                             widget.isSelfView
                                 ? 'Data Medis Belum Diisi'
                                 : 'Akses Ditolak / Token Kedaluwarsa',
-                            style: AppTypography.seniorTitle(color: Colors.white),
+                            style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: AppDimensions.spaceSM),
                           Text(
                             widget.isSelfView
-                                ? 'Silakan lengkapi profil medis darurat Anda terlebih dahulu.'
+                                ? 'Lengkapi profil medis darurat Anda agar relawan dan paramedis dapat memberikan pertolongan yang tepat.'
                                 : profileProvider.errorMessage ??
                                     'Token darurat hanya berlaku 2 jam selama insiden aktif.',
                             style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
                             textAlign: TextAlign.center,
                           ),
                           if (widget.isSelfView) ...[
-                            const SizedBox(height: AppDimensions.spaceLG),
+                            const SizedBox(height: AppDimensions.spaceXL),
                             AccessibleButton(
                               label: 'Isi Data Medis Sekarang',
                               onPressed: () => context.push('/profile/ice-card'),
-                              backgroundColor: AppColors.safeGreen,
+                              backgroundColor: AppColors.primaryTeal,
                               icon: Icons.edit_note_rounded,
                             ),
                           ],
@@ -141,80 +154,280 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                     ),
                   )
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG, vertical: AppDimensions.spaceMD),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Watermark / Badge Otorisasi Resmi
+                        // Avatar Header & Citizen Info (Sesuai Referensi Gambar Layar 3)
+                        Center(
+                          child: Column(
+                            children: [
+                              Container(
+                                width: 84.0,
+                                height: 84.0,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryTealLight,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.primaryTeal, width: 3.0),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: AppColors.cardShadow,
+                                      blurRadius: 14.0,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.elderly_rounded,
+                                  color: AppColors.primaryTealDark,
+                                  size: 48.0,
+                                ),
+                              ),
+                              const SizedBox(height: AppDimensions.spaceMD),
+                              Text(
+                                patientName,
+                                style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
+                              ),
+                              const SizedBox(height: 2.0),
+                              Text(
+                                'Lansia Terdaftar • RT 04 / RW 02',
+                                style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: AppDimensions.spaceLG),
+
+                        // Segmented Pill Tab Bar (Sesuai Referensi Gambar Layar 3)
                         Container(
-                          padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                          padding: const EdgeInsets.all(4.0),
                           decoration: BoxDecoration(
-                            color: widget.isSelfView
-                                ? AppColors.infoBlue.withValues(alpha: 0.15)
-                                : AppColors.emergencyRed.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                            border: Border.all(
-                              color: widget.isSelfView ? AppColors.infoBlueLight : AppColors.emergencyRed,
-                              width: 2.0,
-                            ),
+                            color: AppColors.cardWhite,
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                            border: Border.all(color: AppColors.mintBorder, width: 1.5),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.cardShadow,
+                                blurRadius: 10.0,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: Row(
                             children: [
-                              Icon(
-                                widget.isSelfView ? Icons.badge_rounded : Icons.verified_user_rounded,
-                                color: widget.isSelfView ? AppColors.infoBlueLight : AppColors.emergencyRedLight,
-                                size: 30.0,
-                              ),
-                              const SizedBox(width: AppDimensions.spaceMD),
                               Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      widget.isSelfView
-                                          ? 'Kartu Medis Resmi Warga'
-                                          : 'Akses Darurat Aktif (2 Jam)',
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    FeedbackService.instance.triggerSuccessFeedback();
+                                    setState(() => _selectedTabIndex = 0);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                    decoration: BoxDecoration(
+                                      color: _selectedTabIndex == 0 ? AppColors.primaryTeal : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                                     ),
-                                    Text(
-                                      widget.isSelfView
-                                          ? 'Tersimpan terenkripsi di perangkat untuk akses penyelamatan cepat.'
-                                          : 'Akses Anda telah dicatat di Audit Log sistem bersama stempel waktu.',
-                                      style: const TextStyle(color: AppColors.textDarkSecondary, fontSize: 13.0),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Informasi Medis',
+                                      style: TextStyle(
+                                        color: _selectedTabIndex == 0 ? Colors.white : AppColors.textDarkSecondary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.0,
+                                      ),
                                     ),
-                                  ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    FeedbackService.instance.triggerSuccessFeedback();
+                                    setState(() => _selectedTabIndex = 1);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                    decoration: BoxDecoration(
+                                      color: _selectedTabIndex == 1 ? AppColors.primaryTeal : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'QR Code ICE',
+                                      style: TextStyle(
+                                        color: _selectedTabIndex == 1 ? Colors.white : AppColors.textDarkSecondary,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                         ),
+
                         const SizedBox(height: AppDimensions.spaceLG),
 
-                        // Tombol Toggle QR Code Medis (Tampak Jelas untuk Paramedis)
-                        AccessibleButton(
-                          label: _showQrCode ? 'SEMBUNYIKAN QR CODE MEDIS' : 'TAMPILKAN QR CODE DARURAT (ICE)',
-                          onPressed: () {
-                            FeedbackService.instance.triggerSuccessFeedback();
-                            setState(() => _showQrCode = !_showQrCode);
-                          },
-                          backgroundColor: _showQrCode ? AppColors.darkCard : AppColors.emergencyRed,
-                          borderColor: AppColors.darkBorderHighContrast,
-                          icon: _showQrCode ? Icons.qr_code_rounded : Icons.qr_code_scanner_rounded,
-                        ),
+                        // Tab 0: Informasi Medis Lengkap
+                        if (_selectedTabIndex == 0) ...[
+                          // Kartu Golongan Darah
+                          Container(
+                            padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardWhite,
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                              border: Border.all(color: AppColors.mintBorder, width: 1.5),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: AppColors.cardShadow,
+                                  blurRadius: 14.0,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 64.0,
+                                  height: 64.0,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.emergencyRed,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    card.bloodType,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: AppDimensions.spaceLG),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'GOLONGAN DARAH',
+                                        style: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
+                                      ),
+                                      Text(
+                                        'Tipe ${card.bloodType}',
+                                        style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
 
-                        // Tampilan QR Code Medis Resolusi Tinggi
-                        if (_showQrCode) ...[
-                          const SizedBox(height: AppDimensions.spaceLG),
+                          const SizedBox(height: AppDimensions.spaceMD),
+
+                          // Alergi Obat & Makanan
+                          _MedicalSectionCard(
+                            title: 'Alergi Obat & Makanan',
+                            icon: Icons.warning_amber_rounded,
+                            accentColor: AppColors.warningAmber,
+                            items: card.allergies.isEmpty ? const ['Tidak ada riwayat alergi'] : card.allergies,
+                          ),
+
+                          const SizedBox(height: AppDimensions.spaceMD),
+
+                          // Penyakit Kronis
+                          _MedicalSectionCard(
+                            title: 'Riwayat Penyakit Kronis',
+                            icon: Icons.health_and_safety_outlined,
+                            accentColor: AppColors.primaryTealDark,
+                            items: card.chronicConditions.isEmpty
+                                ? const ['Tidak ada riwayat penyakit kronis']
+                                : card.chronicConditions,
+                          ),
+
+                          const SizedBox(height: AppDimensions.spaceMD),
+
+                          // Kontak Dokter & Catatan Khusus
+                          if (card.doctorName != null || card.doctorPhone != null || card.doctorNotes != null) ...[
+                            Container(
+                              padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                              decoration: BoxDecoration(
+                                color: AppColors.cardWhite,
+                                borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                                border: Border.all(color: AppColors.mintBorder, width: 1.5),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: AppColors.cardShadow,
+                                    blurRadius: 14.0,
+                                    offset: Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(8.0),
+                                        decoration: const BoxDecoration(
+                                          color: AppColors.primaryTealLight,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(Icons.local_hospital_rounded, color: AppColors.primaryTealDark, size: 22),
+                                      ),
+                                      const SizedBox(width: AppDimensions.spaceSM),
+                                      Text(
+                                        'Dokter / Faskes Rujukan',
+                                        style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
+                                      ),
+                                    ],
+                                  ),
+                                  if (card.doctorName != null) ...[
+                                    const SizedBox(height: AppDimensions.spaceMD),
+                                    Text(
+                                      card.doctorName!,
+                                      style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                                    ),
+                                  ],
+                                  if (card.doctorNotes != null) ...[
+                                    const SizedBox(height: AppDimensions.spaceSM),
+                                    Text(
+                                      'Catatan: ${card.doctorNotes}',
+                                      style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
+                                    ),
+                                  ],
+                                  if (card.doctorPhone != null) ...[
+                                    const SizedBox(height: AppDimensions.spaceMD),
+                                    AccessibleButton(
+                                      label: 'Hubungi Dokter (${card.doctorPhone})',
+                                      onPressed: () => _callDoctor(card.doctorPhone!),
+                                      backgroundColor: AppColors.primaryTealLight,
+                                      textColor: AppColors.primaryTealDeep,
+                                      borderColor: AppColors.primaryTeal,
+                                      icon: Icons.phone_in_talk_rounded,
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          ],
+                        ] else ...[
+                          // Tab 1: QR Code Medis
                           Container(
                             padding: const EdgeInsets.all(AppDimensions.spaceXL),
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+                              color: AppColors.cardWhite,
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                              border: Border.all(color: AppColors.mintBorder, width: 1.5),
                               boxShadow: const [
                                 BoxShadow(
-                                  color: Colors.black45,
-                                  blurRadius: 10.0,
-                                  offset: Offset(0, 4),
+                                  color: AppColors.cardShadow,
+                                  blurRadius: 20.0,
+                                  offset: Offset(0, 6),
                                 ),
                               ],
                             ),
@@ -223,35 +436,26 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                 QrImageView(
                                   data: _generateQrPayload(card, authProvider),
                                   version: QrVersions.auto,
-                                  size: 220.0,
+                                  size: 200.0,
                                   backgroundColor: Colors.white,
                                   eyeStyle: const QrEyeStyle(
                                     eyeShape: QrEyeShape.square,
-                                    color: Colors.black,
+                                    color: AppColors.primaryTealDeep,
                                   ),
                                   dataModuleStyle: const QrDataModuleStyle(
                                     dataModuleShape: QrDataModuleShape.square,
-                                    color: Colors.black,
+                                    color: AppColors.textDarkPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: AppDimensions.spaceMD),
-                                const Text(
+                                Text(
                                   'QR MEDIS DARURAT SIGAP',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16.0,
-                                    letterSpacing: 1.0,
-                                  ),
+                                  style: AppTypography.standardTitle(color: AppColors.primaryTealDark),
                                 ),
                                 const SizedBox(height: AppDimensions.spaceXS),
-                                const Text(
-                                  'Dapat dipindai langsung oleh Paramedis / Dokter IGD untuk melihat golongan darah, alergi, dan kontak darurat secara instan.',
-                                  style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 13.0,
-                                    height: 1.4,
-                                  ),
+                                Text(
+                                  'Dapat dipindai langsung oleh Paramedis / Relawan untuk melihat golongan darah, alergi, dan kontak darurat tanpa koneksi internet.',
+                                  style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -261,123 +465,13 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
 
                         const SizedBox(height: AppDimensions.spaceLG),
 
-                        // Kartu Golongan Darah Besar
-                        Container(
-                          padding: const EdgeInsets.all(AppDimensions.spaceLG),
-                          decoration: BoxDecoration(
-                            color: AppColors.darkCard,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-                            border: Border.all(color: AppColors.darkBorderHighContrast),
+                        if (widget.isSelfView) ...[
+                          AccessibleButton(
+                            label: 'Perbarui Data Medis Saya',
+                            onPressed: () => context.push('/profile/ice-card'),
+                            backgroundColor: AppColors.primaryTeal,
+                            icon: Icons.edit_rounded,
                           ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 72.0,
-                                height: 72.0,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.emergencyRed,
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  card.bloodType,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 26.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: AppDimensions.spaceLG),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'GOLONGAN DARAH',
-                                      style: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
-                                    ),
-                                    Text(
-                                      card.bloodType,
-                                      style: AppTypography.seniorHeadingMedium(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: AppDimensions.spaceLG),
-
-                        // Alergi Obat & Makanan (Kritis untuk penolong)
-                        _MedicalSectionCard(
-                          title: 'ALERGI OBAT & MAKANAN',
-                          icon: Icons.warning_amber_rounded,
-                          accentColor: AppColors.warningAmber,
-                          items: card.allergies.isEmpty ? const ['Tidak ada riwayat alergi'] : card.allergies,
-                        ),
-                        const SizedBox(height: AppDimensions.spaceLG),
-
-                        // Penyakit Kronis
-                        _MedicalSectionCard(
-                          title: 'RIWAYAT PENYAKIT KRONIS',
-                          icon: Icons.health_and_safety_outlined,
-                          accentColor: AppColors.infoBlueLight,
-                          items: card.chronicConditions.isEmpty
-                              ? const ['Tidak ada riwayat penyakit kronis']
-                              : card.chronicConditions,
-                        ),
-                        const SizedBox(height: AppDimensions.spaceLG),
-
-                        // Kontak Dokter & Catatan Khusus
-                        if (card.doctorName != null || card.doctorPhone != null || card.doctorNotes != null) ...[
-                          Container(
-                            padding: const EdgeInsets.all(AppDimensions.spaceLG),
-                            decoration: BoxDecoration(
-                              color: AppColors.darkCard,
-                              borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-                              border: Border.all(color: AppColors.darkBorderHighContrast),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.local_hospital_rounded, color: AppColors.safeGreenLight),
-                                    const SizedBox(width: AppDimensions.spaceSM),
-                                    Text(
-                                      'DOKTER / FASILITAS RUJUKAN',
-                                      style: AppTypography.standardTitle(color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                                if (card.doctorName != null) ...[
-                                  const SizedBox(height: AppDimensions.spaceMD),
-                                  Text(
-                                    card.doctorName!,
-                                    style: AppTypography.seniorTitle(color: Colors.white),
-                                  ),
-                                ],
-                                if (card.doctorNotes != null) ...[
-                                  const SizedBox(height: AppDimensions.spaceSM),
-                                  Text(
-                                    'Catatan: ${card.doctorNotes}',
-                                    style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
-                                  ),
-                                ],
-                                if (card.doctorPhone != null) ...[
-                                  const SizedBox(height: AppDimensions.spaceLG),
-                                  AccessibleButton(
-                                    label: 'Telepon Dokter (${card.doctorPhone})',
-                                    onPressed: () => _callDoctor(card.doctorPhone!),
-                                    backgroundColor: AppColors.safeGreen,
-                                    icon: Icons.phone_in_talk_rounded,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: AppDimensions.space2XL),
                         ],
                       ],
                     ),
@@ -405,18 +499,28 @@ class _MedicalSectionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimensions.spaceLG),
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-        border: Border.all(color: AppColors.darkBorderHighContrast),
+        color: AppColors.cardWhite,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        border: Border.all(color: AppColors.mintBorder, width: 1.5),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 14.0,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, color: accentColor, size: 24.0),
+              Icon(icon, color: accentColor, size: 22.0),
               const SizedBox(width: AppDimensions.spaceSM),
-              Text(title, style: AppTypography.standardTitle(color: Colors.white)),
+              Text(
+                title,
+                style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
+              ),
             ],
           ),
           const SizedBox(height: AppDimensions.spaceMD),
@@ -425,17 +529,17 @@ class _MedicalSectionCard extends StatelessWidget {
             runSpacing: 8.0,
             children: items.map((item) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
                 decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                  border: Border.all(color: accentColor),
+                  color: AppColors.mintSurface,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                  border: Border.all(color: AppColors.mintBorder),
                 ),
                 child: Text(
                   item,
                   style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.0,
+                    color: AppColors.textDarkPrimary,
+                    fontSize: 14.0,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

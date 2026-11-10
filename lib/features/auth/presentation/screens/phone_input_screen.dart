@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
 /// Halaman input nomor telepon untuk proses verifikasi OTP
+/// Menggunakan sistem desain Healthcare Teal & Mint dengan tombol pill ergonomis.
 class PhoneInputScreen extends StatefulWidget {
   const PhoneInputScreen({super.key});
 
@@ -55,7 +56,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
     });
 
     if (success) {
-      // Arahkan ke layar verifikasi OTP
       unawaited(context.push('/auth/otp', extra: formattedPhone));
     } else {
       setState(() {
@@ -67,56 +67,68 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.mintBackground,
       appBar: AppBar(
         title: const Text('Masuk / Daftar'),
+        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG, vertical: AppDimensions.spaceMD),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: AppDimensions.spaceMD),
               Text(
                 'Selamat Datang di SIGAP',
-                style: AppTypography.seniorHeadingMedium(color: Colors.white),
+                style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
               ),
-              const SizedBox(height: AppDimensions.spaceSM),
+              const SizedBox(height: AppDimensions.spaceXS),
               Text(
                 'Masukkan nomor telepon aktif Anda untuk menerima kode verifikasi OTP.',
-                style: AppTypography.seniorBodyPrimary(color: AppColors.textDarkSecondary),
+                style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
               ),
               const SizedBox(height: AppDimensions.spaceXL),
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.darkCard,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                  color: AppColors.cardWhite,
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                   border: Border.all(
                     color: _errorMessage != null
                         ? AppColors.emergencyRed
-                        : AppColors.darkBorderHighContrast,
-                    width: AppDimensions.highContrastBorderWidth,
+                        : AppColors.mintBorder,
+                    width: 1.5,
                   ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppColors.cardShadow,
+                      blurRadius: 12.0,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.spaceMD,
-                  vertical: AppDimensions.spaceXS,
+                  vertical: 4.0,
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimensions.spaceSM,
-                        vertical: AppDimensions.spaceXS,
+                        horizontal: AppDimensions.spaceMD,
+                        vertical: AppDimensions.spaceSM,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.darkSurfaceElevated,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
+                        color: AppColors.primaryTealLight,
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                       ),
-                      child: Text(
+                      child: const Text(
                         '🇮🇩 +62',
-                        style: AppTypography.seniorBodyPrimary(color: Colors.white),
+                        style: TextStyle(
+                          color: AppColors.primaryTealDeep,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0,
+                        ),
                       ),
                     ),
                     const SizedBox(width: AppDimensions.spaceMD),
@@ -124,11 +136,14 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                       child: TextField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
-                        style: AppTypography.seniorBodyPrimary(color: Colors.white),
+                        style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                         decoration: const InputDecoration(
                           hintText: '812-3456-7890',
-                          hintStyle: TextStyle(color: AppColors.textDarkTertiary, fontSize: 18.0),
+                          hintStyle: TextStyle(color: AppColors.textDarkTertiary, fontSize: 16.0),
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          filled: false,
                         ),
                       ),
                     ),
@@ -139,7 +154,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 const SizedBox(height: AppDimensions.spaceSM),
                 Text(
                   _errorMessage!,
-                  style: AppTypography.seniorBodySecondary(color: AppColors.emergencyRedLight),
+                  style: AppTypography.seniorBodySecondary(color: AppColors.emergencyRed),
                 ),
               ],
               const SizedBox(height: AppDimensions.space2XL),
@@ -147,15 +162,18 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 label: _isLoading ? 'Mengirim Kode...' : 'Kirim Kode Verifikasi',
                 onPressed: _isLoading ? null : _handleSendOtp,
                 isSimplified: true,
-                backgroundColor: AppColors.infoBlue,
+                backgroundColor: AppColors.primaryTeal,
                 icon: Icons.sms_outlined,
               ),
-              const SizedBox(height: AppDimensions.spaceLG),
+              const SizedBox(height: AppDimensions.spaceMD),
               AccessibleButton(
                 label: 'Lanjutkan Sebagai Tamu / Demo',
                 onPressed: () => context.push('/auth/role'),
                 isSimplified: true,
                 isSecondary: true,
+                backgroundColor: AppColors.cardWhite,
+                borderColor: AppColors.mintBorder,
+                textColor: AppColors.primaryTealDark,
               ),
             ],
           ),

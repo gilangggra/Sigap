@@ -7,7 +7,8 @@ import '../../../../core/services/safety_check_service.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
-/// Dialog Pengaturan Durasi Perjalanan Aman (Safety Check Setup Modal)
+/// Dialog Pemilihan Durasi Perjalanan Aman (Walk-Safe Timer Setup Dialog)
+/// Berstandar tombol pill ramah lansia dengan estetika modern Healthcare Teal & Mint.
 class SafetyCheckDialog extends StatefulWidget {
   final VoidCallback onStart;
 
@@ -28,10 +29,10 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.darkSurface,
+      backgroundColor: AppColors.cardWhite,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-        side: const BorderSide(color: AppColors.darkBorderHighContrast, width: 2.0),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+        side: const BorderSide(color: AppColors.mintBorder, width: 1.5),
       ),
       insetPadding: const EdgeInsets.all(AppDimensions.spaceLG),
       child: Padding(
@@ -43,15 +44,15 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(AppDimensions.spaceSM),
-                  decoration: BoxDecoration(
-                    color: AppColors.infoBlue.withValues(alpha: 0.2),
+                  padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryTealLight,
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.directions_walk_rounded,
-                    color: AppColors.infoBlueLight,
-                    size: 36.0,
+                    color: AppColors.primaryTealDark,
+                    size: 32.0,
                   ),
                 ),
                 const SizedBox(width: AppDimensions.spaceMD),
@@ -61,7 +62,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                     children: [
                       Text(
                         'Perjalanan Aman',
-                        style: AppTypography.seniorTitle(color: Colors.white),
+                        style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                       ),
                       Text(
                         'Berapa lama Anda akan bepergian?',
@@ -94,22 +95,31 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                     unawaited(FeedbackService.instance.triggerSuccessFeedback());
                     setState(() => _selectedMinutes = mins);
                   },
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.infoBlue : AppColors.darkCard,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                      color: isSelected ? AppColors.primaryTeal : AppColors.mintSurface,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
                       border: Border.all(
-                        color: isSelected ? Colors.white : AppColors.darkBorderHighContrast,
-                        width: isSelected ? 2.5 : 1.0,
+                        color: isSelected ? AppColors.primaryTealDark : AppColors.mintBorder,
+                        width: isSelected ? 2.0 : 1.0,
                       ),
+                      boxShadow: isSelected
+                          ? const [
+                              BoxShadow(
+                                color: AppColors.primaryTealGlow,
+                                blurRadius: 10.0,
+                                offset: Offset(0, 3),
+                              ),
+                            ]
+                          : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '$mins Menit',
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
+                        color: isSelected ? Colors.white : AppColors.textDarkPrimary,
+                        fontSize: 18.0,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                       ),
                     ),
@@ -122,17 +132,17 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
             Container(
               padding: const EdgeInsets.all(AppDimensions.spaceMD),
               decoration: BoxDecoration(
-                color: AppColors.darkCard,
+                color: AppColors.primaryTealLight,
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, color: AppColors.warningAmberLight, size: 22.0),
+                  const Icon(Icons.info_outline_rounded, color: AppColors.primaryTealDark, size: 22.0),
                   const SizedBox(width: AppDimensions.spaceSM),
                   Expanded(
                     child: Text(
                       'Jika waktu habis tanpa konfirmasi aman, alarm darurat otomatis dikirim ke relawan.',
-                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                      style: AppTypography.standardCaption(color: AppColors.primaryTealDeep),
                     ),
                   ),
                 ],
@@ -140,7 +150,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
             ),
             const SizedBox(height: AppDimensions.spaceXL),
 
-            // Tombol Mulai Raksasa
+            // Tombol Mulai
             AccessibleButton(
               label: 'MULAI PENGAWASAN ($_selectedMinutes MENIT)',
               onPressed: () {
@@ -150,8 +160,8 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                 );
                 Navigator.of(context).pop();
               },
-              backgroundColor: AppColors.safeGreen,
-              customHeight: 72.0,
+              backgroundColor: AppColors.primaryTeal,
+              customHeight: 64.0,
               icon: Icons.play_arrow_rounded,
             ),
             const SizedBox(height: AppDimensions.spaceSM),
