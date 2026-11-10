@@ -6,11 +6,13 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
+import '../../../../core/services/fall_detection_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 import '../../../wellness/presentation/state/wellness_provider.dart';
 import '../state/emergency_provider.dart';
+import '../widgets/fall_alert_dialog.dart';
 
 /// Halaman Beranda Care-Receiver (Antarmuka Khusus Lansia / Simplified Mode)
 /// Mengimplementasikan Tombol SOS ukuran min 120x120dp, Card Check-in Besar,
@@ -24,6 +26,7 @@ class CareReceiverHomeScreen extends StatefulWidget {
 
 class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   CheckinStatus? _selectedCheckinStatus;
+  bool _isFallGuardActive = true;
 
   @override
   void initState() {
@@ -31,7 +34,39 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
       context.read<WellnessProvider>().loadTodayWellness(auth.userId ?? 'care-receiver-001');
+      _initFallDetection();
     });
+  }
+
+  void _initFallDetection() {
+    final fallService = FallDetectionService.instance;
+    fallService.startMonitoring(
+      onFallEmergencyTriggered: () {
+        if (mounted) {
+          _triggerSosCountdown();
+        }
+      },
+    );
+
+    fallService.stateNotifier.removeListener(_handleFallStateChanged);
+    fallService.stateNotifier.addListener(_handleFallStateChanged);
+  }
+
+  void _handleFallStateChanged() {
+    if (!mounted) return;
+    if (FallDetectionService.instance.stateNotifier.value == FallEngineState.fallConfirmed) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => const FallAlertDialog(),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    FallDetectionService.instance.stateNotifier.removeListener(_handleFallStateChanged);
+    super.dispose();
   }
 
   void _triggerSosCountdown() {
@@ -198,6 +233,94 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                           style: AppTypography.seniorBodySecondary(color: AppColors.textDarkSecondary),
                           textAlign: TextAlign.center,
                         ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppDimensions.spaceLG),
+
+                  // Kartu AI Fall Guard (Deteksi Jatuh Otomatis)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.darkCard,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+                      border: Border.all(
+                        color: _isFallGuardActive ? AppColors.safeGreenLight : AppColors.darkBorderHighContrast,
+                        width: 2.0,
+                      ),
+                    ),
+                    padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(AppDimensions.spaceSM),
+                              decoration: BoxDecoration(
+                                color: (_isFallGuardActive ? AppColors.safeGreenDark : AppColors.darkSurfaceElevated)
+                                    .withValues(alpha: 0.3),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.personal_injury_rounded,
+                                color: _isFallGuardActive ? AppColors.safeGreenLight : AppColors.textDarkTertiary,
+                                size: 32.0,
+                              ),
+                            ),
+                            const SizedBox(width: AppDimensions.spaceMD),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'AI Fall Guard',
+                                    style: AppTypography.seniorTitle(color: Colors.white),
+                                  ),
+                                  Text(
+                                    _isFallGuardActive
+                                        ? 'Sensor memantau benturan & imobilitas secara otomatis.'
+                                        : 'Fitur deteksi jatuh dinonaktifkan.',
+                                    style: AppTypography.standardCaption(
+                                      color: _isFallGuardActive ? AppColors.safeGreenLight : AppColors.textDarkSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Switch(
+                              value: _isFallGuardActive,
+                              activeColor: AppColors.safeGreenLight,
+                              onChanged: (val) {
+                                setState(() => _isFallGuardActive = val);
+                                unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                                if (val) {
+                                  _initFallDetection();
+                                } else {
+                                  FallDetectionService.instance.stopMonitoring();
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                        if (_isFallGuardActive) ...[
+                          const SizedBox(height: AppDimensions.spaceSM),
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.darkBorderHighContrast),
+                              padding: const EdgeInsets.symmetric(vertical: AppDimensions.spaceSM),
+                            ),
+                            onPressed: () {
+                              unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                              FallDetectionService.instance.simulateFallEvent();
+                            },
+                            icon: const Icon(Icons.play_circle_outline_rounded, color: AppColors.warningAmberLight, size: 20),
+                            label: const Text(
+                              'Uji Simulasi Deteksi Jatuh (10s Pre-Alarm)',
+                              style: TextStyle(color: AppColors.warningAmberLight, fontSize: 14),
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
