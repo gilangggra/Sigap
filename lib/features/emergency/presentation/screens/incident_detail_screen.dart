@@ -66,10 +66,19 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
   Future<void> _openGoogleMapsRoute() async {
     final double lat = widget.incident.latitude;
     final double lng = widget.incident.longitude;
-    final Uri url = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
+    final Uri googleMapsAppUri = Uri.parse('google.navigation:q=$lat,$lng&mode=d');
+    final Uri googleMapsWebUri = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lng');
 
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
+    try {
+      if (await canLaunchUrl(googleMapsAppUri)) {
+        await launchUrl(googleMapsAppUri);
+      } else if (await canLaunchUrl(googleMapsWebUri)) {
+        await launchUrl(googleMapsWebUri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      if (await canLaunchUrl(googleMapsWebUri)) {
+        await launchUrl(googleMapsWebUri, mode: LaunchMode.externalApplication);
+      }
     }
   }
 
