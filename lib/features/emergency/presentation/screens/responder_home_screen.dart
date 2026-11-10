@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
@@ -262,6 +263,34 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                     ),
                   ),
                 ],
+              ),
+
+              const SizedBox(height: AppDimensions.spaceMD),
+
+              // Tombol Uji Notifikasi Alarm SOS
+              AccessibleButton(
+                label: 'Uji Alarm Notifikasi Darurat (Heads-Up SOS)',
+                onPressed: () {
+                  unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                  unawaited(
+                    NotificationService.instance.showEmergencyAlert(
+                      incidentId: _activeEmergency['id'] as String,
+                      victimName: _activeEmergency['victimName'] as String,
+                      address: _activeEmergency['address'] as String,
+                      distanceMeters: 320,
+                    ),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      backgroundColor: AppColors.emergencyRedDark,
+                      content: Text('Notifikasi darurat SOS terkirim ke panel notifikasi HP Anda.'),
+                    ),
+                  );
+                },
+                backgroundColor: AppColors.darkCard,
+                textColor: AppColors.emergencyRedLight,
+                borderColor: AppColors.emergencyRed,
+                icon: Icons.notifications_active_rounded,
               ),
             ],
           ),

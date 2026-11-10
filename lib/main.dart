@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'core/constants/app_constants.dart';
 import 'core/router/app_router.dart';
 import 'core/services/location_service.dart';
+import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
 import 'core/state/auth_provider.dart';
 import 'core/theme/app_theme.dart';
@@ -48,7 +49,23 @@ Future<void> main() async {
     }
   }
 
-  // 4. Jalankan aplikasi dibungkus MultiProvider
+  // 4. Inisialisasi Service Notifikasi & Permintaan Izin
+  try {
+    await NotificationService.instance.initialize(
+      onNotificationTap: (payload) {
+        if (payload.isNotEmpty) {
+          appRouter.push(payload);
+        }
+      },
+    );
+    await NotificationService.instance.requestPermission();
+  } catch (e) {
+    if (kDebugMode) {
+      print('⚠️ [main] Inisialisasi notifikasi ditunda: $e');
+    }
+  }
+
+  // 5. Jalankan aplikasi dibungkus MultiProvider
   runApp(
     MultiProvider(
       providers: [
