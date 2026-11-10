@@ -85,6 +85,15 @@ abstract final class AppTypography {
     );
   }
 
+  /// Angka hitung mundur besar (48sp, ekstra tebal) untuk dialog darurat / SOS countdown
+  static TextStyle countdownDisplay({Color color = Colors.white}) {
+    return GoogleFonts.inter(
+      fontSize: 48.0,
+      fontWeight: FontWeight.w800,
+      color: color,
+    );
+  }
+
   // ===========================================================================
   // TIPOGRAFI STANDAR (RESPONDER, GUARDIAN, CIVIC ADMIN)
   // ===========================================================================

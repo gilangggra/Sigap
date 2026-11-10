@@ -36,7 +36,6 @@ class FallDetectionService {
   // Nilai pembacaan sensor terakhir
   double _lastGyroMagnitude = 0.0;
   DateTime? _freeFallTimestamp;
-  DateTime? _impactTimestamp;
   final List<double> _postImpactAccels = <double>[];
   Timer? _immobilityTimer;
   Timer? _preAlarmCountdownTimer;
@@ -132,7 +131,6 @@ class FallDetectionService {
         // Cek Fase 2: Impact Shock (>2.65g) + Rotasi Tubuh Tajam (>140 deg/s)
         if (svm > impactThreshold && _lastGyroMagnitude > gyroAngularThreshold) {
           _currentState = FallEngineState.impactDetected;
-          _impactTimestamp = now;
           _postImpactAccels.clear();
           stateNotifier.value = FallEngineState.impactDetected;
           _startImmobilityVerification();
@@ -261,7 +259,6 @@ class FallDetectionService {
     stateNotifier.value = _currentState;
     _postImpactAccels.clear();
     _freeFallTimestamp = null;
-    _impactTimestamp = null;
   }
 
   /// 9. Menonaktifkan Layanan Sensor
@@ -278,3 +275,4 @@ class FallDetectionService {
     _preAlarmCountdownTimer?.cancel();
   }
 }
+

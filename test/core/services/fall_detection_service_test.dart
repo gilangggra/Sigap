@@ -1,8 +1,47 @@
+import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sensors_plus_platform_interface/sensors_plus_platform_interface.dart';
 import 'package:sigap/core/services/fall_detection_service.dart';
+
+class FakeSensorsPlatform extends SensorsPlatform {
+  final StreamController<AccelerometerEvent> _accelController =
+      StreamController<AccelerometerEvent>.broadcast();
+  final StreamController<GyroscopeEvent> _gyroController =
+      StreamController<GyroscopeEvent>.broadcast();
+
+  @override
+  Stream<AccelerometerEvent> accelerometerEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) => _accelController.stream;
+
+  @override
+  Stream<GyroscopeEvent> gyroscopeEventStream({
+    Duration samplingPeriod = SensorInterval.normalInterval,
+  }) => _gyroController.stream;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() {
+    SensorsPlatform.instance = FakeSensorsPlatform();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('xyz.luan/audioplayers.global'),
+      (MethodCall methodCall) async => 1,
+    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('xyz.luan/audioplayers'),
+      (MethodCall methodCall) async => 1,
+    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(
+      const MethodChannel('vibration'),
+      (MethodCall methodCall) async => false,
+    );
+  });
 
   group('FallDetectionService AI Fall Guard Unit Tests', () {
     final fallService = FallDetectionService.instance;

@@ -37,6 +37,13 @@ class FeedbackService {
     } catch (_) {}
   }
 
+  /// Haptic feedback untuk setiap detak hitung mundur (SOS / Fall Alert)
+  Future<void> triggerCountdownHaptic() async {
+    try {
+      await HapticFeedback.heavyImpact();
+    } catch (_) {}
+  }
+
   /// Getaran ketukan konfirmasi biasa (berhasil check-in, minum obat)
   Future<void> triggerSuccessFeedback() async {
     await HapticFeedback.mediumImpact();

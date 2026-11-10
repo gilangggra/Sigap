@@ -98,7 +98,7 @@ class FallAlertDialog extends StatelessWidget {
                 backgroundColor: AppColors.safeGreenDark,
                 textColor: Colors.white,
                 borderColor: AppColors.safeGreenLight,
-                height: 76.0,
+                customHeight: 76.0,
                 icon: Icons.check_circle_rounded,
               ),
               const SizedBox(height: AppDimensions.spaceMD),
@@ -113,7 +113,7 @@ class FallAlertDialog extends StatelessWidget {
                 backgroundColor: AppColors.darkCard,
                 textColor: AppColors.emergencyRedLight,
                 borderColor: AppColors.emergencyRed,
-                height: 60.0,
+                customHeight: 60.0,
                 icon: Icons.send_rounded,
               ),
             ],
@@ -123,3 +123,4 @@ class FallAlertDialog extends StatelessWidget {
     );
   }
 }
+
