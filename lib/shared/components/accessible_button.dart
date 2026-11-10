@@ -5,9 +5,9 @@ import '../../core/constants/app_dimensions.dart';
 import '../../core/services/feedback_service.dart';
 import '../../core/theme/app_typography.dart';
 
-/// Tombol berstandar aksesibilitas tinggi untuk SIGAP dengan gaya modern Pill Button (Healthcare).
+/// Tombol berstandar aksesibilitas tinggi untuk SIGAP dengan format standar mobile.
 /// Memastikan ukuran target sentuh minimum (min 64dp untuk lansia, 72dp untuk simplified),
-/// kontras warna WCAG AA/AAA, getaran konfirmasi saat ditekan, dan bentuk pill ergonomis.
+/// kontras warna WCAG AA/AAA, getaran konfirmasi saat ditekan, dan tipografi Poppins yang konsisten.
 class AccessibleButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -36,13 +36,13 @@ class AccessibleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Memenuhi standar aksesibilitas minimum (min 64dp, simplified 72dp)
     final double targetHeight = customHeight ??
         (isSimplified
             ? AppDimensions.seniorRecommendedTouchTarget
             : AppDimensions.seniorMinTouchTarget);
 
-    final double effectiveRadius = customRadius ?? AppDimensions.radiusPill;
+    final double effectiveRadius = customRadius ??
+        (isSimplified ? AppDimensions.radiusLG : AppDimensions.radiusMD);
 
     final Color effectiveBg = isSecondary
         ? (isSimplified ? AppColors.mintSurface : Colors.transparent)
@@ -74,8 +74,7 @@ class AccessibleButton extends StatelessWidget {
       label: label,
       child: Material(
         color: effectiveBg,
-        elevation: isSecondary ? 0 : AppDimensions.elevationLow,
-        shadowColor: AppColors.primaryTealGlow,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(effectiveRadius),
           side: borderSide,
@@ -106,7 +105,7 @@ class AccessibleButton extends StatelessWidget {
                   Icon(
                     icon,
                     color: effectiveText,
-                    size: isSimplified ? 28.0 : 22.0,
+                    size: isSimplified ? 26.0 : 20.0,
                   ),
                   SizedBox(
                     width: isSimplified ? AppDimensions.spaceMD : AppDimensions.spaceSM,

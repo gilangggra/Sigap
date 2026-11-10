@@ -9,7 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
 /// Halaman input nomor telepon untuk proses verifikasi OTP
-/// Menggunakan sistem desain Healthcare Teal & Mint dengan tombol pill ergonomis.
+/// Menggunakan standar antarmuka mobile yang rapi dan konsisten dengan font Poppins.
 class PhoneInputScreen extends StatefulWidget {
   const PhoneInputScreen({super.key});
 
@@ -67,43 +67,46 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.mintBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Masuk / Daftar'),
         elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG, vertical: AppDimensions.spaceMD),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceMD,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
               Text(
                 'Selamat Datang di SIGAP',
-                style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
+                style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
               ),
-              const SizedBox(height: AppDimensions.spaceXS),
+              const SizedBox(height: 2.0),
               Text(
                 'Masukkan nomor telepon aktif Anda untuk menerima kode verifikasi OTP.',
                 style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
               ),
-              const SizedBox(height: AppDimensions.spaceXL),
+              const SizedBox(height: AppDimensions.spaceLG),
               Container(
                 decoration: BoxDecoration(
                   color: AppColors.cardWhite,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
                   border: Border.all(
                     color: _errorMessage != null
                         ? AppColors.emergencyRed
-                        : AppColors.mintBorder,
-                    width: 1.5,
+                        : AppColors.lightBorder,
+                    width: 1.0,
                   ),
                   boxShadow: const [
                     BoxShadow(
                       color: AppColors.cardShadow,
-                      blurRadius: 12.0,
-                      offset: Offset(0, 3),
+                      blurRadius: 6.0,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
@@ -115,19 +118,19 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: AppDimensions.spaceMD,
-                        vertical: AppDimensions.spaceSM,
+                        horizontal: 10.0,
+                        vertical: 6.0,
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primaryTealLight,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
                       ),
                       child: const Text(
                         '🇮🇩 +62',
                         style: TextStyle(
                           color: AppColors.primaryTealDeep,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16.0,
+                          fontSize: 15.0,
                         ),
                       ),
                     ),
@@ -137,9 +140,9 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
                         style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: '812-3456-7890',
-                          hintStyle: TextStyle(color: AppColors.textDarkTertiary, fontSize: 16.0),
+                          hintStyle: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
                           border: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           focusedBorder: InputBorder.none,
@@ -154,10 +157,10 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 const SizedBox(height: AppDimensions.spaceSM),
                 Text(
                   _errorMessage!,
-                  style: AppTypography.seniorBodySecondary(color: AppColors.emergencyRed),
+                  style: AppTypography.standardCaption(color: AppColors.emergencyRed),
                 ),
               ],
-              const SizedBox(height: AppDimensions.space2XL),
+              const SizedBox(height: AppDimensions.spaceLG),
               AccessibleButton(
                 label: _isLoading ? 'Mengirim Kode...' : 'Kirim Kode Verifikasi',
                 onPressed: _isLoading ? null : _handleSendOtp,
@@ -165,16 +168,17 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
                 backgroundColor: AppColors.primaryTeal,
                 icon: Icons.sms_outlined,
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
               AccessibleButton(
                 label: 'Lanjutkan Sebagai Tamu / Demo',
                 onPressed: () => context.push('/auth/role'),
                 isSimplified: true,
                 isSecondary: true,
                 backgroundColor: AppColors.cardWhite,
-                borderColor: AppColors.mintBorder,
-                textColor: AppColors.primaryTealDark,
+                borderColor: AppColors.lightBorder,
+                textColor: AppColors.textDarkPrimary,
               ),
+              const SizedBox(height: AppDimensions.spaceXL),
             ],
           ),
         ),

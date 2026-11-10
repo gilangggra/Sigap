@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 import 'app_typography.dart';
 
-/// Konfigurasi tema Material 3 untuk SIGAP berdasarkan Sistem Desain Medis & Healthcare Modern.
-/// Terinspirasi dari estetika Teal & Mint dengan tombol pill dan sudut melengkung halus.
+/// Konfigurasi tema Material 3 standar mobile dengan tipografi [Poppins] yang konsisten.
 abstract final class AppTheme {
-  /// Tema Terang Utama (Healthcare & Medical Teal-Mint Theme - Standar SIGAP)
+  /// Tema Terang Standar Mobile (Clean Slate & Teal Healthcare)
   static ThemeData get lightTheme {
+    final baseTextTheme = ThemeData.light().textTheme;
+    final poppinsTheme = GoogleFonts.poppinsTextTheme(baseTextTheme);
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.mintBackground,
+      scaffoldBackgroundColor: AppColors.lightBackground,
       primaryColor: AppColors.primaryTeal,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primaryTeal,
@@ -26,12 +29,17 @@ abstract final class AppTheme {
         onError: Colors.white,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Colors.white,
         foregroundColor: AppColors.textDarkPrimary,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
-        iconTheme: const IconThemeData(color: AppColors.textDarkPrimary, size: 24),
+        scrolledUnderElevation: 1.0,
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 18.0,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textDarkPrimary,
+        ),
+        iconTheme: const IconThemeData(color: AppColors.textDarkPrimary, size: 22),
       ),
       cardTheme: CardThemeData(
         color: AppColors.cardWhite,
@@ -39,20 +47,20 @@ abstract final class AppTheme {
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-          side: const BorderSide(color: AppColors.mintBorder, width: 1.0),
+          side: const BorderSide(color: AppColors.lightBorder, width: 1.0),
         ),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryTeal,
           foregroundColor: Colors.white,
-          minimumSize: const Size(double.infinity, AppDimensions.seniorMinTouchTarget),
+          minimumSize: const Size(double.infinity, AppDimensions.standardMinTouchTarget),
           padding: const EdgeInsets.symmetric(
-            horizontal: AppDimensions.spaceLG,
-            vertical: AppDimensions.spaceMD,
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceSM,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           ),
           textStyle: AppTypography.standardButtonLabel(color: Colors.white),
           elevation: 0,
@@ -61,10 +69,10 @@ abstract final class AppTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primaryTealDark,
-          minimumSize: const Size(double.infinity, AppDimensions.seniorMinTouchTarget),
+          minimumSize: const Size(double.infinity, AppDimensions.standardMinTouchTarget),
           side: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           ),
           textStyle: AppTypography.standardButtonLabel(color: AppColors.primaryTealDark),
         ),
@@ -73,24 +81,29 @@ abstract final class AppTheme {
         filled: true,
         fillColor: AppColors.cardWhite,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppDimensions.spaceLG,
+          horizontal: AppDimensions.spaceMD,
           vertical: AppDimensions.spaceMD,
         ),
         hintStyle: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
-          borderSide: const BorderSide(color: AppColors.mintBorder, width: 1.0),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1.0),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
-          borderSide: const BorderSide(color: AppColors.mintBorder, width: 1.0),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+          borderSide: const BorderSide(color: AppColors.lightBorder, width: 1.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           borderSide: const BorderSide(color: AppColors.primaryTeal, width: 2.0),
         ),
       ),
-      textTheme: TextTheme(
+      dividerTheme: const DividerThemeData(
+        color: AppColors.lightBorder,
+        thickness: 1.0,
+        space: 1.0,
+      ),
+      textTheme: poppinsTheme.copyWith(
         displayLarge: AppTypography.standardDisplayLarge(color: AppColors.textDarkPrimary),
         headlineMedium: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
         titleMedium: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
@@ -100,13 +113,15 @@ abstract final class AppTheme {
     );
   }
 
-  /// Tema Khusus Lansia (Care-Receiver / Simplified Healthcare Mode)
-  /// Dirancang dengan keterbacaan tinggi, kontras tajam, dan target sentuh >= 72dp
+  /// Tema Khusus Lansia (Care-Receiver / Simplified Mode Ramah Lansia)
   static ThemeData get seniorTheme {
+    final baseTextTheme = ThemeData.light().textTheme;
+    final poppinsTheme = GoogleFonts.poppinsTextTheme(baseTextTheme);
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      scaffoldBackgroundColor: AppColors.mintBackground,
+      scaffoldBackgroundColor: AppColors.lightBackground,
       primaryColor: AppColors.primaryTeal,
       colorScheme: const ColorScheme.light(
         primary: AppColors.primaryTealDark,
@@ -119,18 +134,23 @@ abstract final class AppTheme {
         onError: Colors.white,
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.cardWhite,
+        backgroundColor: Colors.white,
         foregroundColor: AppColors.textDarkPrimary,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
-        toolbarHeight: 72.0,
-        iconTheme: const IconThemeData(color: AppColors.textDarkPrimary, size: 28),
+        scrolledUnderElevation: 1.0,
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 20.0,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textDarkPrimary,
+        ),
+        toolbarHeight: 64.0,
+        iconTheme: const IconThemeData(color: AppColors.textDarkPrimary, size: 26),
       ),
       cardTheme: CardThemeData(
         color: AppColors.cardWhite,
-        elevation: AppDimensions.elevationLow,
-        shadowColor: AppColors.cardShadow,
+        elevation: 0,
+        margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
           side: const BorderSide(
@@ -152,10 +172,10 @@ abstract final class AppTheme {
             vertical: AppDimensions.spaceMD,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           ),
           textStyle: AppTypography.seniorButtonLabel(),
-          elevation: AppDimensions.elevationLow,
+          elevation: 0,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -170,12 +190,12 @@ abstract final class AppTheme {
             width: AppDimensions.highContrastBorderWidth,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
           ),
           textStyle: AppTypography.seniorButtonLabel(color: AppColors.textDarkPrimary),
         ),
       ),
-      textTheme: TextTheme(
+      textTheme: poppinsTheme.copyWith(
         displayLarge: AppTypography.seniorHeadingLarge(),
         headlineMedium: AppTypography.seniorHeadingMedium(),
         titleLarge: AppTypography.seniorTitle(),
@@ -185,8 +205,11 @@ abstract final class AppTheme {
     );
   }
 
-  /// Tema Gelap Opsional (Night / High-Contrast Dark Mode)
+  /// Tema Gelap Standar (Opsi Kontras Gelap)
   static ThemeData get darkTheme {
+    final baseTextTheme = ThemeData.dark().textTheme;
+    final poppinsTheme = GoogleFonts.poppinsTextTheme(baseTextTheme);
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -205,7 +228,12 @@ abstract final class AppTheme {
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.textLightPrimary,
         elevation: 0,
-        titleTextStyle: AppTypography.standardHeadline(color: AppColors.textLightPrimary),
+        centerTitle: false,
+        titleTextStyle: GoogleFonts.poppins(
+          fontSize: 18.0,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textLightPrimary,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.darkCard,
@@ -215,21 +243,7 @@ abstract final class AppTheme {
           side: const BorderSide(color: AppColors.darkBorder),
         ),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primaryTeal,
-          foregroundColor: Colors.white,
-          minimumSize: const Size(
-            double.infinity,
-            AppDimensions.standardMinTouchTarget,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
-          ),
-          textStyle: AppTypography.standardButtonLabel(color: Colors.white),
-        ),
-      ),
-      textTheme: TextTheme(
+      textTheme: poppinsTheme.copyWith(
         displayLarge: AppTypography.standardDisplayLarge(color: AppColors.textLightPrimary),
         headlineMedium: AppTypography.standardHeadline(color: AppColors.textLightPrimary),
         titleMedium: AppTypography.standardTitle(color: AppColors.textLightPrimary),

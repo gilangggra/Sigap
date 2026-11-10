@@ -8,7 +8,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
 /// Dialog Pemilihan Durasi Perjalanan Aman (Walk-Safe Timer Setup Dialog)
-/// Berstandar tombol pill ramah lansia dengan estetika modern Healthcare Teal & Mint.
+/// Berstandar mobile modern dengan tipografi Poppins yang konsisten.
 class SafetyCheckDialog extends StatefulWidget {
   final VoidCallback onStart;
 
@@ -32,11 +32,11 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
       backgroundColor: AppColors.cardWhite,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        side: const BorderSide(color: AppColors.mintBorder, width: 1.5),
+        side: const BorderSide(color: AppColors.lightBorder, width: 1.0),
       ),
-      insetPadding: const EdgeInsets.all(AppDimensions.spaceLG),
+      insetPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG),
       child: Padding(
-        padding: const EdgeInsets.all(AppDimensions.spaceXL),
+        padding: const EdgeInsets.all(AppDimensions.spaceLG),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -44,7 +44,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                  padding: const EdgeInsets.all(10.0),
                   decoration: const BoxDecoration(
                     color: AppColors.primaryTealLight,
                     shape: BoxShape.circle,
@@ -52,7 +52,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                   child: const Icon(
                     Icons.directions_walk_rounded,
                     color: AppColors.primaryTealDark,
-                    size: 32.0,
+                    size: 26.0,
                   ),
                 ),
                 const SizedBox(width: AppDimensions.spaceMD),
@@ -73,17 +73,17 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                 ),
               ],
             ),
-            const SizedBox(height: AppDimensions.spaceLG),
+            const SizedBox(height: AppDimensions.spaceMD),
 
-            // Pilihan Durasi Ramah Lansia (Grid 2 Kolom)
+            // Pilihan Durasi (Grid 2 Kolom)
             GridView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                childAspectRatio: 2.0,
-                crossAxisSpacing: AppDimensions.spaceMD,
-                mainAxisSpacing: AppDimensions.spaceMD,
+                childAspectRatio: 2.2,
+                crossAxisSpacing: AppDimensions.spaceSM,
+                mainAxisSpacing: AppDimensions.spaceSM,
               ),
               itemCount: _durations.length,
               itemBuilder: (context, index) {
@@ -95,31 +95,22 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                     unawaited(FeedbackService.instance.triggerSuccessFeedback());
                     setState(() => _selectedMinutes = mins);
                   },
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
                   child: Container(
                     decoration: BoxDecoration(
                       color: isSelected ? AppColors.primaryTeal : AppColors.mintSurface,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
                       border: Border.all(
-                        color: isSelected ? AppColors.primaryTealDark : AppColors.mintBorder,
-                        width: isSelected ? 2.0 : 1.0,
+                        color: isSelected ? AppColors.primaryTealDark : AppColors.lightBorder,
+                        width: isSelected ? 1.5 : 1.0,
                       ),
-                      boxShadow: isSelected
-                          ? const [
-                              BoxShadow(
-                                color: AppColors.primaryTealGlow,
-                                blurRadius: 10.0,
-                                offset: Offset(0, 3),
-                              ),
-                            ]
-                          : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '$mins Menit',
                       style: TextStyle(
                         color: isSelected ? Colors.white : AppColors.textDarkPrimary,
-                        fontSize: 18.0,
+                        fontSize: 16.0,
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                       ),
                     ),
@@ -137,7 +128,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, color: AppColors.primaryTealDark, size: 22.0),
+                  const Icon(Icons.info_outline_rounded, color: AppColors.primaryTealDark, size: 20.0),
                   const SizedBox(width: AppDimensions.spaceSM),
                   Expanded(
                     child: Text(
@@ -148,7 +139,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
                 ],
               ),
             ),
-            const SizedBox(height: AppDimensions.spaceXL),
+            const SizedBox(height: AppDimensions.spaceLG),
 
             // Tombol Mulai
             AccessibleButton(
@@ -171,7 +162,7 @@ class _SafetyCheckDialogState extends State<SafetyCheckDialog> {
               label: 'Batal',
               onPressed: () => Navigator.of(context).pop(),
               isSecondary: true,
-              customHeight: 52.0,
+              customHeight: 50.0,
             ),
           ],
         ),

@@ -12,7 +12,7 @@ import '../../domain/models/task_item.dart';
 import '../state/task_provider.dart';
 
 /// Halaman Papan Tugas Bantuan Mikro Warga (Mutual-Aid Task Marketplace)
-/// Menampilkan radar tugas dalam radius 800m dengan filter kategori dan klaim tugas.
+/// Menampilkan radar tugas dalam radius 800m dengan format standar mobile dan tipografi Poppins konsisten.
 class TaskBoardScreen extends StatefulWidget {
   const TaskBoardScreen({super.key});
 
@@ -47,6 +47,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: AppColors.safeGreenDark,
+            behavior: SnackBarBehavior.floating,
             content: Text(
               'Tugas "${task.category.label}" berhasil diambil! Warga telah dinotifikasi.',
               style: AppTypography.standardBody(color: Colors.white),
@@ -57,6 +58,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: AppColors.emergencyRedDark,
+            behavior: SnackBarBehavior.floating,
             content: Text('Gagal mengambil tugas atau sudah diambil relawan lain.'),
           ),
         );
@@ -80,6 +82,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: AppColors.safeGreenDark,
+          behavior: SnackBarBehavior.floating,
           content: Text('Selamat! Tugas selesai. +10 Poin Sosial ditambahkan ke profil Anda.'),
         ),
       );
@@ -93,30 +96,32 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
     final myClaimedTasks = provider.myClaimedTasks;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Bantu Warga (Tugas Mikro)'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20.0),
+          onPressed: () => context.pop(),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.leaderboard_rounded),
             tooltip: 'Papan Peringkat RT',
             onPressed: () => context.push('/tasks/leaderboard'),
           ),
-          IconButton(
-            icon: const Icon(Icons.add_task_rounded),
-            tooltip: 'Buat Permohonan Bantuan',
-            onPressed: () => context.push('/tasks/create'),
-          ),
         ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async => provider.loadNearbyTasks(),
-          color: AppColors.infoBlue,
-          backgroundColor: AppColors.darkCard,
+          color: AppColors.primaryTeal,
+          backgroundColor: Colors.white,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppDimensions.spaceMD),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spaceMD,
+              vertical: AppDimensions.spaceSM,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -124,18 +129,18 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppDimensions.spaceMD),
                   decoration: BoxDecoration(
-                    color: AppColors.infoBlue.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                    border: Border.all(color: AppColors.infoBlue.withValues(alpha: 0.5)),
+                    color: AppColors.primaryTealLight,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                    border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.radar_rounded, color: AppColors.infoBlueLight, size: 28.0),
+                      const Icon(Icons.radar_rounded, color: AppColors.primaryTealDark, size: 26.0),
                       const SizedBox(width: AppDimensions.spaceMD),
                       Expanded(
                         child: Text(
                           'Radar Tugas Terdekat (Radius 800m)\nSetiap tugas selesai memberi +10 Poin Sosial.',
-                          style: AppTypography.standardCaption(color: Colors.white),
+                          style: AppTypography.standardCaption(color: AppColors.primaryTealDeep),
                         ),
                       ),
                     ],
@@ -153,11 +158,19 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                         label: const Text('Semua'),
                         selected: provider.selectedCategory == null,
                         onSelected: (_) => provider.setCategoryFilter(null),
-                        backgroundColor: AppColors.darkCard,
-                        selectedColor: AppColors.infoBlue,
+                        backgroundColor: AppColors.cardWhite,
+                        selectedColor: AppColors.primaryTealLight,
+                        checkmarkColor: AppColors.primaryTealDark,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                          side: BorderSide(
+                            color: provider.selectedCategory == null ? AppColors.primaryTeal : AppColors.lightBorder,
+                          ),
+                        ),
                         labelStyle: TextStyle(
-                          color: provider.selectedCategory == null ? Colors.white : AppColors.textDarkSecondary,
+                          color: provider.selectedCategory == null ? AppColors.primaryTealDark : AppColors.textDarkSecondary,
                           fontWeight: FontWeight.bold,
+                          fontSize: 13.0,
                         ),
                       ),
                       const SizedBox(width: AppDimensions.spaceSM),
@@ -170,11 +183,19 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                             label: Text(cat.label),
                             selected: isSelected,
                             onSelected: (_) => provider.setCategoryFilter(isSelected ? null : cat),
-                            backgroundColor: AppColors.darkCard,
-                            selectedColor: AppColors.infoBlue,
+                            backgroundColor: AppColors.cardWhite,
+                            selectedColor: AppColors.primaryTealLight,
+                            checkmarkColor: AppColors.primaryTealDark,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                              side: BorderSide(
+                                color: isSelected ? AppColors.primaryTeal : AppColors.lightBorder,
+                              ),
+                            ),
                             labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : AppColors.textDarkSecondary,
+                              color: isSelected ? AppColors.primaryTealDark : AppColors.textDarkSecondary,
                               fontWeight: FontWeight.bold,
+                              fontSize: 13.0,
                             ),
                           ),
                         );
@@ -189,20 +210,27 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                 if (myClaimedTasks.isNotEmpty) ...[
                   Text(
                     'Tugas yang Sedang Anda Kerjakan',
-                    style: AppTypography.standardTitle(color: AppColors.safeGreenLight),
+                    style: AppTypography.categoryHeadline(color: AppColors.safeGreenDark),
                   ),
-                  const SizedBox(height: AppDimensions.spaceMD),
+                  const SizedBox(height: AppDimensions.spaceSM),
                   ...myClaimedTasks.map((task) {
                     final isDone = task.status == TaskStatus.completed;
                     return Container(
                       margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
                       decoration: BoxDecoration(
-                        color: AppColors.darkCard,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                        color: AppColors.cardWhite,
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                         border: Border.all(
-                          color: isDone ? AppColors.safeGreenDark : AppColors.infoBlue,
-                          width: 2.0,
+                          color: isDone ? AppColors.safeGreen : AppColors.primaryTeal,
+                          width: 1.5,
                         ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppColors.cardShadow,
+                            blurRadius: 8.0,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
                       padding: const EdgeInsets.all(AppDimensions.spaceMD),
                       child: Column(
@@ -215,25 +243,29 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                               Expanded(
                                 child: Text(
                                   task.category.label,
-                                  style: AppTypography.standardTitle(color: Colors.white),
+                                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                                 ),
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: isDone ? AppColors.safeGreenDark : AppColors.infoBlue,
+                                  color: isDone ? AppColors.safeGreen.withValues(alpha: 0.15) : AppColors.primaryTealLight,
                                   borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
                                 ),
                                 child: Text(
                                   task.status.label,
-                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: isDone ? AppColors.safeGreenDark : AppColors.primaryTealDark,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: AppDimensions.spaceSM),
-                          Text(task.description, style: AppTypography.standardBody(color: Colors.white)),
-                          const SizedBox(height: 4.0),
+                          Text(task.description, style: AppTypography.standardBody(color: AppColors.textDarkPrimary)),
+                          const SizedBox(height: 2.0),
                           Text('Tujuan: ${task.destinationAddress}', style: AppTypography.standardCaption(color: AppColors.textDarkSecondary)),
                           const SizedBox(height: AppDimensions.spaceMD),
                           if (!isDone)
@@ -256,36 +288,36 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                   children: [
                     Text(
                       'Tugas Menunggu Relawan (${nearbyTasks.length})',
-                      style: AppTypography.standardTitle(color: Colors.white),
+                      style: AppTypography.categoryHeadline(),
                     ),
                     if (provider.isLoading)
                       const SizedBox(
                         width: 16.0,
                         height: 16.0,
-                        child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.infoBlueLight),
+                        child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.primaryTeal),
                       ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceSM),
 
                 if (nearbyTasks.isEmpty) ...[
                   Container(
                     padding: const EdgeInsets.all(AppDimensions.spaceXL),
                     decoration: BoxDecoration(
-                      color: AppColors.darkCard,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                      border: Border.all(color: AppColors.darkBorder),
+                      color: AppColors.cardWhite,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                      border: Border.all(color: AppColors.lightBorder),
                     ),
                     child: Center(
                       child: Column(
                         children: [
-                          const Icon(Icons.check_circle_outline_rounded, color: AppColors.safeGreenLight, size: 48.0),
+                          const Icon(Icons.check_circle_outline_rounded, color: AppColors.safeGreen, size: 44.0),
                           const SizedBox(height: AppDimensions.spaceMD),
                           Text(
                             'Semua warga di sekitar aman!',
-                            style: AppTypography.standardTitle(color: Colors.white),
+                            style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                           ),
-                          const SizedBox(height: 4.0),
+                          const SizedBox(height: 2.0),
                           Text(
                             'Belum ada permohonan bantuan mikro baru dalam radius 800m.',
                             style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
@@ -301,9 +333,16 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                     return Container(
                       margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
                       decoration: BoxDecoration(
-                        color: AppColors.darkCard,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                        border: Border.all(color: AppColors.darkBorder),
+                        color: AppColors.cardWhite,
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                        border: Border.all(color: AppColors.lightBorder, width: 1.0),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: AppColors.cardShadow,
+                            blurRadius: 6.0,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
                       ),
                       padding: const EdgeInsets.all(AppDimensions.spaceMD),
                       child: Column(
@@ -311,13 +350,13 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                         children: [
                           Row(
                             children: [
-                              Text(task.category.emoji, style: const TextStyle(fontSize: 26.0)),
-                              const SizedBox(width: AppDimensions.spaceMD),
+                              Text(task.category.emoji, style: const TextStyle(fontSize: 24.0)),
+                              const SizedBox(width: AppDimensions.spaceSM),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(task.category.label, style: AppTypography.standardTitle(color: Colors.white)),
+                                    Text(task.category.label, style: AppTypography.standardTitle(color: AppColors.textDarkPrimary)),
                                     Text(
                                       'Untuk: ${task.careReceiverName} • Jarak: $dist',
                                       style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
@@ -328,26 +367,25 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: AppColors.roleGuardian.withValues(alpha: 0.2),
+                                  color: AppColors.primaryTealLight,
                                   borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
-                                  border: Border.all(color: AppColors.roleGuardian),
                                 ),
                                 child: const Text(
                                   '+10 Poin',
-                                  style: TextStyle(color: AppColors.roleGuardian, fontSize: 11, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: AppColors.primaryTealDark, fontSize: 11, fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: AppDimensions.spaceSM),
-                          Text(task.description, style: AppTypography.standardBody(color: Colors.white)),
-                          const SizedBox(height: 4.0),
+                          Text(task.description, style: AppTypography.standardBody(color: AppColors.textDarkPrimary)),
+                          const SizedBox(height: 2.0),
                           Text('Tujuan: ${task.destinationAddress}', style: AppTypography.standardCaption(color: AppColors.textDarkTertiary)),
                           const SizedBox(height: AppDimensions.spaceMD),
                           AccessibleButton(
                             label: 'AMBIL TUGAS INI (BANTU)',
                             onPressed: () => _claimTask(task),
-                            backgroundColor: AppColors.infoBlue,
+                            backgroundColor: AppColors.primaryTeal,
                             icon: Icons.pan_tool_rounded,
                           ),
                         ],
@@ -362,11 +400,10 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/tasks/create'),
-        backgroundColor: AppColors.roleGuardian,
+        backgroundColor: AppColors.primaryTeal,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: const Text('Buat Permohonan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
 }
-

@@ -8,8 +8,7 @@ import '../../../../shared/components/accessible_button.dart';
 import '../state/wellness_provider.dart';
 
 /// Halaman Dasbor Keluarga / Wali (Primary Guardian Dashboard)
-/// Menampilkan ringkasan kondisi lansia yang dipantau, riwayat check-in harian,
-/// status eskalasi Dead-Man Switch, dan pemantauan kepatuhan konsumsi obat harian.
+/// Menampilkan ringkasan kondisi lansia yang dipantau dengan tata letak standar mobile dan font Poppins.
 class GuardianHomeScreen extends StatefulWidget {
   const GuardianHomeScreen({super.key});
 
@@ -48,7 +47,7 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
     final checkinStatus = todayCheckin?.status;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('SIGAP — Dasbor Wali'),
         actions: [
@@ -73,33 +72,43 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
         child: RefreshIndicator(
           onRefresh: () async => _fetchData(),
           color: AppColors.roleGuardian,
-          backgroundColor: AppColors.darkCard,
+          backgroundColor: Colors.white,
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppDimensions.spaceMD),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.spaceMD,
+              vertical: AppDimensions.spaceSM,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Kartu Profil Lansia Yang Dipantau
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.darkCard,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
+                    color: AppColors.cardWhite,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
                     border: Border.all(
-                      color: hasCheckedIn ? AppColors.safeGreenDark : AppColors.roleGuardian,
-                      width: 2.0,
+                      color: hasCheckedIn ? AppColors.safeGreen : AppColors.lightBorder,
+                      width: 1.0,
                     ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: AppColors.cardShadow,
+                        blurRadius: 8.0,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
                   ),
-                  padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                  padding: const EdgeInsets.all(AppDimensions.spaceMD),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           CircleAvatar(
-                            radius: 28.0,
-                            backgroundColor: AppColors.roleGuardian.withValues(alpha: 0.2),
-                            child: const Icon(Icons.person, color: AppColors.roleGuardian, size: 36.0),
+                            radius: 26.0,
+                            backgroundColor: AppColors.roleGuardian.withValues(alpha: 0.15),
+                            child: const Icon(Icons.person, color: AppColors.roleGuardian, size: 30.0),
                           ),
                           const SizedBox(width: AppDimensions.spaceMD),
                           Expanded(
@@ -108,7 +117,7 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                               children: [
                                 Text(
                                   'Ibu Aminah (71 thn)',
-                                  style: AppTypography.standardHeadline(color: Colors.white),
+                                  style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
                                 ),
                                 Text(
                                   'Domisili: RT 03 / RW 05 • Hubungan: Ibu Kandung',
@@ -120,13 +129,13 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: hasCheckedIn ? AppColors.safeGreenDark : AppColors.warningAmber,
+                              color: hasCheckedIn ? AppColors.safeGreen.withValues(alpha: 0.15) : const Color(0xFFFEF3C7),
                               borderRadius: BorderRadius.circular(AppDimensions.radiusFull),
                             ),
                             child: Text(
                               hasCheckedIn ? 'Aman' : 'Menunggu',
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: hasCheckedIn ? AppColors.safeGreenDark : AppColors.warningAmberDark,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -134,17 +143,17 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppDimensions.spaceLG),
-                      const Divider(color: AppColors.darkBorder),
+                      const SizedBox(height: AppDimensions.spaceMD),
+                      const Divider(color: AppColors.lightBorder),
                       const SizedBox(height: AppDimensions.spaceMD),
 
-                      // Status Check-in Harian (Dead-Man Switch Monitor)
+                      // Status Check-in Harian
                       if (hasCheckedIn) ...[
                         Row(
                           children: [
                             Text(
                               checkinStatus?.emoji ?? '😊',
-                              style: const TextStyle(fontSize: 34.0),
+                              style: const TextStyle(fontSize: 30.0),
                             ),
                             const SizedBox(width: AppDimensions.spaceMD),
                             Expanded(
@@ -153,7 +162,7 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                                 children: [
                                   Text(
                                     'Check-in: ${checkinStatus?.label ?? "Sudah Merespons"}',
-                                    style: AppTypography.standardTitle(color: Colors.white),
+                                    style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                                   ),
                                   Text(
                                     'Waktu Respons: ${_formatTime(todayCheckin?.respondedAt ?? todayCheckin?.createdAt)}',
@@ -162,7 +171,7 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                                 ],
                               ),
                             ),
-                            const Icon(Icons.check_circle_rounded, color: AppColors.safeGreenLight, size: 28.0),
+                            const Icon(Icons.check_circle_rounded, color: AppColors.safeGreen, size: 26.0),
                           ],
                         ),
                       ] else ...[
@@ -171,8 +180,8 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                           children: [
                             const Icon(
                               Icons.schedule_rounded,
-                              color: AppColors.warningAmberLight,
-                              size: 34.0,
+                              color: AppColors.warningAmber,
+                              size: 30.0,
                             ),
                             const SizedBox(width: AppDimensions.spaceMD),
                             Expanded(
@@ -181,14 +190,14 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                                 children: [
                                   Text(
                                     'Belum Melakukan Check-in Hari Ini',
-                                    style: AppTypography.standardTitle(color: AppColors.warningAmberLight),
+                                    style: AppTypography.standardTitle(color: AppColors.warningAmberDark),
                                   ),
-                                  const SizedBox(height: 4.0),
+                                  const SizedBox(height: 2.0),
                                   Text(
                                     'Status Eskalasi: ${todayCheckin?.escalationStatus.label ?? "Menunggu Check-in"}',
                                     style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
                                   ),
-                                  const SizedBox(height: 6.0),
+                                  const SizedBox(height: 4.0),
                                   Text(
                                     'Sistem Dead-Man Switch akan mengirimkan notifikasi eskalasi otomatis ke wali dan admin RT jika belum ada konfirmasi.',
                                     style: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
@@ -203,33 +212,33 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppDimensions.spaceXL),
+                const SizedBox(height: AppDimensions.spaceLG),
 
                 // Pemantauan Kepatuhan Minum Obat
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Jadwal & Kepatuhan Minum Obat',
-                      style: AppTypography.standardTitle(color: Colors.white),
+                      'Jadwal & Kepatuhan Obat',
+                      style: AppTypography.categoryHeadline(),
                     ),
                     if (wellness.isLoading)
                       const SizedBox(
-                        width: 18.0,
-                        height: 18.0,
+                        width: 16.0,
+                        height: 16.0,
                         child: CircularProgressIndicator(strokeWidth: 2.0, color: AppColors.roleGuardian),
                       ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceSM),
 
                 if (wellness.medicationSchedules.isEmpty) ...[
                   Container(
-                    padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                    padding: const EdgeInsets.all(AppDimensions.spaceMD),
                     decoration: BoxDecoration(
-                      color: AppColors.darkCard,
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                      border: Border.all(color: AppColors.darkBorder),
+                      color: AppColors.cardWhite,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                      border: Border.all(color: AppColors.lightBorder),
                     ),
                     child: Center(
                       child: Text(
@@ -244,7 +253,7 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                         ? schedule.reminderTimes.map((t) => '$t WIB').join(', ')
                         : 'Waktu belum diatur';
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
+                      padding: const EdgeInsets.only(bottom: AppDimensions.spaceSM),
                       child: _MedicationItemCard(
                         medicineName: schedule.medicationName,
                         dosage: schedule.dosage,
@@ -256,17 +265,17 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                   }),
                 ],
 
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // Akses Data Medis Darurat (ICE Card)
                 AccessibleButton(
                   label: 'Lihat / Perbarui Profil Medis (ICE Card)',
                   onPressed: () => context.push('/profile/ice-card'),
-                  backgroundColor: AppColors.roleGuardian,
+                  backgroundColor: AppColors.primaryTeal,
                   icon: Icons.medical_information_rounded,
                 ),
 
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceSM),
 
                 // Hubungi Kontak Lansia Langsung
                 AccessibleButton(
@@ -275,15 +284,17 @@ class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Menghubungi nomor telepon lansia terdaftar...'),
-                        backgroundColor: AppColors.darkSurfaceElevated,
+                        backgroundColor: AppColors.primaryTealDeep,
+                        behavior: SnackBarBehavior.floating,
                       ),
                     );
                   },
-                  backgroundColor: AppColors.darkSurfaceElevated,
-                  textColor: Colors.white,
-                  borderColor: AppColors.darkBorderHighContrast,
+                  backgroundColor: AppColors.cardWhite,
+                  textColor: AppColors.textDarkPrimary,
+                  borderColor: AppColors.lightBorder,
                   icon: Icons.phone_rounded,
                 ),
+                const SizedBox(height: AppDimensions.spaceXL),
               ],
             ),
           ),
@@ -319,26 +330,33 @@ class _MedicationItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+        color: AppColors.cardWhite,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
         border: Border.all(
-          color: isTaken ? AppColors.safeGreenDark : AppColors.darkBorder,
+          color: isTaken ? AppColors.safeGreen : AppColors.lightBorder,
         ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.cardShadow,
+            blurRadius: 6.0,
+            offset: Offset(0, 1),
+          ),
+        ],
       ),
       padding: const EdgeInsets.all(AppDimensions.spaceMD),
       child: Row(
         children: [
           Icon(
             isTaken ? Icons.check_circle_rounded : Icons.alarm_rounded,
-            color: isTaken ? AppColors.safeGreenLight : AppColors.warningAmber,
-            size: 32.0,
+            color: isTaken ? AppColors.safeGreen : AppColors.warningAmber,
+            size: 28.0,
           ),
           const SizedBox(width: AppDimensions.spaceMD),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(medicineName, style: AppTypography.standardTitle(color: Colors.white)),
+                Text(medicineName, style: AppTypography.standardTitle(color: AppColors.textDarkPrimary)),
                 Text(dosage, style: AppTypography.standardBody(color: AppColors.textDarkSecondary)),
                 Text(
                   'Jadwal: $scheduledTime',
@@ -350,13 +368,13 @@ class _MedicationItemCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: isTaken ? AppColors.safeGreenDark : AppColors.darkSurfaceElevated,
+              color: isTaken ? AppColors.safeGreen.withValues(alpha: 0.15) : AppColors.mintSurface,
               borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
             ),
             child: Text(
               isTaken ? 'Sudah Diminum${_formatTime(takenAt)}' : 'Menunggu',
               style: TextStyle(
-                color: isTaken ? Colors.white : AppColors.warningAmberLight,
+                color: isTaken ? AppColors.safeGreenDark : AppColors.warningAmberDark,
                 fontSize: 12.0,
                 fontWeight: FontWeight.bold,
               ),

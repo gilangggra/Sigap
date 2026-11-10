@@ -9,7 +9,7 @@ import '../../../../shared/components/accessible_button.dart';
 import 'safety_check_dialog.dart';
 
 /// Kartu Antarmuka Fitur Cek Keselamatan Perjalanan (Walk-Safe Timer Card)
-/// Ditampilkan pada Beranda Lansia dengan estetika modern Healthcare Pill & White Surface.
+/// Ditampilkan pada Beranda Lansia dengan format standar mobile dan tipografi Poppins konsisten.
 class SafetyCheckCard extends StatelessWidget {
   final VoidCallback onEmergencyTriggered;
 
@@ -33,23 +33,23 @@ class SafetyCheckCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppColors.cardWhite,
               borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-              border: Border.all(color: AppColors.mintBorder, width: 1.5),
+              border: Border.all(color: AppColors.lightBorder, width: 1.0),
               boxShadow: const [
                 BoxShadow(
                   color: AppColors.cardShadow,
-                  blurRadius: 16.0,
-                  offset: Offset(0, 4),
+                  blurRadius: 8.0,
+                  offset: Offset(0, 2),
                 ),
               ],
             ),
-            padding: const EdgeInsets.all(AppDimensions.spaceLG),
+            padding: const EdgeInsets.all(AppDimensions.spaceMD),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                      padding: const EdgeInsets.all(10.0),
                       decoration: const BoxDecoration(
                         color: AppColors.primaryTealLight,
                         shape: BoxShape.circle,
@@ -57,7 +57,7 @@ class SafetyCheckCard extends StatelessWidget {
                       child: const Icon(
                         Icons.directions_walk_rounded,
                         color: AppColors.primaryTealDark,
-                        size: 28.0,
+                        size: 26.0,
                       ),
                     ),
                     const SizedBox(width: AppDimensions.spaceMD),
@@ -69,9 +69,8 @@ class SafetyCheckCard extends StatelessWidget {
                             'Cek Perjalanan Aman',
                             style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                           ),
-                          const SizedBox(height: 2),
                           Text(
-                            'Atur pengatur waktu saat bepergian ke masjid atau jalan pagi.',
+                            'Atur waktu pengawasan saat jalan pagi atau ke masjid.',
                             style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                           ),
                         ],
@@ -79,7 +78,7 @@ class SafetyCheckCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
                 AccessibleButton(
                   label: 'MULAI PERJALANAN AMAN',
                   onPressed: () {
@@ -111,25 +110,25 @@ class SafetyCheckCard extends StatelessWidget {
               color: status == SafetyCheckStatus.preAlarmTriggered
                   ? AppColors.emergencyRed
                   : AppColors.primaryTeal,
-              width: 2.5,
+              width: 2.0,
             ),
             boxShadow: const [
               BoxShadow(
                 color: AppColors.cardShadow,
-                blurRadius: 20.0,
-                offset: Offset(0, 6),
+                blurRadius: 10.0,
+                offset: Offset(0, 3),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.all(AppDimensions.spaceMD),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 children: [
                   Container(
-                    width: 14.0,
-                    height: 14.0,
+                    width: 12.0,
+                    height: 12.0,
                     decoration: BoxDecoration(
                       color: status == SafetyCheckStatus.preAlarmTriggered
                           ? AppColors.emergencyRed
@@ -147,8 +146,7 @@ class SafetyCheckCard extends StatelessWidget {
                           ? AppColors.emergencyRed
                           : AppColors.primaryTealDark,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14.0,
-                      letterSpacing: 0.5,
+                      fontSize: 13.0,
                     ),
                   ),
                 ],
@@ -171,9 +169,9 @@ class SafetyCheckCard extends StatelessWidget {
                           color: status == SafetyCheckStatus.preAlarmTriggered
                               ? AppColors.emergencyRed
                               : AppColors.textDarkPrimary,
-                          fontSize: 44.0,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.5,
+                          fontSize: 40.0,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.0,
                         ),
                       ),
                       Text(
@@ -189,9 +187,9 @@ class SafetyCheckCard extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: AppDimensions.spaceLG),
+              const SizedBox(height: AppDimensions.spaceMD),
 
-              // Tombol Konfirmasi Tiba Raksasa (Target Sentuh Utama: 72dp)
+              // Tombol Konfirmasi Tiba (Target Sentuh Utama: 72dp)
               AccessibleButton(
                 label: 'SAYA SUDAH SAMPAI (AMAN)',
                 onPressed: () {
@@ -207,7 +205,7 @@ class SafetyCheckCard extends StatelessWidget {
                 customHeight: 72.0,
                 icon: Icons.check_circle_rounded,
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               // Baris Opsi Tambahan (+15 Menit & Batalkan)
               Row(
@@ -217,21 +215,21 @@ class SafetyCheckCard extends StatelessWidget {
                       label: '+15 Menit',
                       onPressed: () => safetyService.extendDuration(additionalMinutes: 15),
                       backgroundColor: AppColors.mintSurface,
-                      borderColor: AppColors.mintBorder,
+                      borderColor: AppColors.lightBorder,
                       textColor: AppColors.primaryTealDark,
-                      customHeight: 56.0,
+                      customHeight: 52.0,
                       icon: Icons.more_time_rounded,
                     ),
                   ),
-                  const SizedBox(width: AppDimensions.spaceMD),
+                  const SizedBox(width: AppDimensions.spaceSM),
                   Expanded(
                     child: AccessibleButton(
                       label: 'Batalkan',
                       onPressed: () => safetyService.cancelSafetyCheck(),
                       backgroundColor: AppColors.mintSurface,
-                      borderColor: AppColors.mintBorder,
+                      borderColor: AppColors.lightBorder,
                       textColor: AppColors.textDarkSecondary,
-                      customHeight: 56.0,
+                      customHeight: 52.0,
                       icon: Icons.close_rounded,
                     ),
                   ),

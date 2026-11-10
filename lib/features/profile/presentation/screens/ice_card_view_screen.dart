@@ -13,7 +13,7 @@ import '../../../../shared/components/accessible_button.dart';
 import '../state/profile_provider.dart';
 
 /// Halaman Tampilan Data Medis Darurat (Digital ICE Card & Medical ID Pass).
-/// Didesain dengan Sistem Desain Medis & Healthcare Modern (Sesuai Referensi Gambar).
+/// Didesain dengan tata letak standar mobile yang bersih dan tipografi Poppins konsisten.
 class IceCardViewScreen extends StatefulWidget {
   final String? emergencyToken;
   final bool isSelfView;
@@ -89,11 +89,11 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
     final patientName = authProvider.fullName ?? 'Ibu Aminah';
 
     return Scaffold(
-      backgroundColor: AppColors.mintBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: Text(widget.isSelfView ? 'Kartu Medis Digital' : 'Data Medis Korban'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20.0),
           onPressed: () => context.pop(),
         ),
       ),
@@ -120,7 +120,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                             child: const Icon(
                               Icons.medical_information_outlined,
                               color: AppColors.primaryTealDark,
-                              size: 56.0,
+                              size: 48.0,
                             ),
                           ),
                           const SizedBox(height: AppDimensions.spaceMD),
@@ -131,7 +131,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                             style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: AppDimensions.spaceSM),
+                          const SizedBox(height: AppDimensions.spaceXS),
                           Text(
                             widget.isSelfView
                                 ? 'Lengkapi profil medis darurat Anda agar relawan dan paramedis dapat memberikan pertolongan yang tepat.'
@@ -141,7 +141,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                             textAlign: TextAlign.center,
                           ),
                           if (widget.isSelfView) ...[
-                            const SizedBox(height: AppDimensions.spaceXL),
+                            const SizedBox(height: AppDimensions.spaceLG),
                             AccessibleButton(
                               label: 'Isi Data Medis Sekarang',
                               onPressed: () => context.push('/profile/ice-card'),
@@ -154,65 +154,65 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                     ),
                   )
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG, vertical: AppDimensions.spaceMD),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spaceMD,
+                      vertical: AppDimensions.spaceSM,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Avatar Header & Citizen Info (Sesuai Referensi Gambar Layar 3)
-                        Center(
-                          child: Column(
+                        // Kartu Profil Pasien Standar Mobile
+                        Container(
+                          padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                          decoration: BoxDecoration(
+                            color: AppColors.cardWhite,
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                            border: Border.all(color: AppColors.lightBorder, width: 1.0),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: AppColors.cardShadow,
+                                blurRadius: 8.0,
+                                offset: Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
                             children: [
-                              Container(
-                                width: 84.0,
-                                height: 84.0,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryTealLight,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.primaryTeal, width: 3.0),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: AppColors.cardShadow,
-                                      blurRadius: 14.0,
-                                      offset: Offset(0, 4),
+                              const CircleAvatar(
+                                radius: 28.0,
+                                backgroundColor: AppColors.primaryTealLight,
+                                child: Icon(Icons.elderly_rounded, color: AppColors.primaryTealDark, size: 32.0),
+                              ),
+                              const SizedBox(width: AppDimensions.spaceMD),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      patientName,
+                                      style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
+                                    ),
+                                    const SizedBox(height: 2.0),
+                                    Text(
+                                      'Lansia Terdaftar • RT 04 / RW 02',
+                                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                                     ),
                                   ],
                                 ),
-                                child: const Icon(
-                                  Icons.elderly_rounded,
-                                  color: AppColors.primaryTealDark,
-                                  size: 48.0,
-                                ),
-                              ),
-                              const SizedBox(height: AppDimensions.spaceMD),
-                              Text(
-                                patientName,
-                                style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
-                              ),
-                              const SizedBox(height: 2.0),
-                              Text(
-                                'Lansia Terdaftar • RT 04 / RW 02',
-                                style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                               ),
                             ],
                           ),
                         ),
 
-                        const SizedBox(height: AppDimensions.spaceLG),
+                        const SizedBox(height: AppDimensions.spaceMD),
 
-                        // Segmented Pill Tab Bar (Sesuai Referensi Gambar Layar 3)
+                        // Segmented Control Tabs (Informasi Medis vs QR Code ICE)
                         Container(
-                          padding: const EdgeInsets.all(4.0),
+                          padding: const EdgeInsets.all(3.0),
                           decoration: BoxDecoration(
-                            color: AppColors.cardWhite,
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
-                            border: Border.all(color: AppColors.mintBorder, width: 1.5),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: AppColors.cardShadow,
-                                blurRadius: 10.0,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
+                            color: AppColors.mintSurface,
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                            border: Border.all(color: AppColors.lightBorder, width: 1.0),
                           ),
                           child: Row(
                             children: [
@@ -223,10 +223,10 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                     setState(() => _selectedTabIndex = 0);
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                                     decoration: BoxDecoration(
                                       color: _selectedTabIndex == 0 ? AppColors.primaryTeal : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                                      borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
@@ -234,7 +234,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                       style: TextStyle(
                                         color: _selectedTabIndex == 0 ? Colors.white : AppColors.textDarkSecondary,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 14.0,
+                                        fontSize: 13.0,
                                       ),
                                     ),
                                   ),
@@ -247,10 +247,10 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                     setState(() => _selectedTabIndex = 1);
                                   },
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                                    padding: const EdgeInsets.symmetric(vertical: 10.0),
                                     decoration: BoxDecoration(
                                       color: _selectedTabIndex == 1 ? AppColors.primaryTeal : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
+                                      borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
@@ -258,7 +258,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                       style: TextStyle(
                                         color: _selectedTabIndex == 1 ? Colors.white : AppColors.textDarkSecondary,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 14.0,
+                                        fontSize: 13.0,
                                       ),
                                     ),
                                   ),
@@ -268,30 +268,30 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: AppDimensions.spaceLG),
+                        const SizedBox(height: AppDimensions.spaceMD),
 
                         // Tab 0: Informasi Medis Lengkap
                         if (_selectedTabIndex == 0) ...[
                           // Kartu Golongan Darah
                           Container(
-                            padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                            padding: const EdgeInsets.all(AppDimensions.spaceMD),
                             decoration: BoxDecoration(
                               color: AppColors.cardWhite,
                               borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                              border: Border.all(color: AppColors.mintBorder, width: 1.5),
+                              border: Border.all(color: AppColors.lightBorder, width: 1.0),
                               boxShadow: const [
                                 BoxShadow(
                                   color: AppColors.cardShadow,
-                                  blurRadius: 14.0,
-                                  offset: Offset(0, 4),
+                                  blurRadius: 8.0,
+                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
                             child: Row(
                               children: [
                                 Container(
-                                  width: 64.0,
-                                  height: 64.0,
+                                  width: 54.0,
+                                  height: 54.0,
                                   decoration: const BoxDecoration(
                                     color: AppColors.emergencyRed,
                                     shape: BoxShape.circle,
@@ -301,12 +301,12 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                     card.bloodType,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 24.0,
+                                      fontSize: 22.0,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: AppDimensions.spaceLG),
+                                const SizedBox(width: AppDimensions.spaceMD),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,7 +317,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                       ),
                                       Text(
                                         'Tipe ${card.bloodType}',
-                                        style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
+                                        style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
                                       ),
                                     ],
                                   ),
@@ -353,16 +353,16 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                           // Kontak Dokter & Catatan Khusus
                           if (card.doctorName != null || card.doctorPhone != null || card.doctorNotes != null) ...[
                             Container(
-                              padding: const EdgeInsets.all(AppDimensions.spaceLG),
+                              padding: const EdgeInsets.all(AppDimensions.spaceMD),
                               decoration: BoxDecoration(
                                 color: AppColors.cardWhite,
                                 borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                                border: Border.all(color: AppColors.mintBorder, width: 1.5),
+                                border: Border.all(color: AppColors.lightBorder, width: 1.0),
                                 boxShadow: const [
                                   BoxShadow(
                                     color: AppColors.cardShadow,
-                                    blurRadius: 14.0,
-                                    offset: Offset(0, 4),
+                                    blurRadius: 8.0,
+                                    offset: Offset(0, 2),
                                   ),
                                 ],
                               ),
@@ -372,12 +372,12 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                   Row(
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(6.0),
                                         decoration: const BoxDecoration(
                                           color: AppColors.primaryTealLight,
                                           shape: BoxShape.circle,
                                         ),
-                                        child: const Icon(Icons.local_hospital_rounded, color: AppColors.primaryTealDark, size: 22),
+                                        child: const Icon(Icons.local_hospital_rounded, color: AppColors.primaryTealDark, size: 20),
                                       ),
                                       const SizedBox(width: AppDimensions.spaceSM),
                                       Text(
@@ -387,14 +387,14 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                     ],
                                   ),
                                   if (card.doctorName != null) ...[
-                                    const SizedBox(height: AppDimensions.spaceMD),
+                                    const SizedBox(height: AppDimensions.spaceSM),
                                     Text(
                                       card.doctorName!,
-                                      style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                                      style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                                     ),
                                   ],
                                   if (card.doctorNotes != null) ...[
-                                    const SizedBox(height: AppDimensions.spaceSM),
+                                    const SizedBox(height: 2.0),
                                     Text(
                                       'Catatan: ${card.doctorNotes}',
                                       style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
@@ -422,12 +422,12 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                             decoration: BoxDecoration(
                               color: AppColors.cardWhite,
                               borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-                              border: Border.all(color: AppColors.mintBorder, width: 1.5),
+                              border: Border.all(color: AppColors.lightBorder, width: 1.0),
                               boxShadow: const [
                                 BoxShadow(
                                   color: AppColors.cardShadow,
-                                  blurRadius: 20.0,
-                                  offset: Offset(0, 6),
+                                  blurRadius: 10.0,
+                                  offset: Offset(0, 2),
                                 ),
                               ],
                             ),
@@ -436,7 +436,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                 QrImageView(
                                   data: _generateQrPayload(card, authProvider),
                                   version: QrVersions.auto,
-                                  size: 200.0,
+                                  size: 190.0,
                                   backgroundColor: Colors.white,
                                   eyeStyle: const QrEyeStyle(
                                     eyeShape: QrEyeShape.square,
@@ -454,7 +454,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                                 ),
                                 const SizedBox(height: AppDimensions.spaceXS),
                                 Text(
-                                  'Dapat dipindai langsung oleh Paramedis / Relawan untuk melihat golongan darah, alergi, dan kontak darurat tanpa koneksi internet.',
+                                  'Dapat dipindai langsung oleh Paramedis / Relawan untuk melihat data medis tanpa koneksi internet.',
                                   style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                                   textAlign: TextAlign.center,
                                 ),
@@ -463,7 +463,7 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                           ),
                         ],
 
-                        const SizedBox(height: AppDimensions.spaceLG),
+                        const SizedBox(height: AppDimensions.spaceMD),
 
                         if (widget.isSelfView) ...[
                           AccessibleButton(
@@ -497,16 +497,16 @@ class _MedicalSectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppDimensions.spaceLG),
+      padding: const EdgeInsets.all(AppDimensions.spaceMD),
       decoration: BoxDecoration(
         color: AppColors.cardWhite,
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
-        border: Border.all(color: AppColors.mintBorder, width: 1.5),
+        border: Border.all(color: AppColors.lightBorder, width: 1.0),
         boxShadow: const [
           BoxShadow(
             color: AppColors.cardShadow,
-            blurRadius: 14.0,
-            offset: Offset(0, 4),
+            blurRadius: 8.0,
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -515,7 +515,7 @@ class _MedicalSectionCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: accentColor, size: 22.0),
+              Icon(icon, color: accentColor, size: 20.0),
               const SizedBox(width: AppDimensions.spaceSM),
               Text(
                 title,
@@ -523,24 +523,24 @@ class _MedicalSectionCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppDimensions.spaceMD),
+          const SizedBox(height: AppDimensions.spaceSM),
           Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
             children: items.map((item) {
               return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
                 decoration: BoxDecoration(
                   color: AppColors.mintSurface,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusPill),
-                  border: Border.all(color: AppColors.mintBorder),
+                  borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
+                  border: Border.all(color: AppColors.lightBorder),
                 ),
                 child: Text(
                   item,
                   style: const TextStyle(
                     color: AppColors.textDarkPrimary,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 13.0,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               );

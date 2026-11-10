@@ -9,7 +9,7 @@ import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 
 /// Halaman pemilihan peran (Role-Based Onboarding)
-/// Mengimplementasikan sistem desain Healthcare Teal & Mint dengan kartu permukaan putih halus.
+/// Mengimplementasikan tata letak standar mobile yang rapi dan konsisten dengan font Poppins.
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
@@ -27,27 +27,30 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.mintBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Pilih Peran Anda'),
         elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceLG, vertical: AppDimensions.spaceMD),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceSM,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 'Peran dalam Komunitas',
-                style: AppTypography.seniorHeadingMedium(color: AppColors.textDarkPrimary),
+                style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
               ),
-              const SizedBox(height: AppDimensions.spaceXS),
+              const SizedBox(height: 2.0),
               Text(
                 'Pilih peran Anda untuk menyesuaikan tata letak dan fitur yang paling relevan.',
-                style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
+                style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
               ),
-              const SizedBox(height: AppDimensions.spaceLG),
+              const SizedBox(height: AppDimensions.spaceMD),
 
               // Kartu Peran 1: Care-Receiver
               _RoleCard(
@@ -57,7 +60,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 accentColor: AppColors.primaryTeal,
                 onTap: () => _selectRole(context, UserRole.careReceiver),
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               // Kartu Peran 2: Responder
               _RoleCard(
@@ -67,7 +70,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 accentColor: AppColors.roleResponder,
                 onTap: () => _selectRole(context, UserRole.responder),
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               // Kartu Peran 3: Guardian
               _RoleCard(
@@ -77,7 +80,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 accentColor: AppColors.roleGuardian,
                 onTap: () => _selectRole(context, UserRole.guardian),
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               // Kartu Peran 4: Civic Admin
               _RoleCard(
@@ -87,6 +90,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 accentColor: AppColors.roleAdmin,
                 onTap: () => _selectRole(context, UserRole.civicAdmin),
               ),
+              const SizedBox(height: AppDimensions.spaceXL),
             ],
           ),
         ),
@@ -117,8 +121,8 @@ class _RoleCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
         side: const BorderSide(
-          color: AppColors.mintBorder,
-          width: 1.5,
+          color: AppColors.lightBorder,
+          width: 1.0,
         ),
       ),
       elevation: 0,
@@ -127,30 +131,30 @@ class _RoleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
         child: Container(
           constraints: const BoxConstraints(
-            minHeight: AppDimensions.seniorRecommendedTouchTarget,
+            minHeight: AppDimensions.seniorMinTouchTarget,
           ),
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.all(AppDimensions.spaceMD),
           child: Row(
             children: [
               Container(
-                width: 60.0,
-                height: 60.0,
+                width: 48.0,
+                height: 48.0,
                 decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.15),
+                  color: accentColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: accentColor, size: 32.0),
+                child: Icon(icon, color: accentColor, size: 26.0),
               ),
-              const SizedBox(width: AppDimensions.spaceLG),
+              const SizedBox(width: AppDimensions.spaceMD),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                      style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                     ),
-                    const SizedBox(height: AppDimensions.spaceXS),
+                    const SizedBox(height: 2.0),
                     Text(
                       description,
                       style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
@@ -161,7 +165,7 @@ class _RoleCard extends StatelessWidget {
               const Icon(
                 Icons.arrow_forward_ios_rounded,
                 color: AppColors.textDarkTertiary,
-                size: 20.0,
+                size: 16.0,
               ),
             ],
           ),

@@ -12,8 +12,7 @@ import '../../domain/models/ice_card.dart';
 import '../state/profile_provider.dart';
 
 /// Halaman form pengisian / penyuntingan data medis darurat (ICE Card)
-/// Data disimpan terenkripsi dan hanya dapat diakses oleh korban, keluarga,
-/// atau relawan pengunci insiden aktif dengan token resmi 2 jam.
+/// Menggunakan standar tata letak formulir mobile dan tipografi Poppins konsisten.
 class IceCardFormScreen extends StatefulWidget {
   const IceCardFormScreen({super.key});
 
@@ -76,6 +75,8 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
   }
 
   Future<void> _saveIceCard() async {
+    if (!_formKey.currentState!.validate()) return;
+
     final authProvider = context.read<AuthProvider>();
     final profileProvider = context.read<ProfileProvider>();
     final careReceiverId = authProvider.userId ?? 'care-receiver-default';
@@ -114,6 +115,7 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: AppColors.safeGreenDark,
+          behavior: SnackBarBehavior.floating,
           content: Text('Kartu Informasi Medis Darurat (ICE Card) berhasil disimpan.'),
         ),
       );
@@ -123,6 +125,7 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: AppColors.emergencyRedDark,
+          behavior: SnackBarBehavior.floating,
           content: Text(profileProvider.errorMessage ?? 'Gagal menyimpan ICE Card.'),
         ),
       );
@@ -134,13 +137,20 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
     final profileProvider = context.watch<ProfileProvider>();
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
-        title: const Text('Data Medis Darurat (ICE Card)'),
+        title: const Text('Isi Data Medis (ICE Card)'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20.0),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceSM,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
@@ -150,45 +160,45 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
                 Container(
                   padding: const EdgeInsets.all(AppDimensions.spaceMD),
                   decoration: BoxDecoration(
-                    color: AppColors.darkSurfaceElevated,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                    border: Border.all(color: AppColors.infoBlueLight),
+                    color: AppColors.primaryTealLight,
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusCard),
+                    border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline_rounded, color: AppColors.infoBlueLight, size: 28.0),
+                      const Icon(Icons.lock_outline_rounded, color: AppColors.primaryTealDark, size: 24.0),
                       const SizedBox(width: AppDimensions.spaceMD),
                       Expanded(
                         child: Text(
-                          'Data medis ini dienkripsi at-rest menggunakan pgcrypto. Hanya dapat diakses saat tombol SOS aktif oleh relawan terverifikasi.',
-                          style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                          'Data medis ini dienkripsi aman di cloud. Hanya dapat diakses saat tombol SOS aktif oleh relawan terverifikasi.',
+                          style: AppTypography.standardCaption(color: AppColors.primaryTealDeep),
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spaceXL),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // 1. Golongan Darah
                 Text(
                   'Golongan Darah',
-                  style: AppTypography.seniorTitle(color: Colors.white),
+                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                 ),
-                const SizedBox(height: AppDimensions.spaceSM),
+                const SizedBox(height: AppDimensions.spaceXS),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spaceMD),
                   decoration: BoxDecoration(
-                    color: AppColors.darkCard,
+                    color: AppColors.cardWhite,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                    border: Border.all(color: AppColors.darkBorderHighContrast),
+                    border: Border.all(color: AppColors.lightBorder),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _selectedBloodType,
-                      dropdownColor: AppColors.darkCard,
-                      icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
+                      dropdownColor: AppColors.cardWhite,
+                      icon: const Icon(Icons.arrow_drop_down, color: AppColors.textDarkPrimary),
                       isExpanded: true,
-                      style: AppTypography.seniorBodyPrimary(color: Colors.white),
+                      style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                       items: _bloodTypes.map((type) {
                         return DropdownMenuItem<String>(
                           value: type,
@@ -203,91 +213,91 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // 2. Alergi Obat & Makanan
                 Text(
                   'Alergi Obat / Makanan',
-                  style: AppTypography.seniorTitle(color: Colors.white),
+                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                 ),
-                const SizedBox(height: AppDimensions.spaceXS),
+                const SizedBox(height: 2.0),
                 Text(
                   'Pisahkan dengan tanda koma (contoh: Penicillin, Aspirin, Kacang)',
-                  style: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
+                  style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                 ),
-                const SizedBox(height: AppDimensions.spaceSM),
+                const SizedBox(height: AppDimensions.spaceXS),
                 _AccessibleInputField(
                   controller: _allergiesController,
                   hintText: 'Penicillin, Sulfonamida, dll',
                   maxLines: 2,
                 ),
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // 3. Penyakit Kronis / Riwayat Penyakit
                 Text(
                   'Penyakit Kronis / Kondisi Khusus',
-                  style: AppTypography.seniorTitle(color: Colors.white),
+                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                 ),
-                const SizedBox(height: AppDimensions.spaceXS),
+                const SizedBox(height: 2.0),
                 Text(
                   'Contoh: Hipertensi, Diabetes, Asma, Ring Jantung',
-                  style: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
+                  style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                 ),
-                const SizedBox(height: AppDimensions.spaceSM),
+                const SizedBox(height: AppDimensions.spaceXS),
                 _AccessibleInputField(
                   controller: _conditionsController,
                   hintText: 'Hipertensi, Diabetes Melitus, dll',
                   maxLines: 2,
                 ),
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // 4. Dokter Rujukan / Puskesmas
                 Text(
                   'Nama Dokter / Fasilitas Kesehatan',
-                  style: AppTypography.seniorTitle(color: Colors.white),
+                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                 ),
-                const SizedBox(height: AppDimensions.spaceSM),
+                const SizedBox(height: AppDimensions.spaceXS),
                 _AccessibleInputField(
                   controller: _doctorNameController,
                   hintText: 'dr. Hendra Kusuma (Puskesmas Menteng)',
                 ),
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // 5. Nomor Telepon Dokter
                 Text(
                   'Nomor Telepon Dokter / RS',
-                  style: AppTypography.seniorTitle(color: Colors.white),
+                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                 ),
-                const SizedBox(height: AppDimensions.spaceSM),
+                const SizedBox(height: AppDimensions.spaceXS),
                 _AccessibleInputField(
                   controller: _doctorPhoneController,
                   hintText: '+6281234567890',
                   keyboardType: TextInputType.phone,
                 ),
-                const SizedBox(height: AppDimensions.spaceLG),
+                const SizedBox(height: AppDimensions.spaceMD),
 
                 // 6. Catatan Khusus Tindakan Medis
                 Text(
                   'Catatan Khusus Tindakan Pertama',
-                  style: AppTypography.seniorTitle(color: Colors.white),
+                  style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                 ),
-                const SizedBox(height: AppDimensions.spaceSM),
+                const SizedBox(height: AppDimensions.spaceXS),
                 _AccessibleInputField(
                   controller: _doctorNotesController,
                   hintText: 'Catatan penting bagi relawan saat pertolongan pertama...',
                   maxLines: 3,
                 ),
-                const SizedBox(height: AppDimensions.space2XL),
+                const SizedBox(height: AppDimensions.spaceLG),
 
                 // Tombol Simpan
                 AccessibleButton(
                   label: profileProvider.isLoading ? 'Menyimpan Data...' : 'Simpan ICE Card Medis',
                   onPressed: profileProvider.isLoading ? null : _saveIceCard,
                   isSimplified: true,
-                  backgroundColor: AppColors.safeGreen,
+                  backgroundColor: AppColors.primaryTeal,
                   icon: Icons.check_circle_outline,
                 ),
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceSM),
 
                 // Tombol Lihat Kartu Medis & QR Code
                 AccessibleButton(
@@ -295,8 +305,12 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
                   onPressed: () => context.push('/profile/ice-card-view'),
                   isSimplified: true,
                   isSecondary: true,
+                  backgroundColor: AppColors.cardWhite,
+                  borderColor: AppColors.lightBorder,
+                  textColor: AppColors.textDarkPrimary,
                   icon: Icons.qr_code_2_rounded,
                 ),
+                const SizedBox(height: AppDimensions.spaceXL),
               ],
             ),
           ),
@@ -323,23 +337,26 @@ class _AccessibleInputField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.darkCard,
+        color: AppColors.cardWhite,
         borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-        border: Border.all(color: AppColors.darkBorderHighContrast),
+        border: Border.all(color: AppColors.lightBorder, width: 1.0),
       ),
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.spaceMD,
-        vertical: AppDimensions.spaceSM,
+        vertical: 4.0,
       ),
       child: TextField(
         controller: controller,
         maxLines: maxLines,
         keyboardType: keyboardType,
-        style: AppTypography.seniorBodyPrimary(color: Colors.white),
+        style: AppTypography.standardBody(color: AppColors.textDarkPrimary),
         decoration: InputDecoration(
           hintText: hintText,
-          hintStyle: const TextStyle(color: AppColors.textDarkTertiary, fontSize: 16.0),
+          hintStyle: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          filled: false,
         ),
       ),
     );
