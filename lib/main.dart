@@ -7,6 +7,7 @@ import 'core/router/app_router.dart';
 import 'core/services/location_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/supabase_service.dart';
+import 'core/services/sync_service.dart';
 import 'core/state/auth_provider.dart';
 import 'core/theme/app_theme.dart';
 import 'features/emergency/presentation/state/emergency_provider.dart';
@@ -65,7 +66,16 @@ Future<void> main() async {
     }
   }
 
-  // 5. Jalankan aplikasi dibungkus MultiProvider
+  // 5. Inisialisasi Autonomous Network Sync Manager
+  try {
+    await SyncService.instance.initialize();
+  } catch (e) {
+    if (kDebugMode) {
+      print('⚠️ [main] Inisialisasi SyncService ditunda: $e');
+    }
+  }
+
+  // 6. Jalankan aplikasi dibungkus MultiProvider
   runApp(
     MultiProvider(
       providers: [

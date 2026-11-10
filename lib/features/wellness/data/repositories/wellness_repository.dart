@@ -9,6 +9,8 @@ import '../../domain/models/wellness_log.dart';
 /// Repository pengelola rekaman kesehatan harian (Check-in, Dead-Man Switch, dan Kepatuhan Obat).
 /// Dilengkapi sistem penyimpanan offline-first dan sinkronisasi otomatis.
 class WellnessRepository {
+  static final WellnessRepository instance = WellnessRepository();
+
   final SupabaseService _supabaseService;
   final LocalCacheService _localCacheService;
 
@@ -42,6 +44,7 @@ class WellnessRepository {
     await _localCacheService.saveTodayCheckin(localLog);
 
     if (!_supabaseService.isInitialized) {
+      await _localCacheService.recordOfflineCheckin(localLog);
       if (kDebugMode) {
         print('ℹ️ [WellnessRepository] Mode offline: Check-in diamankan di cache lokal (${status.label})');
       }
@@ -65,6 +68,7 @@ class WellnessRepository {
       }
       return localLog;
     } catch (e) {
+      await _localCacheService.recordOfflineCheckin(localLog);
       if (kDebugMode) {
         print('⚠️ [WellnessRepository] Gagal menyimpan check-in ke cloud, log lokal tetap aman: $e');
       }
@@ -227,6 +231,38 @@ class WellnessRepository {
     } catch (e) {
       if (kDebugMode) {
         print('⚠️ [WellnessRepository] Sinkronisasi log obat tertunda ditunda: $e');
+      }
+    }
+  }
+
+  /// 6. Sinkronisasi otomatis log check-in harian yang tercatat saat offline ke Cloud
+  Future<void> syncPendingCheckins() async {
+    if (!_supabaseService.isInitialized) return;
+
+    final pending = await _localCacheService.getPendingCheckins();
+    if (pending.isEmpty) return;
+
+    try {
+      for (final item in pending) {
+        final checkDate = item['check_date'] is String
+            ? (item['check_date'] as String).split('T').first
+            : DateTime.now().toIso8601String().split('T').first;
+
+        await _client.from('wellness_logs').upsert({
+          'care_receiver_id': item['care_receiver_id'],
+          'check_date': checkDate,
+          'status': item['status'],
+          'escalation_status': item['escalation_status'] ?? 'resolved',
+          'responded_at': item['responded_at'],
+        });
+      }
+      await _localCacheService.clearPendingCheckins();
+      if (kDebugMode) {
+        print('✅ [WellnessRepository] ${pending.length} check-in offline berhasil disinkronkan ke Cloud Supabase');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('⚠️ [WellnessRepository] Sinkronisasi check-in tertunda ditunda: $e');
       }
     }
   }

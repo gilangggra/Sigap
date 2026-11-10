@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -285,6 +286,16 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
                   isSimplified: true,
                   backgroundColor: AppColors.safeGreen,
                   icon: Icons.check_circle_outline,
+                ),
+                const SizedBox(height: AppDimensions.spaceMD),
+
+                // Tombol Lihat Kartu Medis & QR Code
+                AccessibleButton(
+                  label: 'Lihat Kartu Medis & QR Code',
+                  onPressed: () => context.push('/profile/ice-card-view'),
+                  isSimplified: true,
+                  isSecondary: true,
+                  icon: Icons.qr_code_2_rounded,
                 ),
               ],
             ),

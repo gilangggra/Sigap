@@ -164,12 +164,24 @@ class ProfileScreen extends StatelessWidget {
 
               const SizedBox(height: AppDimensions.spaceXL),
 
+              // Tombol Lihat Kartu Medis Digital & QR Code
+              AccessibleButton(
+                label: 'Kartu Medis Digital & QR (ICE)',
+                onPressed: () => context.push('/profile/ice-card-view'),
+                isSimplified: authProvider.simplifiedMode,
+                backgroundColor: AppColors.emergencyRed,
+                icon: Icons.qr_code_2_rounded,
+              ),
+
+              const SizedBox(height: AppDimensions.spaceMD),
+
               // Tombol Kelola ICE Card Medis
               AccessibleButton(
                 label: 'Kelola Data Medis Darurat (ICE Card)',
                 onPressed: () => context.push('/profile/ice-card'),
                 isSimplified: authProvider.simplifiedMode,
-                backgroundColor: AppColors.emergencyRedDark,
+                backgroundColor: AppColors.darkCard,
+                borderColor: AppColors.darkBorderHighContrast,
                 icon: Icons.medical_services_rounded,
               ),
 

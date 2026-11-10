@@ -22,6 +22,7 @@ class LocalCacheService {
   static const String _keyMedSchedulesPrefix = 'sigap_med_schedules_';
   static const String _keyWellnessCheckinPrefix = 'sigap_wellness_checkin_';
   static const String _keyPendingMedLogs = 'sigap_pending_med_logs';
+  static const String _keyPendingCheckinLogs = 'sigap_pending_checkin_logs';
 
   // ===========================================================================
   // 1. DATA MEDIS DARURAT (ICE CARD) — CACHE TERENKRIPSI
@@ -192,6 +193,45 @@ class LocalCacheService {
       }
     } catch (_) {}
     return null;
+  }
+
+  /// Mencatat respons check-in ke antrean sinkronisasi offline (jika gagal tersambung ke Cloud)
+  Future<void> recordOfflineCheckin(WellnessLog log) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_keyPendingCheckinLogs);
+      final List<dynamic> list = raw != null ? jsonDecode(raw) as List<dynamic> : [];
+      list.add(log.toJson());
+      await prefs.setString(_keyPendingCheckinLogs, jsonEncode(list));
+      if (kDebugMode) {
+        print('📥 [LocalCacheService] Check-in (${log.status?.label ?? "Respons Sehat"}) diantrikan untuk sinkronisasi cloud');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('⚠️ [LocalCacheService] Gagal mengantrikan check-in offline: $e');
+      }
+    }
+  }
+
+  /// Mengambil daftar check-in tertunda yang perlu disinkronkan ke Supabase
+  Future<List<Map<String, dynamic>>> getPendingCheckins() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString(_keyPendingCheckinLogs);
+      if (raw != null && raw.isNotEmpty) {
+        final list = jsonDecode(raw) as List<dynamic>;
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  /// Menghapus antrean check-in setelah berhasil disinkronkan ke Cloud
+  Future<void> clearPendingCheckins() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_keyPendingCheckinLogs);
+    } catch (_) {}
   }
 }
 

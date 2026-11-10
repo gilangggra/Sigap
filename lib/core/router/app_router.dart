@@ -121,6 +121,14 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
+    // Rute Kartu Medis Digital & QR Code Pribadi (Self-View)
+    GoRoute(
+      path: '/profile/ice-card-view',
+      builder: (BuildContext context, GoRouterState state) {
+        return const IceCardViewScreen(isSelfView: true);
+      },
+    ),
+
     // Rute Lihat Kartu Medis Darurat Korban (Responder via Token)
     GoRoute(
       path: '/emergency/ice-card-view',
