@@ -152,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     Switch(
                       value: authProvider.simplifiedMode,
-                      activeThumbColor: AppColors.safeGreenLight,
+                      activeColor: AppColors.safeGreenLight,
                       onChanged: (val) {
                         FeedbackService.instance.triggerSuccessFeedback();
                         authProvider.setSimplifiedMode(val);

@@ -83,7 +83,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                 ),
                 Switch(
                   value: _isOnline,
-                  activeThumbColor: AppColors.safeGreenLight,
+                  activeColor: AppColors.safeGreenLight,
                   onChanged: (val) {
                     setState(() => _isOnline = val);
                     unawaited(FeedbackService.instance.triggerSuccessFeedback());
