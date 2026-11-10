@@ -1,24 +1,62 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/services/local_cache_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../auth/domain/models/user_profile.dart';
 import '../../domain/models/ice_card.dart';
 
 /// Repository untuk pengelolaan profil medis darurat (ICE Card)
 /// dan otorisasi akses token darurat bagi penolong pertama.
+/// Dilengkapi penyimpanan lokal terenkripsi (Offline-First Secure Cache).
 class ProfileRepository {
   final SupabaseService _supabaseService;
+  final LocalCacheService _localCacheService;
 
-  ProfileRepository({SupabaseService? supabaseService})
-      : _supabaseService = supabaseService ?? SupabaseService.instance;
+  ProfileRepository({
+    SupabaseService? supabaseService,
+    LocalCacheService? localCacheService,
+  })  : _supabaseService = supabaseService ?? SupabaseService.instance,
+        _localCacheService = localCacheService ?? LocalCacheService.instance;
 
   SupabaseClient get _client => _supabaseService.client;
 
   /// 1. Mengambil data ICE Card milik Care-Receiver tertentu
+  /// Prioritas: Cloud Supabase -> Jika offline / gagal, ambil dari Secure Cache Lokal -> Fallback Mock
   Future<IceCard?> getIceCard(String careReceiverId) async {
-    // Data mock default untuk demonstrasi atau saat offline
-    final defaultMockCard = IceCard(
+    // 1. Coba ambil dari database Supabase jika online
+    if (_supabaseService.isInitialized) {
+      try {
+        final dynamic response = await _client
+            .from('ice_cards')
+            .select()
+            .eq('care_receiver_id', careReceiverId)
+            .maybeSingle();
+
+        if (response != null && response is Map<String, dynamic>) {
+          final cloudCard = IceCard.fromJson(response);
+          // Simpan salinan terbaru ke cache lokal terenkripsi
+          await _localCacheService.saveIceCard(cloudCard);
+          return cloudCard;
+        }
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ [ProfileRepository] Supabase unreachable, beralih ke cache lokal: $e');
+        }
+      }
+    }
+
+    // 2. Ambil dari cache lokal terenkripsi (Offline Mode)
+    final cachedCard = await _localCacheService.getIceCard(careReceiverId);
+    if (cachedCard != null) {
+      if (kDebugMode) {
+        print('🔒 [ProfileRepository] ICE Card berhasil dimuat dari secure cache offline.');
+      }
+      return cachedCard;
+    }
+
+    // 3. Fallback mock default jika belum pernah ada data tersimpan
+    return IceCard(
       id: 'mock-ice-card-001',
       careReceiverId: careReceiverId,
       bloodType: 'B+',
@@ -30,46 +68,28 @@ class ProfileRepository {
       createdAt: DateTime.now().subtract(const Duration(days: 30)),
       updatedAt: DateTime.now(),
     );
-
-    if (!_supabaseService.isInitialized) {
-      return defaultMockCard;
-    }
-
-    try {
-      final dynamic response = await _client
-          .from('ice_cards')
-          .select()
-          .eq('care_receiver_id', careReceiverId)
-          .maybeSingle();
-
-      if (response != null && response is Map<String, dynamic>) {
-        return IceCard.fromJson(response);
-      }
-      return defaultMockCard;
-    } catch (e) {
-      if (kDebugMode) {
-        print('⚠️ [ProfileRepository] Menggunakan data ICE Card fallback: $e');
-      }
-      return defaultMockCard;
-    }
   }
 
   /// 2. Menyimpan atau memperbarui data ICE Card
+  /// Selalu disimpan ke Secure Cache Lokal terlebih dahulu, lalu di-push ke Cloud jika online
   Future<void> saveIceCard(IceCard iceCard) async {
+    // 1. Simpan ke secure cache lokal seketika (Offline-First)
+    await _localCacheService.saveIceCard(iceCard);
+
     if (!_supabaseService.isInitialized) {
       if (kDebugMode) {
-        print('ℹ️ [ProfileRepository] Mode demo: ICE Card disimpan secara lokal');
+        print('ℹ️ [ProfileRepository] Mode offline/demo: ICE Card diamankan di secure cache lokal');
       }
       return;
     }
 
+    // 2. Sinkronisasikan ke Supabase jika ada koneksi
     try {
       await _client.from('ice_cards').upsert(iceCard.toJson());
     } catch (e) {
       if (kDebugMode) {
-        print('❌ [ProfileRepository] Gagal menyimpan data ICE Card: $e');
+        print('⚠️ [ProfileRepository] Gagal sinkronisasi ICE Card ke cloud, data tetap tersimpan di lokal: $e');
       }
-      rethrow;
     }
   }
 
