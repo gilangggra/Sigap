@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../constants/app_colors.dart';
@@ -280,7 +279,7 @@ class NotificationService {
     );
 
     final int notificationId = taskId.hashCode.abs();
-    final String payload = '/tasks';
+    const String payload = '/tasks';
 
     await _localNotifications.show(
       notificationId,

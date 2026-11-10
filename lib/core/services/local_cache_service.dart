@@ -123,7 +123,7 @@ class LocalCacheService {
       // 2. Catat ke antrean sinkronisasi
       final prefs = await SharedPreferences.getInstance();
       final pendingRaw = prefs.getString(_keyPendingMedLogs);
-      List<dynamic> pendingList = pendingRaw != null ? jsonDecode(pendingRaw) as List<dynamic> : [];
+      final List<dynamic> pendingList = pendingRaw != null ? jsonDecode(pendingRaw) as List<dynamic> : [];
 
       pendingList.add({
         'schedule_id': scheduleId,
