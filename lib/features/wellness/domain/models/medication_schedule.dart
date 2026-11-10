@@ -47,6 +47,8 @@ class MedicationSchedule {
       'dosage': dosage,
       'reminder_times': reminderTimes,
       'is_active': isActive,
+      'is_taken_today': isTakenToday,
+      'taken_at': takenAt?.toIso8601String(),
     };
   }
 

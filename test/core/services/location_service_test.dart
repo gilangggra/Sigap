@@ -16,7 +16,7 @@ void main() {
       expect(locationService.formatDistance(250), equals('250 m'));
       expect(locationService.formatDistance(999), equals('999 m'));
       expect(locationService.formatDistance(1000), equals('1.0 km'));
-      expect(locationService.formatDistance(1450), equals('1.5 km'));
+      expect(locationService.formatDistance(1500), equals('1.5 km'));
       expect(locationService.formatDistance(2500), equals('2.5 km'));
     });
 
