@@ -7,12 +7,15 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/services/fall_detection_service.dart';
+import '../../../../core/services/safety_check_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 import '../../../wellness/presentation/state/wellness_provider.dart';
 import '../state/emergency_provider.dart';
 import '../widgets/fall_alert_dialog.dart';
+import '../widgets/safety_check_alert_dialog.dart';
+import '../widgets/safety_check_card.dart';
 
 /// Halaman Beranda Care-Receiver (Antarmuka Khusus Lansia / Simplified Mode)
 /// Mengimplementasikan Tombol SOS ukuran min 120x120dp, Card Check-in Besar,
@@ -35,6 +38,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
       final auth = context.read<AuthProvider>();
       context.read<WellnessProvider>().loadTodayWellness(auth.userId ?? 'care-receiver-001');
       _initFallDetection();
+      _initSafetyCheck();
     });
   }
 
@@ -62,6 +66,37 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
     fallService.stateNotifier.addListener(_handleFallStateChanged);
   }
 
+  void _initSafetyCheck() {
+    final safetyService = SafetyCheckService.instance;
+    safetyService.statusNotifier.removeListener(_handleSafetyCheckStateChanged);
+    safetyService.statusNotifier.addListener(_handleSafetyCheckStateChanged);
+  }
+
+  void _handleSafetyCheckStateChanged() {
+    if (!mounted) return;
+    final status = SafetyCheckService.instance.statusNotifier.value;
+    if (status == SafetyCheckStatus.verificationPrompt || status == SafetyCheckStatus.preAlarmTriggered) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => const SafetyCheckAlertDialog(),
+      );
+    }
+  }
+
+  void _handleSafetyCheckEmergency() {
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).maybePop();
+      final authProvider = context.read<AuthProvider>();
+      final emergencyProvider = context.read<EmergencyProvider>();
+
+      unawaited(emergencyProvider.dispatchEmergency(
+        careReceiverId: authProvider.userId ?? 'care-receiver-001',
+        senderName: '${authProvider.fullName ?? "Lansia SIGAP"} (Cek Keselamatan Perjalanan Habis)',
+      ));
+    }
+  }
+
   void _handleFallStateChanged() {
     if (!mounted) return;
     if (FallDetectionService.instance.stateNotifier.value == FallEngineState.fallConfirmed) {
@@ -76,6 +111,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   @override
   void dispose() {
     FallDetectionService.instance.stateNotifier.removeListener(_handleFallStateChanged);
+    SafetyCheckService.instance.statusNotifier.removeListener(_handleSafetyCheckStateChanged);
     super.dispose();
   }
 
@@ -269,6 +305,13 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                         ),
                       ],
                     ),
+                  ),
+
+                  const SizedBox(height: AppDimensions.spaceLG),
+
+                  // Kartu Cek Perjalanan Aman (Safety Check / Walk-Safe Timer)
+                  SafetyCheckCard(
+                    onEmergencyTriggered: _handleSafetyCheckEmergency,
                   ),
 
                   const SizedBox(height: AppDimensions.spaceLG),
