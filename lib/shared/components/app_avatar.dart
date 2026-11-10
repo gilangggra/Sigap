@@ -83,3 +83,4 @@ class AppAvatar extends StatelessWidget {
     return avatarWidget;
   }
 }
+

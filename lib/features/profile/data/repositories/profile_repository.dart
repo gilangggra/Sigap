@@ -24,8 +24,8 @@ class ProfileRepository {
   /// 1. Mengambil data ICE Card milik Care-Receiver tertentu
   /// Prioritas: Cloud Supabase -> Jika offline / gagal, ambil dari Secure Cache Lokal -> Fallback Mock
   Future<IceCard?> getIceCard(String careReceiverId) async {
-    // 1. Coba ambil dari database Supabase jika online
-    if (_supabaseService.isInitialized) {
+    // 1. Coba ambil dari database Supabase jika online dan ID berupa UUID valid
+    if (_supabaseService.isInitialized && AppConstants.isValidUuid(careReceiverId)) {
       try {
         final dynamic response = await _client
             .from('ice_cards')
@@ -76,7 +76,10 @@ class ProfileRepository {
     // 1. Simpan ke secure cache lokal seketika (Offline-First)
     await _localCacheService.saveIceCard(iceCard);
 
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(iceCard.id) ||
+        !AppConstants.isValidUuid(iceCard.careReceiverId)) {
       if (kDebugMode) {
         print('ℹ️ [ProfileRepository] Mode offline/demo: ICE Card diamankan di secure cache lokal');
       }

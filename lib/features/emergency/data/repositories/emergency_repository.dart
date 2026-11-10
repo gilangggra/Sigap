@@ -116,7 +116,13 @@ class EmergencyRepository {
     required String incidentId,
     required String responderId,
   }) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(incidentId) ||
+        !AppConstants.isValidUuid(responderId)) {
+      if (kDebugMode) {
+        print('ℹ️ [EmergencyRepository] Mode simulasi/demo aktif: Lock incident $incidentId oleh $responderId');
+      }
       return true;
     }
 
@@ -139,7 +145,13 @@ class EmergencyRepository {
     required String resolvedBy,
     required String resolutionNotes,
   }) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(incidentId) ||
+        !AppConstants.isValidUuid(resolvedBy)) {
+      if (kDebugMode) {
+        print('ℹ️ [EmergencyRepository] Mode simulasi/demo aktif: Resolve incident $incidentId');
+      }
       return true;
     }
 
@@ -163,7 +175,12 @@ class EmergencyRepository {
 
   /// 4. Pembatalan Insiden oleh Korban (dalam masa countdown / darurat palsu)
   Future<void> cancelIncident(String incidentId) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(incidentId)) {
+      if (kDebugMode) {
+        print('ℹ️ [EmergencyRepository] Mode simulasi/demo aktif: Cancel incident $incidentId');
+      }
       return;
     }
 

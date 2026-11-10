@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
+import '../constants/app_constants.dart';
 import 'supabase_service.dart';
 
 /// Helper geolokasi terpusat untuk perizinan, pengambilan koordinat instan,
@@ -218,9 +219,12 @@ class LocationService {
     required double longitude,
   }) async {
     final supabase = SupabaseService.instance;
-    if (!supabase.isInitialized) {
+    if (!supabase.isInitialized ||
+        supabase.currentUser == null ||
+        !AppConstants.isValidUuid(responderId) ||
+        responderId == AppConstants.demoUserId) {
       if (kDebugMode) {
-        print('ℹ️ [LocationService] Mode offline: Koordinat siaga ($latitude, $longitude) dicatat lokal.');
+        print('ℹ️ [LocationService] Mode offline/demo: Koordinat siaga ($latitude, $longitude) dicatat lokal.');
       }
       return;
     }
@@ -246,7 +250,12 @@ class LocationService {
   /// Menghapus lokasi dari Supabase saat relawan offline demi menjaga privasi
   Future<void> clearLocationFromCloud(String responderId) async {
     final supabase = SupabaseService.instance;
-    if (!supabase.isInitialized) return;
+    if (!supabase.isInitialized ||
+        supabase.currentUser == null ||
+        !AppConstants.isValidUuid(responderId) ||
+        responderId == AppConstants.demoUserId) {
+      return;
+    }
 
     try {
       await supabase.client.from('profiles').update({

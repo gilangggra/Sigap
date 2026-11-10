@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
@@ -7,7 +8,8 @@ import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/components/accessible_button.dart';
 
-/// Halaman verifikasi kode OTP 6-digit
+/// Halaman verifikasi kode OTP 6-digit.
+/// Mengadopsi standar desain mobile kesehatan modern yang bersih, konsisten, dan rapi.
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
 
@@ -70,90 +72,143 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Verifikasi OTP'),
+        elevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceMD,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: AppDimensions.spaceMD),
-              Text(
-                'Masukkan Kode 6 Digit',
-                style: AppTypography.seniorHeadingMedium(color: Colors.white),
-              ),
               const SizedBox(height: AppDimensions.spaceSM),
               Text(
+                'Masukkan Kode 6 Digit',
+                style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
+              ),
+              const SizedBox(height: 4.0),
+              Text(
                 'Kode verifikasi telah dikirim melalui SMS ke ${widget.phoneNumber}.',
-                style: AppTypography.seniorBodyPrimary(color: AppColors.textDarkSecondary),
+                style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
               ),
               const SizedBox(height: AppDimensions.spaceXL),
+
+              // Kartu Input OTP
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.darkCard,
+                  color: AppColors.cardWhite,
                   borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
                   border: Border.all(
                     color: _errorMessage != null
                         ? AppColors.emergencyRed
-                        : AppColors.darkBorderHighContrast,
-                    width: AppDimensions.highContrastBorderWidth,
+                        : AppColors.lightBorder,
+                    width: 1.5,
                   ),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: AppColors.cardShadow,
+                      blurRadius: 8.0,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.spaceLG,
-                  vertical: AppDimensions.spaceMD,
+                  vertical: AppDimensions.spaceLG,
                 ),
                 child: TextField(
                   controller: _otpController,
                   keyboardType: TextInputType.number,
                   maxLength: 6,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32.0,
-                    letterSpacing: 12.0,
+                  style: GoogleFonts.poppins(
+                    color: AppColors.textDarkPrimary,
+                    fontSize: 30.0,
+                    letterSpacing: 10.0,
                     fontWeight: FontWeight.bold,
                   ),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: '------',
-                    hintStyle: TextStyle(
+                    hintStyle: GoogleFonts.poppins(
                       color: AppColors.textDarkTertiary,
-                      letterSpacing: 12.0,
+                      letterSpacing: 10.0,
+                      fontSize: 30.0,
                     ),
                     counterText: '',
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    filled: false,
                   ),
                 ),
               ),
+
+              // Alert pesan kesalahan jika ada
               if (_errorMessage != null) ...[
                 const SizedBox(height: AppDimensions.spaceSM),
-                Text(
-                  _errorMessage!,
-                  style: AppTypography.seniorBodySecondary(color: AppColors.emergencyRedLight),
-                  textAlign: TextAlign.center,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.spaceMD,
+                    vertical: AppDimensions.spaceSM,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.emergencyRed.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
+                    border: Border.all(
+                      color: AppColors.emergencyRed.withValues(alpha: 0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.error_outline_rounded,
+                        color: AppColors.emergencyRed,
+                        size: 18.0,
+                      ),
+                      const SizedBox(width: AppDimensions.spaceSM),
+                      Expanded(
+                        child: Text(
+                          _errorMessage!,
+                          style: AppTypography.standardCaption(color: AppColors.emergencyRed),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
+
               const SizedBox(height: AppDimensions.space2XL),
+
+              // Tombol Verifikasi Utama
               AccessibleButton(
                 label: _isLoading ? 'Memverifikasi...' : 'Verifikasi & Lanjutkan',
                 onPressed: _isLoading ? null : _verifyOtp,
                 isSimplified: true,
-                backgroundColor: AppColors.safeGreen,
-                icon: Icons.check_circle_outline,
+                backgroundColor: AppColors.primaryTeal,
+                icon: Icons.check_circle_outline_rounded,
               ),
+
               const SizedBox(height: AppDimensions.spaceMD),
+
+              // Tombol Kirim Ulang OTP
               AccessibleButton(
                 label: 'Kirim Ulang Kode (SMS)',
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Kode OTP baru telah dikirimkan')),
+                    const SnackBar(
+                      backgroundColor: AppColors.primaryTealDeep,
+                      content: Text('Kode OTP baru telah dikirimkan ke nomor Anda'),
+                    ),
                   );
                 },
                 isSimplified: true,
                 isSecondary: true,
+                icon: Icons.sms_outlined,
               ),
             ],
           ),

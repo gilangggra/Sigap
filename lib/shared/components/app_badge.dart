@@ -113,3 +113,4 @@ class AppBadge extends StatelessWidget {
     );
   }
 }
+

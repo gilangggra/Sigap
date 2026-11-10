@@ -120,3 +120,4 @@ class AppCard extends StatelessWidget {
     return cardContent;
   }
 }
+

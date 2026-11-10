@@ -43,7 +43,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
     final authProvider = context.read<AuthProvider>();
     final emergencyProvider = context.read<EmergencyProvider>();
-    final responderId = authProvider.userId ?? 'mock-responder-id';
+    final responderId = authProvider.userId ?? AppConstants.demoUserId;
 
     final success = await emergencyProvider.lockIncident(
       incidentId: widget.incident.id,
@@ -140,7 +140,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
                 await emergencyProvider.resolveIncident(
                   incidentId: widget.incident.id,
-                  resolvedBy: authProvider.userId ?? 'demo-user',
+                  resolvedBy: authProvider.userId ?? AppConstants.demoUserId,
                   resolutionNotes: _notesController.text.trim().isEmpty
                       ? 'Insiden telah diselesaikan oleh relawan dan keluarga.'
                       : _notesController.text.trim(),

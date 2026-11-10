@@ -133,3 +133,4 @@ abstract final class AppBorders {
     width: AppDimensions.highContrastBorderWidth,
   );
 }
+

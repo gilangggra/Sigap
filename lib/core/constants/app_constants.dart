@@ -78,5 +78,19 @@ abstract final class AppConstants {
 
   /// Ambang batas waktu deteksi offline (detik)
   static const int networkTimeoutSeconds = 5;
+
+  /// UUID demo statis yang valid untuk pengujian/simulasi tanpa backend
+  static const String demoUserId = '00000000-0000-0000-0000-000000000002';
+  static const String demoRtAreaId = '00000000-0000-0000-0000-000000000001';
+  static const String demoAdminId = '00000000-0000-0000-0000-000000000003';
+
+  /// Helper untuk memvalidasi format string UUID v4 / v1 PostgreSQL
+  static bool isValidUuid(String? value) {
+    if (value == null || value.trim().isEmpty) return false;
+    final uuidRegex = RegExp(
+      r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+    );
+    return uuidRegex.hasMatch(value.trim());
+  }
 }
 

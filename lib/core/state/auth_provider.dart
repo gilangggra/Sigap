@@ -47,7 +47,7 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      _errorMessage = _sanitizeErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -75,7 +75,7 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      _errorMessage = _sanitizeErrorMessage(e);
       notifyListeners();
       return false;
     }
@@ -115,13 +115,30 @@ class AuthProvider extends ChangeNotifier {
 
       _rtArea = area;
       if (_userProfile != null) {
-        await _repository.joinRtArea(
-          userId: _userProfile!.id,
-          rtAreaId: area.id,
-        );
+        // Normalisasi ID jika sebelumnya terisi mock string non-UUID
+        final validId = AppConstants.isValidUuid(_userProfile!.id)
+            ? _userProfile!.id
+            : AppConstants.demoUserId;
         _userProfile = _userProfile!.copyWith(
+          id: validId,
           rtAreaId: area.id,
           isVerified: false,
+        );
+        await _repository.joinRtArea(
+          userId: validId,
+          rtAreaId: area.id,
+        );
+      } else {
+        _userProfile = UserProfile(
+          id: AppConstants.demoUserId,
+          fullName: 'Warga SIGAP',
+          phoneNumber: '+628123456789',
+          role: _role,
+          rtAreaId: area.id,
+          isVerified: false,
+          simplifiedMode: _role == UserRole.careReceiver,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
         );
       }
       _isVerified = false;
@@ -130,10 +147,27 @@ class AuthProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       _isLoading = false;
-      _errorMessage = e.toString();
+      _errorMessage = _sanitizeErrorMessage(e);
       notifyListeners();
       return false;
     }
+  }
+
+  /// Helper untuk membersihkan pesan kesalahan teknis agar ramah bagi pengguna
+  String _sanitizeErrorMessage(Object error) {
+    final str = error.toString();
+    if (str.contains('22P02') || str.contains('invalid input syntax for type uuid')) {
+      return 'Format identitas tidak valid. Silakan coba masuk kembali.';
+    }
+    if (str.contains('SocketException') ||
+        str.contains('NetworkException') ||
+        str.contains('Failed host lookup')) {
+      return 'Koneksi internet bermasalah. Periksa jaringan Anda.';
+    }
+    if (str.contains('PostgrestException')) {
+      return 'Terjadi kendala koneksi ke server data. Silakan coba lagi.';
+    }
+    return str;
   }
 
   /// Set status autentikasi manual (misal bypass demo / restore session)

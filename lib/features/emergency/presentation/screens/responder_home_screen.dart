@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/services/location_service.dart';
@@ -41,7 +42,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
 
   void _initStandbyTracking() {
     if (_isOnline) {
-      final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+      final responderId = SupabaseService.instance.currentUser?.id ?? AppConstants.demoUserId;
       unawaited(LocationService.instance.startStandbyTracking(responderId: responderId));
     }
   }
@@ -55,7 +56,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
 
   @override
   void dispose() {
-    final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+    final responderId = SupabaseService.instance.currentUser?.id ?? AppConstants.demoUserId;
     unawaited(LocationService.instance.stopStandbyTracking(responderId: responderId, clearCloudLocation: false));
     super.dispose();
   }
@@ -169,7 +170,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                           onChanged: (val) {
                             setState(() => _isOnline = val);
                             unawaited(FeedbackService.instance.triggerSuccessFeedback());
-                            final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+                            final responderId = SupabaseService.instance.currentUser?.id ?? AppConstants.demoUserId;
                             if (val) {
                               unawaited(LocationService.instance.startStandbyTracking(responderId: responderId));
                             } else {

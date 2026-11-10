@@ -43,7 +43,7 @@ class AuthRepository {
     if (!_supabaseService.isInitialized) {
       // Return profil demo terverifikasi
       return UserProfile(
-        id: 'demo-user-${DateTime.now().millisecondsSinceEpoch}',
+        id: AppConstants.demoUserId,
         fullName: 'Warga SIGAP (Demo)',
         phoneNumber: phoneNumber,
         role: UserRole.careReceiver,
@@ -93,7 +93,7 @@ class AuthRepository {
 
   /// 3. Mengambil data profil pengguna berdasarkan user ID
   Future<UserProfile?> getUserProfile(String userId) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized || !AppConstants.isValidUuid(userId)) {
       return null;
     }
 
@@ -118,7 +118,9 @@ class AuthRepository {
 
   /// 4. Menyimpan atau memperbarui profil pengguna
   Future<void> upsertProfile(UserProfile profile) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(profile.id)) {
       return;
     }
 
@@ -139,7 +141,7 @@ class AuthRepository {
     // Mock data untuk kode RT default saat offline / pengujian cepat
     if (cleanCode == 'SIGAP-RT03-26') {
       return RtArea(
-        id: '00000000-0000-0000-0000-000000000001',
+        id: AppConstants.demoRtAreaId,
         rtNumber: '03',
         rwNumber: '05',
         kelurahan: 'Menteng',
@@ -183,7 +185,15 @@ class AuthRepository {
     required String userId,
     required String rtAreaId,
   }) async {
-    if (!_supabaseService.isInitialized) {
+    // Lewati panggilan remote database jika user demo, bukan UUID valid, atau menggunakan area demo
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(userId) ||
+        !AppConstants.isValidUuid(rtAreaId) ||
+        rtAreaId == AppConstants.demoRtAreaId) {
+      if (kDebugMode) {
+        print('ℹ️ [AuthRepository] Mode demo aktif: Melewati update cloud joinRtArea untuk $userId');
+      }
       return;
     }
 
@@ -203,7 +213,9 @@ class AuthRepository {
 
   /// 7. Mengambil daftar warga yang menunggu verifikasi di RT terkait
   Future<List<UserProfile>> getPendingResidents(String rtAreaId) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        !AppConstants.isValidUuid(rtAreaId) ||
+        rtAreaId == AppConstants.demoRtAreaId) {
       return <UserProfile>[
         UserProfile(
           id: 'mock-resident-1',
@@ -257,7 +269,14 @@ class AuthRepository {
     required String adminId,
     required bool isApproved,
   }) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(residentId) ||
+        !AppConstants.isValidUuid(adminId) ||
+        adminId == AppConstants.demoAdminId) {
+      if (kDebugMode) {
+        print('ℹ️ [AuthRepository] Mode demo aktif: Memverifikasi warga $residentId (Approved: $isApproved)');
+      }
       return;
     }
 
@@ -289,7 +308,13 @@ class AuthRepository {
     required String rtAreaId,
     required String newInviteCode,
   }) async {
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(rtAreaId) ||
+        rtAreaId == AppConstants.demoRtAreaId) {
+      if (kDebugMode) {
+        print('ℹ️ [AuthRepository] Mode demo aktif: Melewati update cloud refreshRtInviteCode');
+      }
       return;
     }
 
