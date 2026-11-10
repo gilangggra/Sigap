@@ -209,7 +209,7 @@ class EmergencyRepository {
           .inFilter('status', [IncidentStatus.dispatched.value, IncidentStatus.responding.value])
           .order('created_at', ascending: false);
 
-      if (response is List && response.isNotEmpty) {
+      if (response is List) {
         final list = response
             .map((dynamic item) => Incident.fromJson(Map<String, dynamic>.from(item as Map)))
             .toList();
@@ -226,12 +226,12 @@ class EmergencyRepository {
         }).toList();
       }
 
-      return [mockIncident];
+      return <Incident>[];
     } catch (e) {
       if (kDebugMode) {
         print('⚠️ [EmergencyRepository] Gagal mengambil insiden aktif: $e');
       }
-      return [mockIncident];
+      return <Incident>[];
     }
   }
 }

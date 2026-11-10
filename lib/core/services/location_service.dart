@@ -16,6 +16,7 @@ class LocationService {
   Timer? _periodicFallbackTimer;
   Position? _lastSentPosition;
   Position? get lastStandbyPosition => _lastSentPosition;
+  Position? get currentPosition => standbyPositionNotifier.value ?? _lastSentPosition;
 
   /// Notifier posisi siaga terkini untuk update UI relawan secara reaktif
   final ValueNotifier<Position?> standbyPositionNotifier = ValueNotifier<Position?>(null);

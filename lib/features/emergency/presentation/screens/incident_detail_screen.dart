@@ -299,7 +299,10 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                 const SizedBox(height: AppDimensions.spaceMD),
                 AccessibleButton(
                   label: 'Lihat Data Medis (ICE Card 2 Jam)',
-                  onPressed: () => context.push('/emergency/ice-card-view'),
+                  onPressed: () => context.push(
+                    '/emergency/ice-card-view',
+                    extra: 'EMERGENCY-TOKEN-${widget.incident.id}',
+                  ),
                   backgroundColor: AppColors.infoBlueDark,
                   icon: Icons.medical_services_rounded,
                 ),

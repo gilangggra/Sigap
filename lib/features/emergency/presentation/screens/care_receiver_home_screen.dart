@@ -43,7 +43,17 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
     fallService.startMonitoring(
       onFallEmergencyTriggered: () {
         if (mounted) {
-          _triggerSosCountdown();
+          // Tutup FallAlertDialog jika masih terbuka di layar
+          Navigator.of(context, rootNavigator: true).maybePop();
+
+          final authProvider = context.read<AuthProvider>();
+          final emergencyProvider = context.read<EmergencyProvider>();
+
+          // Langsung dispatch sinyal darurat tanpa countdown kedua
+          unawaited(emergencyProvider.dispatchEmergency(
+            careReceiverId: authProvider.userId ?? 'care-receiver-001',
+            senderName: '${authProvider.fullName ?? "Lansia SIGAP"} (Deteksi Jatuh Otomatis)',
+          ));
         }
       },
     );
@@ -154,24 +164,38 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                         borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
                         border: Border.all(color: Colors.white, width: 2.0),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 36.0),
-                          const SizedBox(width: AppDimensions.spaceMD),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Sinyal Darurat Aktif!',
-                                  style: AppTypography.seniorTitle(color: Colors.white),
+                          Row(
+                            children: [
+                              const Icon(Icons.warning_amber_rounded, color: Colors.white, size: 36.0),
+                              const SizedBox(width: AppDimensions.spaceMD),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Sinyal Darurat Aktif!',
+                                      style: AppTypography.seniorTitle(color: Colors.white),
+                                    ),
+                                    Text(
+                                      'Relawan tetangga dan keluarga sedang dihubungi.',
+                                      style: AppTypography.seniorBodySecondary(color: Colors.white),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  'Relawan tetangga dan keluarga sedang dihubungi.',
-                                  style: AppTypography.seniorBodySecondary(color: Colors.white),
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppDimensions.spaceMD),
+                          AccessibleButton(
+                            label: 'BATALKAN DARURAT (SAYA AMAN)',
+                            onPressed: _cancelSosCountdown,
+                            backgroundColor: AppColors.darkSurfaceElevated,
+                            borderColor: Colors.white,
+                            customHeight: 64.0,
+                            icon: Icons.check_circle_rounded,
                           ),
                         ],
                       ),
@@ -193,7 +217,17 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                           button: true,
                           label: 'Tombol Darurat SOS, tekan untuk memanggil bantuan',
                           child: GestureDetector(
-                            onTap: _triggerSosCountdown,
+                            onTap: emergencyProvider.isDispatched
+                                ? () {
+                                    FeedbackService.instance.triggerWarningFeedback();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        backgroundColor: AppColors.emergencyRedDark,
+                                        content: Text('Panggilan darurat sedang aktif. Tekan tombol batalkan di atas jika Anda sudah aman.'),
+                                      ),
+                                    );
+                                  }
+                                : _triggerSosCountdown,
                             child: Container(
                               width: AppDimensions.sosButtonSize + 40.0, // 160dp
                               height: AppDimensions.sosButtonSize + 40.0,

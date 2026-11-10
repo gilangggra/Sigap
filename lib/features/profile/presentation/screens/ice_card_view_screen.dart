@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -126,6 +127,15 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
                             style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
                             textAlign: TextAlign.center,
                           ),
+                          if (widget.isSelfView) ...[
+                            const SizedBox(height: AppDimensions.spaceLG),
+                            AccessibleButton(
+                              label: 'Isi Data Medis Sekarang',
+                              onPressed: () => context.push('/profile/ice-card'),
+                              backgroundColor: AppColors.safeGreen,
+                              icon: Icons.edit_note_rounded,
+                            ),
+                          ],
                         ],
                       ),
                     ),
