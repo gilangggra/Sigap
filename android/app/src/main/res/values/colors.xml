@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- SIGAP Native Theme Colors -->
+    <color name="sigap_dark_background">#121212</color>
+    <color name="sigap_navy_primary">#1D3557</color>
+    <color name="sigap_emergency_red">#E63946</color>
+    <color name="sigap_civic_teal">#2A9D8F</color>
+</resources>
