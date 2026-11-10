@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
+import '../../../../core/services/location_service.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -23,6 +25,26 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
   bool _isOnline = true;
   bool _isClaiming = false;
   String? _lockedIncidentId;
+
+  @override
+  void initState() {
+    super.initState();
+    _initStandbyTracking();
+  }
+
+  void _initStandbyTracking() {
+    if (_isOnline) {
+      final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+      unawaited(LocationService.instance.startStandbyTracking(responderId: responderId));
+    }
+  }
+
+  @override
+  void dispose() {
+    final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+    unawaited(LocationService.instance.stopStandbyTracking(responderId: responderId, clearCloudLocation: false));
+    super.dispose();
+  }
 
   // Mock data insiden aktif terdekat
   final Map<String, dynamic> _activeEmergency = {
@@ -88,6 +110,12 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                   onChanged: (val) {
                     setState(() => _isOnline = val);
                     unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                    final responderId = SupabaseService.instance.currentUser?.id ?? 'mock-responder';
+                    if (val) {
+                      unawaited(LocationService.instance.startStandbyTracking(responderId: responderId));
+                    } else {
+                      unawaited(LocationService.instance.stopStandbyTracking(responderId: responderId));
+                    }
                   },
                 ),
               ],
@@ -111,6 +139,51 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Kartu Status Radar & GPS Siaga Relawan (PostGIS Live Standby)
+              ValueListenableBuilder<Position?>(
+                valueListenable: LocationService.instance.standbyPositionNotifier,
+                builder: (context, position, _) {
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: AppDimensions.spaceMD),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppDimensions.spaceMD,
+                      vertical: AppDimensions.spaceSM,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _isOnline
+                          ? AppColors.safeGreenDark.withValues(alpha: 0.2)
+                          : AppColors.darkCard,
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                      border: Border.all(
+                        color: _isOnline ? AppColors.safeGreenLight : AppColors.darkBorder,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          _isOnline ? Icons.radar_rounded : Icons.location_off_rounded,
+                          color: _isOnline ? AppColors.safeGreenLight : AppColors.textDarkTertiary,
+                          size: 20.0,
+                        ),
+                        const SizedBox(width: AppDimensions.spaceSM),
+                        Expanded(
+                          child: Text(
+                            _isOnline
+                                ? position != null
+                                    ? 'Siaga Aktif • GPS: ${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)} (PostGIS Siap)'
+                                    : 'Siaga Aktif • Menghubungkan satelit GPS...'
+                                : 'Mode Istirahat • Lokasi tidak dibagikan (Privasi Terjaga)',
+                            style: AppTypography.standardCaption(
+                              color: _isOnline ? Colors.white : AppColors.textDarkSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+
               // Banner Insiden Darurat Aktif (Paling Kritis)
               Container(
                 decoration: BoxDecoration(
