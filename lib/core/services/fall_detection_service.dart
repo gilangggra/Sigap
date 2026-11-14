@@ -213,14 +213,15 @@ class FallDetectionService {
   /// 5. Pengiriman Panggilan Darurat Otomatis ke Jaringan Relawan
   void _dispatchConfirmedEmergency() {
     _preAlarmCountdownTimer?.cancel();
-    _currentState = FallEngineState.idle;
-    stateNotifier.value = FallEngineState.idle;
+    _immobilityTimer?.cancel();
+    _postImpactAccels.clear();
 
     if (kDebugMode) {
       print('🚀 [FallDetectionService] Pre-alarm selesai tanpa pembatalan! Mengirimkan SOS Darurat.');
     }
 
     _onFallEmergencyTriggered?.call();
+    _resetToMonitoring();
   }
 
   /// 6. Pembatalan Mandiri oleh Lansia ("Saya Baik-Baik Saja")

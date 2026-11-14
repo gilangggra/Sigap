@@ -201,9 +201,11 @@ class ProfileScreen extends StatelessWidget {
 
               // Tombol Keluar
               TextButton.icon(
-                onPressed: () {
-                  authProvider.reset();
-                  context.go('/auth/phone');
+                onPressed: () async {
+                  await authProvider.signOut();
+                  if (context.mounted) {
+                    context.go('/auth/phone');
+                  }
                 },
                 icon: const Icon(Icons.logout_rounded, color: AppColors.emergencyRed, size: 20),
                 label: const Text(

@@ -43,10 +43,13 @@ class WellnessRepository {
     // 1. Simpan ke cache lokal terlebih dahulu (Offline-First)
     await _localCacheService.saveTodayCheckin(localLog);
 
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(careReceiverId) ||
+        careReceiverId == AppConstants.demoUserId) {
       await _localCacheService.recordOfflineCheckin(localLog);
       if (kDebugMode) {
-        print('ℹ️ [WellnessRepository] Mode offline: Check-in diamankan di cache lokal (${status.label})');
+        print('ℹ️ [WellnessRepository] Mode offline/demo: Check-in diamankan di cache lokal (${status.label})');
       }
       return localLog;
     }
@@ -81,7 +84,10 @@ class WellnessRepository {
     final now = DateTime.now();
     final todayString = now.toIso8601String().split('T').first;
 
-    if (_supabaseService.isInitialized) {
+    if (_supabaseService.isInitialized &&
+        _supabaseService.currentUser != null &&
+        AppConstants.isValidUuid(careReceiverId) &&
+        careReceiverId != AppConstants.demoUserId) {
       try {
         final dynamic response = await _client
             .from('wellness_logs')
@@ -132,8 +138,11 @@ class WellnessRepository {
       ),
     ];
 
-    // 1. Coba ambil dari cloud jika online
-    if (_supabaseService.isInitialized) {
+    // 1. Coba ambil dari cloud jika online dan user terotentikasi dengan ID UUID valid
+    if (_supabaseService.isInitialized &&
+        _supabaseService.currentUser != null &&
+        AppConstants.isValidUuid(careReceiverId) &&
+        careReceiverId != AppConstants.demoUserId) {
       try {
         // Sinkronisasikan antrian offline yang tertunda jika ada
         await syncPendingMedicationLogs();
@@ -182,7 +191,11 @@ class WellnessRepository {
       careReceiverId: careReceiverId,
     );
 
-    if (!_supabaseService.isInitialized) {
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(scheduleId) ||
+        !AppConstants.isValidUuid(careReceiverId) ||
+        careReceiverId == AppConstants.demoUserId) {
       if (kDebugMode) {
         print('ℹ️ [WellnessRepository] Konsumsi obat $scheduleId disimpan di cache offline.');
       }
@@ -209,16 +222,24 @@ class WellnessRepository {
 
   /// 5. Sinkronisasi otomatis log obat yang tercatat saat offline ke Cloud
   Future<void> syncPendingMedicationLogs() async {
-    if (!_supabaseService.isInitialized) return;
+    if (!_supabaseService.isInitialized || _supabaseService.currentUser == null) return;
 
     final pending = await _localCacheService.getPendingMedicationLogs();
     if (pending.isEmpty) return;
 
     try {
       for (final item in pending) {
+        final crId = item['care_receiver_id'] as String?;
+        final schedId = item['schedule_id'] as String?;
+        if (!AppConstants.isValidUuid(crId) ||
+            !AppConstants.isValidUuid(schedId) ||
+            crId == AppConstants.demoUserId) {
+          continue;
+        }
+
         await _client.from('medication_logs').insert({
-          'schedule_id': item['schedule_id'],
-          'care_receiver_id': item['care_receiver_id'],
+          'schedule_id': schedId,
+          'care_receiver_id': crId,
           'scheduled_time': item['taken_at'],
           'taken_at': item['taken_at'],
           'skipped': false,
@@ -237,19 +258,24 @@ class WellnessRepository {
 
   /// 6. Sinkronisasi otomatis log check-in harian yang tercatat saat offline ke Cloud
   Future<void> syncPendingCheckins() async {
-    if (!_supabaseService.isInitialized) return;
+    if (!_supabaseService.isInitialized || _supabaseService.currentUser == null) return;
 
     final pending = await _localCacheService.getPendingCheckins();
     if (pending.isEmpty) return;
 
     try {
       for (final item in pending) {
+        final crId = item['care_receiver_id'] as String?;
+        if (!AppConstants.isValidUuid(crId) || crId == AppConstants.demoUserId) {
+          continue;
+        }
+
         final checkDate = item['check_date'] is String
             ? (item['check_date'] as String).split('T').first
             : DateTime.now().toIso8601String().split('T').first;
 
         await _client.from('wellness_logs').upsert({
-          'care_receiver_id': item['care_receiver_id'],
+          'care_receiver_id': crId,
           'check_date': checkDate,
           'status': item['status'],
           'escalation_status': item['escalation_status'] ?? 'resolved',

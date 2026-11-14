@@ -331,5 +331,18 @@ class AuthRepository {
       rethrow;
     }
   }
+
+  /// 10. Keluar dari sesi autentikasi Supabase dan hapus token lokal
+  Future<void> signOut() async {
+    if (_supabaseService.isInitialized) {
+      try {
+        await _supabaseService.signOut();
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ [AuthRepository] Gagal signOut dari Supabase: $e');
+        }
+      }
+    }
+  }
 }
 

@@ -71,14 +71,13 @@ class EmergencyProvider extends ChangeNotifier {
     unawaited(FeedbackService.instance.cancelVibration());
     _isCountingDown = false;
     _countdownRemaining = AppConstants.sosCountdownSeconds;
-    notifyListeners();
 
     if (_activeIncident != null) {
       unawaited(_repository.cancelIncident(_activeIncident!.id));
       _activeIncident = null;
       _isDispatched = false;
-      notifyListeners();
     }
+    notifyListeners();
   }
 
   /// 3. Mengirim sinyal darurat SOS instan ke server PostGIS & relawan terdekat

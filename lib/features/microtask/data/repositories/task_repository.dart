@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/supabase_service.dart';
 import '../../domain/models/social_credit.dart';
 import '../../domain/models/task_item.dart';
@@ -125,7 +126,11 @@ class TaskRepository {
       updatedAt: DateTime.now(),
     );
 
-    if (_supabaseService.isInitialized) {
+    if (_supabaseService.isInitialized &&
+        _supabaseService.currentUser != null &&
+        AppConstants.isValidUuid(createdBy) &&
+        AppConstants.isValidUuid(careReceiverId) &&
+        createdBy != AppConstants.demoUserId) {
       try {
         final payload = newTask.toJson();
         payload.remove('distance_meters');
@@ -153,7 +158,11 @@ class TaskRepository {
     required String responderId,
     required String responderName,
   }) async {
-    if (_supabaseService.isInitialized) {
+    if (_supabaseService.isInitialized &&
+        _supabaseService.currentUser != null &&
+        AppConstants.isValidUuid(taskId) &&
+        AppConstants.isValidUuid(responderId) &&
+        responderId != AppConstants.demoUserId) {
       try {
         final response = await _supabaseService.client
             .from('tasks')
@@ -196,7 +205,11 @@ class TaskRepository {
     required String responderId,
     String? completionNotes,
   }) async {
-    if (_supabaseService.isInitialized) {
+    if (_supabaseService.isInitialized &&
+        _supabaseService.currentUser != null &&
+        AppConstants.isValidUuid(taskId) &&
+        AppConstants.isValidUuid(responderId) &&
+        responderId != AppConstants.demoUserId) {
       try {
         final response = await _supabaseService.client
             .from('tasks')

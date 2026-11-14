@@ -30,13 +30,15 @@ class CareReceiverHomeScreen extends StatefulWidget {
 class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   CheckinStatus? _selectedCheckinStatus;
   bool _isFallGuardActive = true;
+  bool _isSafetyDialogShowing = false;
+  bool _isFallDialogShowing = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final auth = context.read<AuthProvider>();
-      context.read<WellnessProvider>().loadTodayWellness(auth.userId ?? 'care-receiver-001');
+      context.read<WellnessProvider>().loadTodayWellness(auth.userId ?? AppConstants.demoUserId);
       _initFallDetection();
       _initSafetyCheck();
     });
@@ -47,13 +49,16 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
     fallService.startMonitoring(
       onFallEmergencyTriggered: () {
         if (mounted) {
-          Navigator.of(context, rootNavigator: true).maybePop();
+          if (_isFallDialogShowing) {
+            Navigator.of(context, rootNavigator: true).maybePop();
+            _isFallDialogShowing = false;
+          }
 
           final authProvider = context.read<AuthProvider>();
           final emergencyProvider = context.read<EmergencyProvider>();
 
           unawaited(emergencyProvider.dispatchEmergency(
-            careReceiverId: authProvider.userId ?? 'care-receiver-001',
+            careReceiverId: authProvider.userId ?? AppConstants.demoUserId,
             senderName: '${authProvider.fullName ?? "Lansia SIGAP"} (Deteksi Jatuh Otomatis)',
           ));
         }
@@ -73,23 +78,30 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   void _handleSafetyCheckStateChanged() {
     if (!mounted) return;
     final status = SafetyCheckService.instance.statusNotifier.value;
-    if (status == SafetyCheckStatus.verificationPrompt || status == SafetyCheckStatus.preAlarmTriggered) {
+    if ((status == SafetyCheckStatus.verificationPrompt || status == SafetyCheckStatus.preAlarmTriggered) &&
+        !_isSafetyDialogShowing) {
+      _isSafetyDialogShowing = true;
       showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (ctx) => const SafetyCheckAlertDialog(),
-      );
+      ).then((_) {
+        _isSafetyDialogShowing = false;
+      });
     }
   }
 
   void _handleSafetyCheckEmergency() {
     if (mounted) {
-      Navigator.of(context, rootNavigator: true).maybePop();
+      if (_isSafetyDialogShowing) {
+        Navigator.of(context, rootNavigator: true).maybePop();
+        _isSafetyDialogShowing = false;
+      }
       final authProvider = context.read<AuthProvider>();
       final emergencyProvider = context.read<EmergencyProvider>();
 
       unawaited(emergencyProvider.dispatchEmergency(
-        careReceiverId: authProvider.userId ?? 'care-receiver-001',
+        careReceiverId: authProvider.userId ?? AppConstants.demoUserId,
         senderName: '${authProvider.fullName ?? "Lansia SIGAP"} (Cek Keselamatan Perjalanan Habis)',
       ));
     }
@@ -98,12 +110,15 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
   void _handleFallStateChanged() {
     if (!mounted) return;
     final state = FallDetectionService.instance.stateNotifier.value;
-    if (state == FallEngineState.fallConfirmed) {
+    if (state == FallEngineState.fallConfirmed && !_isFallDialogShowing) {
+      _isFallDialogShowing = true;
       showDialog<void>(
         context: context,
         barrierDismissible: false,
         builder: (ctx) => const FallAlertDialog(),
-      );
+      ).then((_) {
+        _isFallDialogShowing = false;
+      });
     }
   }
 
@@ -120,7 +135,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
 
     FeedbackService.instance.triggerEmergencyVibration();
     emergencyProvider.startSosCountdown(
-      careReceiverId: auth.userId ?? 'care-receiver-001',
+      careReceiverId: auth.userId ?? AppConstants.demoUserId,
       senderName: auth.fullName ?? 'Lansia SIGAP',
     );
   }

@@ -29,8 +29,11 @@ class EmergencyRepository {
   }) async {
     final String incidentId = 'inc-${DateTime.now().millisecondsSinceEpoch}';
 
-    // Fallback SMS jika backend belum terkoneksi / offline
-    if (!_supabaseService.isInitialized) {
+    // Fallback SMS jika backend belum terkoneksi / offline / mode demo / UUID tidak valid
+    if (!_supabaseService.isInitialized ||
+        _supabaseService.currentUser == null ||
+        !AppConstants.isValidUuid(careReceiverId) ||
+        careReceiverId == AppConstants.demoUserId) {
       if (kDebugMode) {
         print('ℹ️ [EmergencyRepository] Mode offline/demo: Mengaktifkan SMS Fallback');
       }

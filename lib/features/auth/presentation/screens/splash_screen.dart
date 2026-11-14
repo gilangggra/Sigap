@@ -32,7 +32,24 @@ class _SplashScreenState extends State<SplashScreen> {
     final session = SupabaseService.instance.currentSession;
     if (session != null) {
       final auth = context.read<AuthProvider>();
-      _navigateBasedOnRole(auth.role);
+      final profile = await auth.restoreSession(
+        session.user.id,
+        session.user.phone,
+      );
+
+      if (!mounted) return;
+
+      if (profile != null) {
+        if (profile.rtAreaId == null || profile.rtAreaId!.isEmpty) {
+          context.go('/auth/rt-code');
+        } else if (!profile.isVerified && profile.role != UserRole.civicAdmin) {
+          context.go('/auth/pending-verification');
+        } else {
+          _navigateBasedOnRole(profile.role);
+        }
+      } else {
+        context.go('/auth/role');
+      }
     } else {
       context.go('/auth/phone');
     }

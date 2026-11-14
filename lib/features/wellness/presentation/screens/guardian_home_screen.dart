@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/theme/app_decorations.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -18,7 +19,7 @@ class GuardianHomeScreen extends StatefulWidget {
 }
 
 class _GuardianHomeScreenState extends State<GuardianHomeScreen> {
-  static const String _defaultMonitoredId = 'care-receiver-001';
+  static const String _defaultMonitoredId = AppConstants.demoUserId;
 
   @override
   void initState() {

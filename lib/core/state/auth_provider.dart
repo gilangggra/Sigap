@@ -198,10 +198,52 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Memulihkan sesi aktif pengguna dari Supabase lokal storage saat aplikasi dibuka
+  Future<UserProfile?> restoreSession(String userId, [String? phone]) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final profile = await _repository.getUserProfile(userId);
+      if (profile != null) {
+        _userProfile = profile;
+        _isAuthenticated = true;
+        _isVerified = profile.isVerified;
+        _role = profile.role;
+        _simplifiedMode = profile.simplifiedMode || profile.role == UserRole.careReceiver;
+
+        // Muat info area jika ada
+        if (profile.rtAreaId != null && profile.rtAreaId == AppConstants.demoRtAreaId) {
+          _rtArea = await _repository.validateRtInviteCode('SIGAP-RT03-26');
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return profile;
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('⚠️ [AuthProvider] Gagal memulihkan profil: $e');
+      }
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return null;
+  }
+
   /// Toggle mode lansia / simplified mode
   void setSimplifiedMode(bool enabled) {
     _simplifiedMode = enabled;
     notifyListeners();
+  }
+
+  /// Logout resmi: menghapus sesi cloud dan mereset state lokal
+  Future<void> signOut() async {
+    _isLoading = true;
+    notifyListeners();
+    await _repository.signOut();
+    reset();
   }
 
   /// Logout dan reset sesi
