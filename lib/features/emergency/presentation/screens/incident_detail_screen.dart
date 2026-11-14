@@ -165,7 +165,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                     backgroundColor: AppColors.safeGreenDark,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
-                    content: const Text('Insiden berhasil ditutup. 50 poin sosial diberikan kepada relawan!'),
+                    content: const Text('Insiden berhasil diselesaikan. Terima kasih atas kepedulian dan kesigapan Anda!'),
                   ),
                 );
                 Navigator.of(context).pop();

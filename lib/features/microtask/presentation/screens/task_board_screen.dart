@@ -85,7 +85,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
         const SnackBar(
           backgroundColor: AppColors.safeGreenDark,
           behavior: SnackBarBehavior.floating,
-          content: Text('Selamat! Tugas selesai. +10 Poin Sosial ditambahkan ke profil Anda.'),
+          content: Text('Alhamdulillah, tugas selesai! Terima kasih atas bantuan tulus Anda.'),
         ),
       );
     }
@@ -100,16 +100,16 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
     return Scaffold(
       backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
-        title: const Text('Bantu Warga (Tugas Mikro)'),
+        title: const Text('Papan Gotong Royong Warga'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20.0),
           onPressed: () => context.pop(),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.leaderboard_rounded),
-            tooltip: 'Papan Peringkat RT',
-            onPressed: () => context.push('/tasks/leaderboard'),
+            icon: const Icon(Icons.volunteer_activism_outlined),
+            tooltip: 'Solidaritas Lingkungan',
+            onPressed: () => context.push('/tasks/impact'),
           ),
         ],
       ),
@@ -145,7 +145,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                       const SizedBox(width: AppDimensions.spaceMD),
                       Expanded(
                         child: Text(
-                          'Radar Tugas Terdekat (Radius 800m)\nSetiap tugas selesai memberi +10 Poin Sosial.',
+                          'Radar Gotong Royong Warga (Radius 800m)\nUluran tangan Anda meringankan beban sesama tetangga.',
                           style: AppTypography.standardCaption(color: AppColors.primaryTealDeep),
                         ),
                       ),
@@ -223,7 +223,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
                 if (myClaimedTasks.isNotEmpty) ...[
                   const AppSectionHeader(
                     title: 'Tugas yang Sedang Anda Kerjakan',
-                    subtitle: 'Selesaikan dan konfirmasi untuk memperoleh poin sosial',
+                    subtitle: 'Konfirmasikan setelah bantuan selesai diberikan',
                   ),
                   const SizedBox(height: AppDimensions.spaceSM),
                   ...myClaimedTasks.map((task) {

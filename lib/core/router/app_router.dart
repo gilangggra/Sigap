@@ -174,11 +174,19 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Rute Papan Peringkat Relawan RT & Poin Sosial
+    // Rute Papan Solidaritas & Gotong Royong Lingkungan RT
+    GoRoute(
+      path: '/tasks/impact',
+      builder: (BuildContext context, GoRouterState state) {
+        return const CommunityImpactScreen();
+      },
+    ),
+
+    // Alias rute lama untuk backward-compatibility
     GoRoute(
       path: '/tasks/leaderboard',
       builder: (BuildContext context, GoRouterState state) {
-        return const LeaderboardScreen();
+        return const CommunityImpactScreen();
       },
     ),
   ],

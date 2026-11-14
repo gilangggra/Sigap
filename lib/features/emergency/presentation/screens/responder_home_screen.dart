@@ -183,7 +183,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                   ),
                 ),
                 const Spacer(),
-                AppBadge.brand('+120 Poin Sosial', icon: Icons.stars_rounded),
+                AppBadge.brand('Relawan Siaga', icon: Icons.volunteer_activism_rounded),
               ],
             ),
           ),
@@ -388,8 +388,8 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                   // 3. Papan Tugas Bantuan Mikro Sekitar
                   // =============================================================
                   AppSectionHeader(
-                    title: 'Tugas Bantuan Mikro',
-                    subtitle: 'Bantu tetangga dan kumpulkan poin kebaikan',
+                    title: 'Gotong Royong Warga',
+                    subtitle: 'Bantu kebutuhan harian tetangga sekitar',
                     actionLabel: 'Lihat Semua',
                     onActionTap: () => context.push('/tasks'),
                   ),
@@ -399,7 +399,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                     category: 'Ambil Resep Obat',
                     targetPerson: 'Bapak Hartono (68 thn)',
                     address: 'Jl. Melati RT 02 / RW 05 (450m)',
-                    points: '+10 Poin',
+                    tag: 'Butuh Hari Ini',
                     icon: Icons.medication_liquid_rounded,
                   ),
                   const SizedBox(height: AppDimensions.spaceSM),
@@ -407,7 +407,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                     category: 'Belanja Kebutuhan Pokok',
                     targetPerson: 'Ibu Sutrisno (74 thn)',
                     address: 'Jl. Dahlia RT 01 / RW 05 (600m)',
-                    points: '+10 Poin',
+                    tag: 'Kebutuhan Dapur',
                     icon: Icons.shopping_basket_rounded,
                   ),
 
@@ -417,23 +417,23 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                     children: [
                       Expanded(
                         child: AccessibleButton(
-                          label: 'Radar Tugas',
+                          label: 'Papan Gotong Royong',
                           onPressed: () => context.push('/tasks'),
                           backgroundColor: AppColors.cardWhite,
                           textColor: AppColors.primaryTealDark,
                           borderColor: AppColors.lightBorder,
-                          icon: Icons.radar_rounded,
+                          icon: Icons.handshake_outlined,
                         ),
                       ),
                       const SizedBox(width: AppDimensions.spaceMD),
                       Expanded(
                         child: AccessibleButton(
-                          label: 'Peringkat',
-                          onPressed: () => context.push('/tasks/leaderboard'),
+                          label: 'Solidaritas RT',
+                          onPressed: () => context.push('/tasks/impact'),
                           backgroundColor: AppColors.cardWhite,
-                          textColor: AppColors.warningAmberDark,
+                          textColor: AppColors.roleGuardian,
                           borderColor: AppColors.lightBorder,
-                          icon: Icons.leaderboard_rounded,
+                          icon: Icons.volunteer_activism_outlined,
                         ),
                       ),
                     ],
@@ -521,14 +521,14 @@ class _TaskItemCard extends StatelessWidget {
   final String category;
   final String targetPerson;
   final String address;
-  final String points;
+  final String tag;
   final IconData icon;
 
   const _TaskItemCard({
     required this.category,
     required this.targetPerson,
     required this.address,
-    required this.points,
+    required this.tag,
     required this.icon,
   });
 
@@ -561,7 +561,7 @@ class _TaskItemCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    AppBadge.brand(points, isSmall: true),
+                    AppBadge.neutral(tag, isSmall: true),
                   ],
                 ),
                 const SizedBox(height: 2),
