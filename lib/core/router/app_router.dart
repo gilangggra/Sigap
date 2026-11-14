@@ -10,14 +10,13 @@ import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/emergency/domain/models/incident.dart';
 import '../../features/emergency/presentation/screens/care_receiver_home_screen.dart';
 import '../../features/emergency/presentation/screens/incident_detail_screen.dart';
-import '../../features/emergency/presentation/screens/responder_home_screen.dart';
+import '../../features/emergency/presentation/screens/resident_home_screen.dart';
 import '../../features/microtask/presentation/screens/create_task_screen.dart';
 import '../../features/microtask/presentation/screens/leaderboard_screen.dart';
 import '../../features/microtask/presentation/screens/task_board_screen.dart';
 import '../../features/profile/presentation/screens/ice_card_form_screen.dart';
 import '../../features/profile/presentation/screens/ice_card_view_screen.dart';
 import '../../features/profile/presentation/screens/profile_screen.dart';
-import '../../features/wellness/presentation/screens/guardian_home_screen.dart';
 
 /// Konfigurasi routing deklaratif modular aplikasi SIGAP menggunakan GoRouter
 final GoRouter appRouter = GoRouter(
@@ -73,7 +72,7 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Rute Beranda Peran 1: Care-Receiver (Lansia / Simplified Mode)
+    // Rute Beranda Persona 1: Mode Khusus Lansia (Care-Receiver / Simplified Mode)
     GoRoute(
       path: '/care-receiver',
       builder: (BuildContext context, GoRouterState state) {
@@ -81,23 +80,31 @@ final GoRouter appRouter = GoRouter(
       },
     ),
 
-    // Rute Beranda Peran 2: Community Responder (Relawan Warga)
+    // Rute Beranda Persona 2: Warga Siaga (Unified Resident: Keluarga & Relawan)
+    GoRoute(
+      path: '/resident',
+      builder: (BuildContext context, GoRouterState state) {
+        return const ResidentHomeScreen();
+      },
+    ),
+
+    // Rute Kompatibilitas Responder (Tab Lingkungan RT)
     GoRoute(
       path: '/responder',
       builder: (BuildContext context, GoRouterState state) {
-        return const ResponderHomeScreen();
+        return const ResidentHomeScreen(initialTabIndex: 0);
       },
     ),
 
-    // Rute Beranda Peran 3: Primary Guardian (Keluarga / Wali)
+    // Rute Kompatibilitas Guardian (Tab Keluarga Saya)
     GoRoute(
       path: '/guardian',
       builder: (BuildContext context, GoRouterState state) {
-        return const GuardianHomeScreen();
+        return const ResidentHomeScreen(initialTabIndex: 1);
       },
     ),
 
-    // Rute Beranda Peran 4: Civic Administrator (Pengurus RT/RW)
+    // Rute Panel Pengurus RT / RW (Civic Administrator)
     GoRoute(
       path: '/admin',
       builder: (BuildContext context, GoRouterState state) {

@@ -153,7 +153,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
 
     final auth = context.read<AuthProvider>();
     context.read<WellnessProvider>().submitCheckin(
-      careReceiverId: auth.userId ?? AppConstants.demoUserId,
+      careReceiverId: auth.userId ?? 'care-receiver-001',
       status: status,
     );
 

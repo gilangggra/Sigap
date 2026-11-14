@@ -307,16 +307,65 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: AppDimensions.spaceSM),
+                // Ringkasan Data Medis Darurat Instan untuk Responder
+                AppCard(
+                  padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                  backgroundColor: AppColors.mintSurface,
+                  border: Border.all(color: AppColors.primaryTeal.withValues(alpha: 0.3)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.medical_services_rounded, color: AppColors.primaryTealDark, size: 20.0),
+                          const SizedBox(width: AppDimensions.spaceSM),
+                          Text(
+                            'Informasi Medis Vital Korban',
+                            style: AppTypography.standardTitle(color: AppColors.primaryTealDeep),
+                          ),
+                          const Spacer(),
+                          AppBadge.danger('Gol. Darah O+', isSmall: true),
+                        ],
+                      ),
+                      const SizedBox(height: AppDimensions.spaceSM),
+                      const Divider(color: AppColors.lightBorder),
+                      const SizedBox(height: AppDimensions.spaceXS),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Alergi Obat:', style: AppTypography.standardCaption(color: AppColors.textDarkTertiary)),
+                                Text('Penisilin (Reaksi Gatal/Sesak)', style: AppTypography.standardBody(color: AppColors.emergencyRed).copyWith(fontWeight: FontWeight.bold, fontSize: 13.0)),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Penyakit Kronis:', style: AppTypography.standardCaption(color: AppColors.textDarkTertiary)),
+                                Text('Hipertensi Tahap 2', style: AppTypography.standardBody(color: AppColors.textDarkPrimary).copyWith(fontSize: 13.0)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spaceSM),
                 AccessibleButton(
-                  label: 'Lihat Data Medis (ICE Card 2 Jam)',
+                  label: 'Lihat Detail Kartu Medis Lengkap (ICE)',
                   onPressed: () => context.push(
                     '/emergency/ice-card-view',
                     extra: 'EMERGENCY-TOKEN-${widget.incident.id}',
                   ),
-                  backgroundColor: AppColors.mintSurface,
+                  backgroundColor: AppColors.cardWhite,
                   borderColor: AppColors.lightBorder,
                   textColor: AppColors.primaryTealDark,
-                  icon: Icons.medical_services_outlined,
+                  icon: Icons.badge_outlined,
                   isSimplified: false,
                 ),
                 const SizedBox(height: AppDimensions.spaceSM),

@@ -32,6 +32,9 @@ class UserProfile {
     required this.updatedAt,
   });
 
+  bool get isCivicAdmin => role.isCivicAdmin;
+  bool get isCareReceiver => role.isCareReceiver;
+
   /// Factory untuk membuat UserProfile dari JSON / Map Supabase
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(

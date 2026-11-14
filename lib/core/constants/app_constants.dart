@@ -1,18 +1,24 @@
 /// Peran pengguna dalam ekosistem SIGAP
 enum UserRole {
-  careReceiver('care_receiver', 'Penerima Bantuan / Lansia'),
-  guardian('guardian', 'Keluarga / Wali'),
-  responder('responder', 'Relawan Warga'),
+  careReceiver('care_receiver', 'Mode Khusus Lansia'),
+  resident('resident', 'Warga Siaga Lingkungan'),
+  // Nilai warisan (legacy) untuk kompatibilitas data Supabase
+  guardian('guardian', 'Warga Siaga (Keluarga)'),
+  responder('responder', 'Warga Siaga (Relawan)'),
   civicAdmin('civic_admin', 'Pengurus RT/RW');
 
   final String value;
   final String label;
   const UserRole(this.value, this.label);
 
+  bool get isCareReceiver => this == UserRole.careReceiver;
+  bool get isResident => this != UserRole.careReceiver;
+  bool get isCivicAdmin => this == UserRole.civicAdmin;
+
   static UserRole fromString(String value) {
     return UserRole.values.firstWhere(
       (element) => element.value == value,
-      orElse: () => UserRole.careReceiver,
+      orElse: () => UserRole.resident,
     );
   }
 }

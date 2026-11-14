@@ -60,11 +60,10 @@ class _SplashScreenState extends State<SplashScreen> {
       case UserRole.careReceiver:
         context.go('/care-receiver');
         break;
+      case UserRole.resident:
       case UserRole.responder:
-        context.go('/responder');
-        break;
       case UserRole.guardian:
-        context.go('/guardian');
+        context.go('/resident');
         break;
       case UserRole.civicAdmin:
         context.go('/admin');
