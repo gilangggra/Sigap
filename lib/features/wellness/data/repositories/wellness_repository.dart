@@ -292,5 +292,53 @@ class WellnessRepository {
       }
     }
   }
+
+  /// 6. Menambahkan jadwal resep obat baru oleh keluarga/wali
+  Future<MedicationSchedule> addMedicationSchedule({
+    required String careReceiverId,
+    required String medicationName,
+    required String dosage,
+    required List<String> reminderTimes,
+    String? createdBy,
+  }) async {
+    final creatorId = createdBy ?? _supabaseService.currentUser?.id ?? careReceiverId;
+    final newSchedule = MedicationSchedule(
+      id: 'med-${DateTime.now().millisecondsSinceEpoch}',
+      careReceiverId: careReceiverId,
+      createdBy: creatorId,
+      medicationName: medicationName,
+      dosage: dosage,
+      reminderTimes: reminderTimes,
+      isActive: true,
+      isTakenToday: false,
+    );
+
+    // 1. Simpan ke cache lokal
+    final currentList = await _localCacheService.getMedicationSchedules(careReceiverId) ?? <MedicationSchedule>[];
+    final updatedList = [...currentList, newSchedule];
+    await _localCacheService.saveMedicationSchedules(careReceiverId, updatedList);
+
+    // 2. Simpan ke Supabase jika online dan valid
+    if (_supabaseService.isInitialized &&
+        _supabaseService.currentUser != null &&
+        AppConstants.isValidUuid(careReceiverId) &&
+        careReceiverId != AppConstants.demoUserId) {
+      try {
+        await _client.from('medication_schedules').insert({
+          'care_receiver_id': careReceiverId,
+          'medication_name': medicationName,
+          'dosage': dosage,
+          'reminder_times': reminderTimes,
+          'is_active': true,
+        });
+      } catch (e) {
+        if (kDebugMode) {
+          print('⚠️ [WellnessRepository] Gagal menyimpan jadwal obat ke cloud, tetap aman di lokal: $e');
+        }
+      }
+    }
+
+    return newSchedule;
+  }
 }
 

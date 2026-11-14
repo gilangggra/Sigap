@@ -95,5 +95,36 @@ class WellnessProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  /// 4. Menambahkan jadwal resep obat baru oleh keluarga
+  Future<bool> addMedicationSchedule({
+    required String careReceiverId,
+    required String medicationName,
+    required String dosage,
+    required List<String> reminderTimes,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final newSchedule = await _repository.addMedicationSchedule(
+        careReceiverId: careReceiverId,
+        medicationName: medicationName,
+        dosage: dosage,
+        reminderTimes: reminderTimes,
+      );
+
+      _medicationSchedules = [..._medicationSchedules, newSchedule];
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
 }
 

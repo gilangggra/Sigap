@@ -108,6 +108,116 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
     return '$hour:$minute WIB';
   }
 
+  void _showAddMedicationSheet(BuildContext context) {
+    final nameCtrl = TextEditingController();
+    final dosageCtrl = TextEditingController(text: '1 tablet sesudah makan');
+    final timeCtrl = TextEditingController(text: '08:00');
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusLG)),
+      ),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: AppDimensions.spaceMD,
+            right: AppDimensions.spaceMD,
+            top: AppDimensions.spaceMD,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + AppDimensions.spaceMD,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Atur Jadwal Obat Orang Tua',
+                    style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20.0),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2.0),
+              Text(
+                'Jadwal obat ini akan langsung muncul di HP orang tua dengan tombol konfirmasi satu sentuhan.',
+                style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+              ),
+              const SizedBox(height: AppDimensions.spaceMD),
+              TextField(
+                controller: nameCtrl,
+                style: const TextStyle(fontSize: 14.0, color: AppColors.textDarkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Nama Obat',
+                  hintText: 'Contoh: Amlodipine 5mg',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spaceSM),
+              TextField(
+                controller: dosageCtrl,
+                style: const TextStyle(fontSize: 14.0, color: AppColors.textDarkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Dosis / Aturan Pakai',
+                  hintText: 'Contoh: 1 tablet setelah sarapan pagi',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spaceSM),
+              TextField(
+                controller: timeCtrl,
+                style: const TextStyle(fontSize: 14.0, color: AppColors.textDarkPrimary),
+                decoration: InputDecoration(
+                  labelText: 'Jam Pengingat (WIB)',
+                  hintText: 'Contoh: 08:00',
+                  suffixIcon: const Icon(Icons.access_time_rounded),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
+                ),
+              ),
+              const SizedBox(height: AppDimensions.spaceMD),
+              AccessibleButton(
+                label: 'Simpan Jadwal Obat',
+                onPressed: () async {
+                  if (nameCtrl.text.trim().isEmpty) return;
+                  final messenger = ScaffoldMessenger.of(context);
+                  final wellness = context.read<WellnessProvider>();
+                  Navigator.of(ctx).pop();
+
+                  final success = await wellness.addMedicationSchedule(
+                    careReceiverId: _defaultMonitoredId,
+                    medicationName: nameCtrl.text.trim(),
+                    dosage: dosageCtrl.text.trim(),
+                    reminderTimes: [timeCtrl.text.trim()],
+                  );
+                  if (mounted && success) {
+                    unawaited(FeedbackService.instance.triggerSuccessFeedback());
+                    messenger.showSnackBar(
+                      const SnackBar(
+                        backgroundColor: AppColors.safeGreenDark,
+                        behavior: SnackBarBehavior.floating,
+                        content: Text('Jadwal obat berhasil ditambahkan dan tersinkron ke HP orang tua.'),
+                      ),
+                    );
+                  }
+                },
+                backgroundColor: AppColors.primaryTeal,
+                icon: Icons.check_rounded,
+                isSimplified: false,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final emergencyProvider = context.watch<EmergencyProvider>();
@@ -708,8 +818,8 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
                       AppSectionHeader(
                         title: 'Jadwal & Kepatuhan Obat',
                         subtitle: 'Pantau riwayat obat harian Ibu Aminah',
-                        actionLabel: 'Kelola Resep',
-                        onActionTap: () => context.push('/profile/ice-card'),
+                        actionLabel: '+ Tambah Resep',
+                        onActionTap: () => _showAddMedicationSheet(context),
                       ),
                       const SizedBox(height: AppDimensions.spaceSM),
 
@@ -719,7 +829,7 @@ class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
                           title: 'Belum Ada Jadwal Obat',
                           description: 'Tambahkan jadwal obat harian untuk memantau kepatuhan minum obat orang tua.',
                           actionLabel: 'Tambah Resep Obat',
-                          onActionPressed: () => context.push('/profile/ice-card'),
+                          onActionPressed: () => _showAddMedicationSheet(context),
                         ),
                       ] else ...[
                         ...wellness.medicationSchedules.map((schedule) {
