@@ -2,17 +2,17 @@
 /// dengan standar mobile modern yang konsisten dan aksesibel untuk seluruh pengguna SIGAP.
 abstract final class AppDimensions {
   // --- Target Sentuh Aksesibilitas (Touch Targets) ---
-  /// Target sentuh minimum mutlak untuk tombol lansia (min 64dp)
-  static const double seniorMinTouchTarget = 64.0;
+  /// Target sentuh standar mobile proporsional & rapi (50dp)
+  static const double seniorMinTouchTarget = 50.0;
 
-  /// Target sentuh yang direkomendasikan untuk mode care-receiver (72x72dp)
-  static const double seniorRecommendedTouchTarget = 72.0;
+  /// Target sentuh nyaman / medium untuk mode tindakan utama (56dp)
+  static const double seniorRecommendedTouchTarget = 56.0;
 
-  /// Ukuran tombol SOS utama (PRD F1.1 mensyaratkan minimum 120x120dp)
-  static const double sosButtonSize = 120.0;
+  /// Ukuran tombol SOS utama yang proporsional dan elegan (128x128dp)
+  static const double sosButtonSize = 128.0;
 
   /// Ukuran ikon pada tombol SOS utama
-  static const double sosIconSize = 56.0;
+  static const double sosIconSize = 40.0;
 
   /// Target sentuh standar mobile Material/iOS (48dp)
   static const double standardMinTouchTarget = 48.0;

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
@@ -32,7 +33,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
 
   void _claimTask(TaskItem task) async {
     final auth = context.read<AuthProvider>();
-    final responderId = auth.userId ?? 'resp-001';
+    final responderId = auth.userId ?? AppConstants.demoUserId;
     final responderName = auth.fullName ?? 'Relawan SIGAP';
 
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
@@ -69,7 +70,7 @@ class _TaskBoardScreenState extends State<TaskBoardScreen> {
 
   void _finishTask(TaskItem task) async {
     final auth = context.read<AuthProvider>();
-    final responderId = auth.userId ?? 'resp-001';
+    final responderId = auth.userId ?? AppConstants.demoUserId;
 
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
 

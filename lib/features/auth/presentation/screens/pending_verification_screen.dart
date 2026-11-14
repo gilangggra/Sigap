@@ -119,25 +119,25 @@ class _PendingVerificationScreenState extends State<PendingVerificationScreen> {
               // Ikon Status Jam Pasir Lembut
               Center(
                 child: Container(
-                  width: 80.0,
-                  height: 80.0,
+                  width: 56.0,
+                  height: 56.0,
                   decoration: BoxDecoration(
                     color: AppColors.warningAmber.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.warningAmber.withValues(alpha: 0.4),
-                      width: 2.0,
+                      color: AppColors.warningAmber.withValues(alpha: 0.35),
+                      width: 1.5,
                     ),
                   ),
                   child: const Icon(
                     Icons.hourglass_top_rounded,
                     color: AppColors.warningAmber,
-                    size: 40.0,
+                    size: 28.0,
                   ),
                 ),
               ),
 
-              const SizedBox(height: AppDimensions.spaceLG),
+              const SizedBox(height: AppDimensions.spaceMD),
 
               Text(
                 'Pendaftaran Sedang Ditinjau',
@@ -209,24 +209,24 @@ class _PendingVerificationScreenState extends State<PendingVerificationScreen> {
                 ),
               ),
 
-              const SizedBox(height: AppDimensions.space2XL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Tombol Periksa Status
               AccessibleButton(
                 label: _isChecking ? 'Memeriksa...' : 'Periksa Status Persetujuan',
                 onPressed: _isChecking ? null : _checkVerificationStatus,
-                isSimplified: true,
+                isSimplified: false,
                 backgroundColor: AppColors.primaryTeal,
                 icon: Icons.refresh_rounded,
               ),
 
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               // Tombol Demo Langsung Setuju
               AccessibleButton(
                 label: 'Simulasikan Persetujuan (Demo)',
                 onPressed: _simulateImmediateApproval,
-                isSimplified: true,
+                isSimplified: false,
                 isSecondary: true,
                 icon: Icons.verified_user_rounded,
               ),

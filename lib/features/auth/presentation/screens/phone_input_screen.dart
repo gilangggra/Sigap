@@ -164,7 +164,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               AccessibleButton(
                 label: _isLoading ? 'Mengirim Kode...' : 'Kirim Kode Verifikasi',
                 onPressed: _isLoading ? null : _handleSendOtp,
-                isSimplified: true,
+                isSimplified: false,
                 backgroundColor: AppColors.primaryTeal,
                 icon: Icons.sms_outlined,
               ),
@@ -172,7 +172,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
               AccessibleButton(
                 label: 'Lanjutkan Sebagai Tamu / Demo',
                 onPressed: () => context.push('/auth/role'),
-                isSimplified: true,
+                isSimplified: false,
                 isSecondary: true,
                 backgroundColor: AppColors.cardWhite,
                 borderColor: AppColors.lightBorder,

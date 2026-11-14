@@ -65,7 +65,10 @@ class AccessibleButton extends StatelessWidget {
         : BorderSide.none;
 
     final TextStyle textStyle = isSimplified
-        ? AppTypography.seniorButtonLabel(color: effectiveText)
+        ? AppTypography.standardButtonLabel(color: effectiveText).copyWith(
+            fontSize: 16.0,
+            fontWeight: FontWeight.w600,
+          )
         : AppTypography.standardButtonLabel(color: effectiveText);
 
     return Semantics(
@@ -93,8 +96,8 @@ class AccessibleButton extends StatelessWidget {
               minWidth: double.infinity,
             ),
             padding: EdgeInsets.symmetric(
-              horizontal: isSimplified ? AppDimensions.spaceLG : AppDimensions.spaceMD,
-              vertical: isSimplified ? AppDimensions.spaceMD : AppDimensions.spaceSM,
+              horizontal: AppDimensions.spaceMD,
+              vertical: isSimplified ? 12.0 : 10.0,
             ),
             alignment: Alignment.center,
             child: Row(
@@ -105,10 +108,10 @@ class AccessibleButton extends StatelessWidget {
                   Icon(
                     icon,
                     color: effectiveText,
-                    size: isSimplified ? 26.0 : 20.0,
+                    size: isSimplified ? 22.0 : 19.0,
                   ),
-                  SizedBox(
-                    width: isSimplified ? AppDimensions.spaceMD : AppDimensions.spaceSM,
+                  const SizedBox(
+                    width: 8.0,
                   ),
                 ],
                 Flexible(

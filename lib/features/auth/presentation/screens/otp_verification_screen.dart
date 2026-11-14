@@ -96,7 +96,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 'Kode verifikasi telah dikirim melalui SMS ke ${widget.phoneNumber}.',
                 style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
               ),
-              const SizedBox(height: AppDimensions.spaceXL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Kartu Input OTP
               Container(
@@ -107,19 +107,19 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     color: _errorMessage != null
                         ? AppColors.emergencyRed
                         : AppColors.lightBorder,
-                    width: 1.5,
+                    width: 1.0,
                   ),
                   boxShadow: const [
                     BoxShadow(
                       color: AppColors.cardShadow,
-                      blurRadius: 8.0,
-                      offset: Offset(0, 2),
+                      blurRadius: 6.0,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spaceLG,
-                  vertical: AppDimensions.spaceLG,
+                  horizontal: AppDimensions.spaceMD,
+                  vertical: 12.0,
                 ),
                 child: TextField(
                   controller: _otpController,
@@ -128,16 +128,16 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     color: AppColors.textDarkPrimary,
-                    fontSize: 30.0,
-                    letterSpacing: 10.0,
+                    fontSize: 22.0,
+                    letterSpacing: 8.0,
                     fontWeight: FontWeight.bold,
                   ),
                   decoration: InputDecoration(
                     hintText: '------',
                     hintStyle: GoogleFonts.poppins(
                       color: AppColors.textDarkTertiary,
-                      letterSpacing: 10.0,
-                      fontSize: 30.0,
+                      letterSpacing: 8.0,
+                      fontSize: 22.0,
                     ),
                     counterText: '',
                     border: InputBorder.none,
@@ -182,18 +182,18 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 ),
               ],
 
-              const SizedBox(height: AppDimensions.space2XL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Tombol Verifikasi Utama
               AccessibleButton(
                 label: _isLoading ? 'Memverifikasi...' : 'Verifikasi & Lanjutkan',
                 onPressed: _isLoading ? null : _verifyOtp,
-                isSimplified: true,
+                isSimplified: false,
                 backgroundColor: AppColors.primaryTeal,
                 icon: Icons.check_circle_outline_rounded,
               ),
 
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               // Tombol Kirim Ulang OTP
               AccessibleButton(
@@ -206,7 +206,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     ),
                   );
                 },
-                isSimplified: true,
+                isSimplified: false,
                 isSecondary: true,
                 icon: Icons.sms_outlined,
               ),

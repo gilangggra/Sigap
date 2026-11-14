@@ -64,7 +64,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
   Future<void> _claimIncident(Incident incident) async {
     final authProvider = context.read<AuthProvider>();
     final emergencyProvider = context.read<EmergencyProvider>();
-    final responderId = authProvider.userId ?? 'responder-001';
+    final responderId = authProvider.userId ?? AppConstants.demoUserId;
 
     setState(() => _isClaiming = true);
     await FeedbackService.instance.triggerSuccessFeedback();
@@ -367,7 +367,7 @@ class _ResponderHomeScreenState extends State<ResponderHomeScreen> {
                               AccessibleButton(
                                 label: 'Lihat Data Medis (ICE Card 2 Jam)',
                                 onPressed: () => context.push(
-                                  '/profile/ice-card-view',
+                                  '/emergency/ice-card-view',
                                   extra: 'EMERGENCY-TOKEN-${inc.id}',
                                 ),
                                 backgroundColor: AppColors.mintSurface,

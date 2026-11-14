@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
@@ -45,7 +46,7 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
   Future<void> _loadExistingIceCard() async {
     final authProvider = context.read<AuthProvider>();
     final profileProvider = context.read<ProfileProvider>();
-    final careReceiverId = authProvider.userId ?? 'care-receiver-default';
+    final careReceiverId = authProvider.userId ?? AppConstants.demoUserId;
 
     await profileProvider.loadIceCard(careReceiverId);
     final card = profileProvider.iceCard;
@@ -79,7 +80,7 @@ class _IceCardFormScreenState extends State<IceCardFormScreen> {
 
     final authProvider = context.read<AuthProvider>();
     final profileProvider = context.read<ProfileProvider>();
-    final careReceiverId = authProvider.userId ?? 'care-receiver-default';
+    final careReceiverId = authProvider.userId ?? AppConstants.demoUserId;
 
     final allergiesList = _allergiesController.text
         .split(',')

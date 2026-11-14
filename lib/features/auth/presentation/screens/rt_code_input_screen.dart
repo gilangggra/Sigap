@@ -96,7 +96,7 @@ class _RtCodeInputScreenState extends State<RtCodeInputScreen> {
                 'Kode unik ini diperoleh dari Pengurus RT setempat untuk memastikan Anda adalah warga yang terdaftar.',
                 style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
               ),
-              const SizedBox(height: AppDimensions.spaceXL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Kartu Input Kode RT
               Container(
@@ -107,19 +107,19 @@ class _RtCodeInputScreenState extends State<RtCodeInputScreen> {
                     color: _errorMessage != null
                         ? AppColors.emergencyRed
                         : AppColors.lightBorder,
-                    width: 1.5,
+                    width: 1.0,
                   ),
                   boxShadow: const [
                     BoxShadow(
                       color: AppColors.cardShadow,
-                      blurRadius: 8.0,
-                      offset: Offset(0, 2),
+                      blurRadius: 6.0,
+                      offset: Offset(0, 1),
                     ),
                   ],
                 ),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppDimensions.spaceLG,
-                  vertical: AppDimensions.spaceMD,
+                  horizontal: AppDimensions.spaceMD,
+                  vertical: 10.0,
                 ),
                 child: TextField(
                   controller: _codeController,
@@ -127,16 +127,16 @@ class _RtCodeInputScreenState extends State<RtCodeInputScreen> {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.poppins(
                     color: AppColors.textDarkPrimary,
-                    fontSize: 22.0,
+                    fontSize: 18.0,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 3.0,
+                    letterSpacing: 2.5,
                   ),
                   decoration: InputDecoration(
                     hintText: 'SIGAP-RTXX-XX',
                     hintStyle: GoogleFonts.poppins(
                       color: AppColors.textDarkTertiary,
                       letterSpacing: 2.0,
-                      fontSize: 18.0,
+                      fontSize: 16.0,
                     ),
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -236,13 +236,13 @@ class _RtCodeInputScreenState extends State<RtCodeInputScreen> {
                 ),
               ),
 
-              const SizedBox(height: AppDimensions.space2XL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Tombol Aksi Utama
               AccessibleButton(
                 label: _isLoading ? 'Memverifikasi Lingkungan...' : 'Gabung Lingkungan RT',
                 onPressed: _isLoading ? null : _handleValidateCode,
-                isSimplified: true,
+                isSimplified: false,
                 backgroundColor: AppColors.primaryTeal,
                 icon: Icons.domain_rounded,
               ),

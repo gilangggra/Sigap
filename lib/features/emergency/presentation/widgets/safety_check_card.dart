@@ -67,7 +67,7 @@ class SafetyCheckCard extends StatelessWidget {
                         children: [
                           Text(
                             'Cek Perjalanan Aman',
-                            style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                            style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                           ),
                           Text(
                             'Atur waktu pengawasan saat jalan pagi atau ke masjid.',
@@ -80,7 +80,7 @@ class SafetyCheckCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppDimensions.spaceMD),
                 AccessibleButton(
-                  label: 'MULAI PERJALANAN AMAN',
+                  label: 'Mulai Perjalanan Aman',
                   onPressed: () {
                     unawaited(FeedbackService.instance.triggerSuccessFeedback());
                     showDialog<void>(
@@ -93,7 +93,7 @@ class SafetyCheckCard extends StatelessWidget {
                   backgroundColor: AppColors.primaryTealLight,
                   borderColor: AppColors.primaryTeal,
                   textColor: AppColors.primaryTealDeep,
-                  customHeight: 64.0,
+                  customHeight: 48.0,
                   icon: Icons.timer_outlined,
                 ),
               ],
@@ -169,9 +169,9 @@ class SafetyCheckCard extends StatelessWidget {
                           color: status == SafetyCheckStatus.preAlarmTriggered
                               ? AppColors.emergencyRed
                               : AppColors.textDarkPrimary,
-                          fontSize: 40.0,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.0,
+                          fontSize: 28.0,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
                         ),
                       ),
                       Text(
@@ -189,9 +189,9 @@ class SafetyCheckCard extends StatelessWidget {
               ),
               const SizedBox(height: AppDimensions.spaceMD),
 
-              // Tombol Konfirmasi Tiba (Target Sentuh Utama: 72dp)
+              // Tombol Konfirmasi Tiba
               AccessibleButton(
-                label: 'SAYA SUDAH SAMPAI (AMAN)',
+                label: 'Saya Sudah Sampai (Aman)',
                 onPressed: () {
                   safetyService.confirmSafe();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -202,7 +202,7 @@ class SafetyCheckCard extends StatelessWidget {
                   );
                 },
                 backgroundColor: AppColors.safeGreen,
-                customHeight: 72.0,
+                customHeight: 50.0,
                 icon: Icons.check_circle_rounded,
               ),
               const SizedBox(height: AppDimensions.spaceSM),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
@@ -42,8 +43,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
 
     final auth = context.read<AuthProvider>();
-    final userId = auth.userId ?? 'care-receiver-001';
+    final userId = auth.userId ?? AppConstants.demoUserId;
     final userName = auth.fullName ?? 'Ibu Aminah (71 thn)';
+    final rtAreaId = auth.rtArea?.id ?? AppConstants.demoRtAreaId;
 
     final success = await context.read<TaskProvider>().createTask(
       createdBy: userId,
@@ -53,7 +55,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       description: _descriptionController.text.trim(),
       destinationAddress: _addressController.text.trim(),
       neededBefore: _neededBefore,
-      rtAreaId: 'rt-001',
+      rtAreaId: rtAreaId,
     );
 
     setState(() => _isSubmitting = false);

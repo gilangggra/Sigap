@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -152,7 +153,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
 
     final auth = context.read<AuthProvider>();
     context.read<WellnessProvider>().submitCheckin(
-      careReceiverId: auth.userId ?? 'care-receiver-001',
+      careReceiverId: auth.userId ?? AppConstants.demoUserId,
       status: status,
     );
 
@@ -300,23 +301,26 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                       // =============================================================
                       AppCard(
                         padding: const EdgeInsets.symmetric(
-                          vertical: AppDimensions.spaceXL,
+                          vertical: AppDimensions.spaceMD,
                           horizontal: AppDimensions.spaceMD,
                         ),
                         child: Column(
                           children: [
                             Text(
                               'PANGGILAN BANTUAN DARURAT',
-                              style: AppTypography.seniorTitle(color: AppColors.emergencyRed),
+                              style: AppTypography.standardHeadline(color: AppColors.emergencyRed).copyWith(
+                                fontSize: 16.0,
+                                letterSpacing: 0.5,
+                              ),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: AppDimensions.spaceXS),
+                            const SizedBox(height: 2.0),
                             Text(
                               'Tekan tombol satu kali jika butuh pertolongan cepat',
                               style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                               textAlign: TextAlign.center,
                             ),
-                            const SizedBox(height: AppDimensions.spaceLG),
+                            const SizedBox(height: AppDimensions.spaceMD),
                             Semantics(
                               button: true,
                               label: 'Tombol Darurat SOS, tekan untuk memanggil bantuan',
@@ -336,24 +340,24 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                                       }
                                     : _triggerSosCountdown,
                                 child: Container(
-                                  width: 172.0,
-                                  height: 172.0,
+                                  width: 136.0,
+                                  height: 136.0,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: AppColors.emergencyRedWash,
                                   ),
                                   alignment: Alignment.center,
                                   child: Container(
-                                    width: 144.0,
-                                    height: 144.0,
+                                    width: 114.0,
+                                    height: 114.0,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: AppColors.emergencyRed.withValues(alpha: 0.12),
                                     ),
                                     alignment: Alignment.center,
                                     child: Container(
-                                      width: 118.0,
-                                      height: 118.0,
+                                      width: 94.0,
+                                      height: 94.0,
                                       decoration: const BoxDecoration(
                                         gradient: AppGradients.emergency,
                                         shape: BoxShape.circle,
@@ -366,11 +370,16 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                                           const Icon(
                                             Icons.sos_rounded,
                                             color: Colors.white,
-                                            size: 46.0,
+                                            size: 34.0,
                                           ),
                                           Text(
                                             'SOS',
-                                            style: AppTypography.seniorSosLabel(),
+                                            style: GoogleFonts.poppins(
+                                              color: Colors.white,
+                                              fontSize: 18.0,
+                                              fontWeight: FontWeight.w800,
+                                              letterSpacing: 1.0,
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -543,7 +552,7 @@ class _CareReceiverHomeScreenState extends State<CareReceiverHomeScreen> {
                               final authUser = context.read<AuthProvider>();
                               context.read<WellnessProvider>().markMedicationTaken(
                                 scheduleId: med.id,
-                                careReceiverId: authUser.userId ?? 'care-receiver-001',
+                                careReceiverId: authUser.userId ?? AppConstants.demoUserId,
                               );
                               unawaited(FeedbackService.instance.triggerSuccessFeedback());
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -629,13 +638,13 @@ class _CheckinOptionCard extends StatelessWidget {
       onTap: onTap,
       padding: const EdgeInsets.symmetric(
         horizontal: AppDimensions.spaceMD,
-        vertical: AppDimensions.spaceMD,
+        vertical: 10.0,
       ),
       child: Row(
         children: [
           Container(
-            width: 44.0,
-            height: 44.0,
+            width: 38.0,
+            height: 38.0,
             decoration: BoxDecoration(
               color: isSelected ? AppColors.primaryTealLight : AppColors.mintSurface,
               shape: BoxShape.circle,
@@ -643,20 +652,20 @@ class _CheckinOptionCard extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               status.emoji,
-              style: const TextStyle(fontSize: 24.0),
+              style: const TextStyle(fontSize: 20.0),
             ),
           ),
           const SizedBox(width: AppDimensions.spaceMD),
           Expanded(
             child: Text(
               status.label,
-              style: AppTypography.seniorTitle(
+              style: AppTypography.standardTitle(
                 color: isSelected ? AppColors.primaryTealDeep : AppColors.textDarkPrimary,
               ),
             ),
           ),
           if (isSelected)
-            const Icon(Icons.check_circle_rounded, color: AppColors.primaryTeal, size: 24.0),
+            const Icon(Icons.check_circle_rounded, color: AppColors.primaryTeal, size: 20.0),
         ],
       ),
     );
@@ -757,7 +766,7 @@ class _SeniorMedicationCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
                   color: isTaken ? AppColors.safeGreenWash : AppColors.primaryTealLight,
                   shape: BoxShape.circle,
@@ -765,7 +774,7 @@ class _SeniorMedicationCard extends StatelessWidget {
                 child: Icon(
                   isTaken ? Icons.check_circle_rounded : Icons.medication_rounded,
                   color: isTaken ? AppColors.safeGreenDark : AppColors.primaryTealDark,
-                  size: 24.0,
+                  size: 20.0,
                 ),
               ),
               const SizedBox(width: AppDimensions.spaceMD),
@@ -775,11 +784,11 @@ class _SeniorMedicationCard extends StatelessWidget {
                   children: [
                     Text(
                       scheduleName,
-                      style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
+                      style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                     ),
                     Text(
                       '$dosage • Jam $reminderTime WIB',
-                      style: AppTypography.seniorBodySecondary(color: AppColors.textDarkSecondary),
+                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                     ),
                   ],
                 ),
@@ -792,7 +801,7 @@ class _SeniorMedicationCard extends StatelessWidget {
           AccessibleButton(
             label: isTaken ? 'Sudah Diminum ✓' : 'Saya Sudah Minum Obat Ini',
             onPressed: isTaken ? null : onTake,
-            isSimplified: true,
+            isSimplified: false,
             backgroundColor: isTaken ? AppColors.mintSurface : AppColors.primaryTeal,
             textColor: isTaken ? AppColors.textDarkTertiary : Colors.white,
             icon: isTaken ? Icons.done_all_rounded : Icons.check_rounded,

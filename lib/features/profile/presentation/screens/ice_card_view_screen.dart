@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_decorations.dart';
@@ -44,11 +45,11 @@ class _IceCardViewScreenState extends State<IceCardViewScreen> {
     final authProvider = context.read<AuthProvider>();
 
     if (widget.isSelfView) {
-      final careReceiverId = authProvider.userId ?? 'care-receiver-default';
+      final careReceiverId = authProvider.userId ?? AppConstants.demoUserId;
       await profileProvider.loadIceCard(careReceiverId);
     } else {
       final token = widget.emergencyToken ?? 'DEMO-EMERGENCY-TOKEN';
-      final responderId = authProvider.userId ?? 'responder-001';
+      final responderId = authProvider.userId ?? AppConstants.demoUserId;
 
       await profileProvider.accessEmergencyIceCard(
         token: token,

@@ -135,7 +135,7 @@ class ProfileScreen extends StatelessWidget {
                             style: AppTypography.standardTitle(color: AppColors.textDarkPrimary),
                           ),
                           Text(
-                            'Tombol lebih besar (min 72dp) dan teks diperbesar.',
+                            'Tombol ramah lansia (56dp) dan teks diperbesar.',
                             style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                           ),
                         ],

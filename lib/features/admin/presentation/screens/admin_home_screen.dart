@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -8,11 +9,12 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../shared/components/components.dart';
 import '../../../auth/data/repositories/auth_repository.dart';
 
 /// Halaman Dasbor Pengurus RT/RW (Civic Admin Dashboard)
 /// Menampilkan manajemen kode undangan RT 30 hari, validasi identitas warga baru,
-/// dan rekap status kesiapsiagaan lingkungan.
+/// dan rekap status kesiapsiagaan lingkungan dengan tata letak standar mobile yang rapi.
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
 
@@ -63,6 +65,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: isApproved ? AppColors.safeGreenDark : AppColors.emergencyRedDark,
+        behavior: SnackBarBehavior.floating,
         content: Text(
           isApproved
               ? 'Akun $name berhasil diverifikasi sebagai warga sah RT 03.'
@@ -76,7 +79,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     unawaited(FeedbackService.instance.triggerSuccessFeedback());
     final String newCode = 'SIGAP-RT03-${DateTime.now().minute}${DateTime.now().second}';
     final authProvider = context.read<AuthProvider>();
-    final String rtAreaId = authProvider.rtAreaId ?? '00000000-0000-0000-0000-000000000001';
+    final String rtAreaId = authProvider.rtAreaId ?? AppConstants.demoRtAreaId;
 
     unawaited(_authRepository.refreshRtInviteCode(
       rtAreaId: rtAreaId,
@@ -90,6 +93,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.roleAdmin,
+        behavior: SnackBarBehavior.floating,
         content: Text('Kode undangan RT diperbarui: $_rtInviteCode (Berlaku 30 hari)'),
       ),
     );
@@ -98,9 +102,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('SIGAP — Pengurus RT 03'),
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.person_outline_rounded),
@@ -116,18 +121,16 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spaceMD),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceSM,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Kartu Kode Undangan RT
-              Container(
-                decoration: BoxDecoration(
-                  color: AppColors.darkCard,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-                  border: Border.all(color: AppColors.roleAdmin, width: 2.0),
-                ),
-                padding: const EdgeInsets.all(AppDimensions.spaceLG),
+              AppCard(
+                border: Border.all(color: AppColors.roleAdmin.withValues(alpha: 0.3), width: 1.5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -136,15 +139,27 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       children: [
                         Text(
                           'KODE UNDANGAN LINGKUNGAN',
-                          style: AppTypography.standardCaption(color: AppColors.textDarkTertiary),
+                          style: GoogleFonts.poppins(
+                            fontSize: 11.0,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.8,
+                            color: AppColors.textDarkTertiary,
+                          ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: AppColors.safeGreenDark,
-                            borderRadius: BorderRadius.circular(4),
+                            color: AppColors.safeGreenLight,
+                            borderRadius: BorderRadius.circular(AppDimensions.radiusSM),
                           ),
-                          child: const Text('Aktif 30 Hari', style: TextStyle(color: Colors.white, fontSize: 11)),
+                          child: Text(
+                            'Aktif 30 Hari',
+                            style: GoogleFonts.poppins(
+                              color: AppColors.safeGreenDark,
+                              fontSize: 11.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -154,55 +169,48 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         Expanded(
                           child: Text(
                             _rtInviteCode,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 26.0,
+                            style: GoogleFonts.poppins(
+                              color: AppColors.roleAdmin,
+                              fontSize: 22.0,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 2.0,
                             ),
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                          icon: const Icon(Icons.refresh_rounded, color: AppColors.roleAdmin),
                           tooltip: 'Perbarui Kode',
                           onPressed: _refreshInviteCode,
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppDimensions.spaceXS),
+                    const SizedBox(height: 2.0),
                     Text(
                       'Bagikan kode ini kepada warga RT 03 untuk pendaftaran dan verifikasi domisili.',
-                      style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
+                      style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: AppDimensions.spaceXL),
+              const SizedBox(height: AppDimensions.spaceLG),
 
               // Daftar Warga Menunggu Verifikasi
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Menunggu Verifikasi (${_pendingResidents.length})',
-                    style: AppTypography.standardTitle(color: Colors.white),
-                  ),
-                ],
+              AppSectionHeader(
+                title: 'Menunggu Verifikasi (${_pendingResidents.length})',
+                subtitle: 'Tinjau identitas warga yang ingin bergabung ke lingkungan RT',
               ),
-              const SizedBox(height: AppDimensions.spaceMD),
+              const SizedBox(height: AppDimensions.spaceSM),
 
               if (_pendingResidents.isEmpty)
-                Container(
-                  padding: const EdgeInsets.all(AppDimensions.spaceLG),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkCard,
-                    borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Semua warga telah terverifikasi.',
-                      style: TextStyle(color: AppColors.textDarkSecondary),
+                AppCard(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                      child: Text(
+                        'Semua warga telah terverifikasi.',
+                        style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                      ),
                     ),
                   ),
                 )
@@ -211,42 +219,44 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _pendingResidents.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.spaceMD),
+                  separatorBuilder: (_, __) => const SizedBox(height: AppDimensions.spaceSM),
                   itemBuilder: (context, index) {
                     final item = _pendingResidents[index];
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.darkCard,
-                        borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
-                        border: Border.all(color: AppColors.darkBorder),
-                      ),
-                      padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                    return AppCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(item['name']!, style: AppTypography.standardTitle(color: Colors.white)),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.infoBlue.withValues(alpha: 0.2),
-                                  borderRadius: BorderRadius.circular(4),
+                              Text(
+                                item['name']!,
+                                style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary).copyWith(
+                                  fontSize: 16.0,
                                 ),
-                                child: Text(item['role']!, style: const TextStyle(color: AppColors.infoBlueLight, fontSize: 12)),
                               ),
+                              AppBadge.brand(item['role']!, isSmall: true),
                             ],
                           ),
-                          const SizedBox(height: 4),
-                          Text('${item['phone']} • ${item['address']}', style: AppTypography.standardCaption(color: AppColors.textDarkSecondary)),
+                          const SizedBox(height: 2.0),
+                          Text(
+                            '${item['phone']} • ${item['address']}',
+                            style: AppTypography.standardCaption(color: AppColors.textDarkSecondary),
+                          ),
                           const SizedBox(height: AppDimensions.spaceMD),
                           Row(
                             children: [
                               Expanded(
                                 child: OutlinedButton(
                                   onPressed: () => _verifyResident(index, false),
-                                  style: OutlinedButton.styleFrom(foregroundColor: AppColors.emergencyRedLight),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppColors.emergencyRed,
+                                    side: const BorderSide(color: AppColors.emergencyRed),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  ),
                                   child: const Text('Tolak'),
                                 ),
                               ),
@@ -254,7 +264,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               Expanded(
                                 child: ElevatedButton(
                                   onPressed: () => _verifyResident(index, true),
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.safeGreen),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryTeal,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  ),
                                   child: const Text('Verifikasi'),
                                 ),
                               ),

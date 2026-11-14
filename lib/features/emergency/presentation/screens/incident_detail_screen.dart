@@ -9,11 +9,12 @@ import '../../../../core/constants/app_dimensions.dart';
 import '../../../../core/services/feedback_service.dart';
 import '../../../../core/state/auth_provider.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../shared/components/accessible_button.dart';
+import '../../../../shared/components/components.dart';
 import '../../domain/models/incident.dart';
 import '../state/emergency_provider.dart';
 
-/// Halaman Detail Penanganan Insiden Darurat untuk Responder, Guardian, dan Civic Admin
+/// Halaman Detail Penanganan Insiden Darurat untuk Responder, Guardian, dan Civic Admin.
+/// Menggunakan standar tema kesehatan modern, tata letak mobile rapi, dan tipografi Poppins konsisten.
 class IncidentDetailScreen extends StatefulWidget {
   final Incident incident;
 
@@ -55,9 +56,11 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: AppColors.safeGreenDark,
-          content: Text('Anda berhasil mengunci insiden! Peta navigasi diaktifkan.'),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
+          content: const Text('Anda berhasil mengunci insiden! Peta navigasi diaktifkan.'),
         ),
       );
     }
@@ -95,14 +98,14 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          backgroundColor: AppColors.darkCard,
+          backgroundColor: AppColors.cardWhite,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-            side: const BorderSide(color: AppColors.darkBorderHighContrast),
+            side: const BorderSide(color: AppColors.lightBorder),
           ),
           title: Text(
             'Tandai Insiden Selesai',
-            style: AppTypography.seniorTitle(color: Colors.white),
+            style: AppTypography.standardHeadline(color: AppColors.textDarkPrimary),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -116,11 +119,18 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
               TextField(
                 controller: _notesController,
                 maxLines: 3,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
+                style: const TextStyle(color: AppColors.textDarkPrimary, fontSize: 14.0),
+                decoration: InputDecoration(
                   hintText: 'Contoh: Korban telah dibawa ke Puskesmas didampingi keluarga...',
-                  hintStyle: TextStyle(color: AppColors.textDarkTertiary),
-                  border: OutlineInputBorder(),
+                  hintStyle: const TextStyle(color: AppColors.textDarkTertiary, fontSize: 13.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                    borderSide: const BorderSide(color: AppColors.lightBorder),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
+                    borderSide: const BorderSide(color: AppColors.primaryTeal, width: 1.5),
+                  ),
                 ),
               ),
             ],
@@ -128,7 +138,7 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Batal', style: TextStyle(color: AppColors.textDarkTertiary)),
+              child: const Text('Batal', style: TextStyle(color: AppColors.textDarkSecondary)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -151,14 +161,20 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
 
                 unawaited(FeedbackService.instance.triggerSuccessFeedback());
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     backgroundColor: AppColors.safeGreenDark,
-                    content: Text('Insiden berhasil ditutup. 50 poin sosial diberikan kepada relawan!'),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
+                    content: const Text('Insiden berhasil ditutup. 50 poin sosial diberikan kepada relawan!'),
                   ),
                 );
                 Navigator.of(context).pop();
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.safeGreen),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.safeGreen,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppDimensions.radiusMD)),
+              ),
               child: const Text('Selesaikan Insiden'),
             ),
           ],
@@ -174,65 +190,54 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
         widget.incident.status == IncidentStatus.responding;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBackground,
+      backgroundColor: AppColors.lightBackground,
       appBar: AppBar(
         title: const Text('Detail Insiden Darurat'),
-        backgroundColor: AppColors.emergencyRedDark,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20.0),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppDimensions.spaceLG),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.spaceMD,
+            vertical: AppDimensions.spaceMD,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // Kartu Status Insiden
-              Container(
-                padding: const EdgeInsets.all(AppDimensions.spaceLG),
-                decoration: BoxDecoration(
-                  color: AppColors.darkCard,
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusLG),
-                  border: Border.all(color: AppColors.emergencyRed, width: 2.0),
-                ),
+              AppCard.emergency(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: AppColors.emergencyRedDark,
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            widget.incident.status.label.toUpperCase(),
-                            style: const TextStyle(color: Colors.white, fontSize: 12.0, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Text(
+                        AppBadge.danger(widget.incident.status.label.toUpperCase(), icon: Icons.emergency_rounded),
+                        const Spacer(),
+                        AppBadge.neutral(
                           widget.incident.gpsApproximate ? 'GPS Perkiraan' : 'GPS Akurat',
-                          style: TextStyle(
-                            color: widget.incident.gpsApproximate ? AppColors.warningAmberLight : AppColors.safeGreenLight,
-                            fontSize: 12.0,
-                          ),
+                          icon: widget.incident.gpsApproximate ? Icons.near_me_outlined : Icons.gps_fixed_rounded,
+                          isSmall: true,
                         ),
                       ],
                     ),
                     const SizedBox(height: AppDimensions.spaceMD),
                     Text(
                       widget.incident.careReceiverName ?? 'Lansia SIGAP',
-                      style: AppTypography.seniorHeadingMedium(color: Colors.white),
+                      style: AppTypography.seniorTitle(color: AppColors.textDarkPrimary),
                     ),
-                    const SizedBox(height: AppDimensions.spaceSM),
+                    const SizedBox(height: AppDimensions.spaceXS),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.location_on_rounded, color: AppColors.emergencyRedLight),
+                        const Icon(Icons.location_on_rounded, color: AppColors.emergencyRed, size: 18.0),
                         const SizedBox(width: AppDimensions.spaceSM),
                         Expanded(
                           child: Text(
                             widget.incident.address ?? 'Koordinat (${widget.incident.latitude}, ${widget.incident.longitude})',
-                            style: AppTypography.seniorBodySecondary(color: Colors.white),
+                            style: AppTypography.standardBody(color: AppColors.textDarkSecondary),
                           ),
                         ),
                       ],
@@ -241,32 +246,36 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                 ),
               ),
 
-              const SizedBox(height: AppDimensions.spaceXL),
+              const SizedBox(height: AppDimensions.spaceMD),
 
-              // Tombol Rute & Kontak
+              // Tombol Rute & Kontak Korban
               Row(
                 children: [
                   Expanded(
                     child: AccessibleButton(
-                      label: 'Buka Peta Navigasi',
+                      label: 'Peta Rute',
                       onPressed: _openGoogleMapsRoute,
-                      backgroundColor: AppColors.infoBlue,
+                      backgroundColor: AppColors.primaryTeal,
+                      textColor: Colors.white,
                       icon: Icons.directions_run_rounded,
+                      isSimplified: false,
                     ),
                   ),
                   const SizedBox(width: AppDimensions.spaceMD),
                   Expanded(
                     child: AccessibleButton(
-                      label: 'Telepon Korban',
+                      label: 'Telepon',
                       onPressed: _callVictim,
-                      backgroundColor: AppColors.safeGreen,
+                      backgroundColor: AppColors.safeGreenDark,
+                      textColor: Colors.white,
                       icon: Icons.phone_rounded,
+                      isSimplified: false,
                     ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: AppDimensions.spaceLG),
+              const SizedBox(height: AppDimensions.spaceMD),
 
               // Tombol Tindakan Kunci Insiden / Data Medis
               if (!isLockedByMe) ...[
@@ -276,10 +285,11 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   backgroundColor: AppColors.emergencyRed,
                   textColor: Colors.white,
                   icon: Icons.flash_on_rounded,
+                  isSimplified: false,
                 ),
               ] else ...[
                 Container(
-                  padding: const EdgeInsets.all(AppDimensions.spaceMD),
+                  padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
                   decoration: BoxDecoration(
                     color: AppColors.safeGreenDark,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusMD),
@@ -287,31 +297,36 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.check_circle_rounded, color: Colors.white),
-                      SizedBox(width: AppDimensions.spaceMD),
+                      Icon(Icons.check_circle_rounded, color: Colors.white, size: 18.0),
+                      SizedBox(width: AppDimensions.spaceSM),
                       Text(
                         'Insiden Sedang Anda Tangani',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16.0),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.0),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceSM),
                 AccessibleButton(
                   label: 'Lihat Data Medis (ICE Card 2 Jam)',
                   onPressed: () => context.push(
                     '/emergency/ice-card-view',
                     extra: 'EMERGENCY-TOKEN-${widget.incident.id}',
                   ),
-                  backgroundColor: AppColors.infoBlueDark,
-                  icon: Icons.medical_services_rounded,
+                  backgroundColor: AppColors.mintSurface,
+                  borderColor: AppColors.lightBorder,
+                  textColor: AppColors.primaryTealDark,
+                  icon: Icons.medical_services_outlined,
+                  isSimplified: false,
                 ),
-                const SizedBox(height: AppDimensions.spaceMD),
+                const SizedBox(height: AppDimensions.spaceSM),
                 AccessibleButton(
                   label: _isResolving ? 'Menyelesaikan...' : 'Tandai Selesai (Resolve)',
                   onPressed: _isResolving ? null : _showResolveDialog,
                   backgroundColor: AppColors.safeGreen,
+                  textColor: Colors.white,
                   icon: Icons.check_circle_outline,
+                  isSimplified: false,
                 ),
               ],
             ],
@@ -321,4 +336,3 @@ class _IncidentDetailScreenState extends State<IncidentDetailScreen> {
     );
   }
 }
-
